@@ -18,7 +18,7 @@ header{background:var(--g);color:#fff;padding:10px 14px;display:flex;align-items
 header b{font-size:18px}
 header small{opacity:.85}
 nav{display:flex;background:var(--g2);position:sticky;top:46px;z-index:4}
-nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px 6px;background:none;border:0;color:#cfe0d3;font-size:12px;font-weight:600;border-bottom:3px solid transparent}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px 6px;background:none;border:0;color:#cfe0d3;font-size:11px;font-weight:600;border-bottom:3px solid transparent}
 nav button i{font-size:24px;line-height:1}
 nav button.on{color:#fff;border-bottom-color:#fff}
 main{padding:12px;max-width:760px;margin:0 auto;padding-bottom:80px}
@@ -71,6 +71,10 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 .mod>div{background:var(--card);width:100%;max-width:560px;border-radius:16px 16px 0 0;padding:16px;max-height:92vh;overflow:auto}
 .mod h2{font-size:19px}
 .toast{position:fixed;left:12px;right:12px;bottom:16px;background:#222;color:#fff;border-radius:10px;padding:12px;z-index:30;text-align:center}
+.wl .h{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.st{display:inline-block;border-radius:20px;padding:1px 8px;font-size:12px;font-weight:600;background:var(--btn2)}
+.st.e{background:var(--okbg);color:var(--ok)}.st.v{background:var(--errbg);color:var(--err)}
+.fehl{color:var(--err);font-weight:700}.deckt{color:var(--ok);font-weight:700}
 .hide{display:none!important}
 .mut{color:var(--mut);font-size:14px}
 </style>
@@ -81,6 +85,7 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
   <button data-tab="scan" class="on"><i class="ti ti-scan" aria-hidden="true"></i>Scannen</button>
   <button data-tab="bestand"><i class="ti ti-stack-2" aria-hidden="true"></i>Bestand</button>
   <button data-tab="rech"><i class="ti ti-file-invoice" aria-hidden="true"></i>Rechnungen</button>
+  <button data-tab="wunsch"><i class="ti ti-clipboard-list" aria-hidden="true"></i>Wünsche</button>
   <button data-tab="stamm"><i class="ti ti-adjustments" aria-hidden="true"></i>Stammdaten</button>
 </nav>
 <main>
@@ -138,6 +143,7 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
         <button class="btn sec fit" id="btnManual">OK</button>
       </div>
     </div>
+    <div class="card hide" id="wunschHint"></div>
     <div class="card hide" id="sumCard">
       <div class="sum" id="sumAus"></div>
       <div class="mut" id="sumInfo" style="margin-top:6px"></div>
@@ -191,6 +197,18 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
     <div class="card"><h2>Rechnungen</h2><div class="lst" id="rList"></div></div>
   </section>
 
+  <!-- Wünsche -->
+  <section id="v-wunsch" class="hide">
+    <div class="card">
+      <div style="display:flex;gap:8px"><button class="btn" data-act="wNew" style="flex:1">+ Wunsch</button><button class="btn sec" data-act="wReload" aria-label="Neu laden"><i class="ti ti-refresh" aria-hidden="true"></i></button></div>
+      <div class="seg" style="margin-top:10px">
+        <button data-act="wView" data-v="art" class="on">Nach Artikel</button><button data-act="wView" data-v="kunde">Nach Kunde</button><button data-act="wView" data-v="done">Erledigt</button>
+      </div>
+      <div class="sum" id="wSum" style="margin-top:10px"></div>
+    </div>
+    <div id="wList"></div>
+  </section>
+
   <!-- Stammdaten -->
   <section id="v-stamm" class="hide">
     <div class="card">
@@ -222,7 +240,7 @@ const S = {
   url: '', code: '', user: '', artikel: {}, artikelList: [], lagerorte: [], nutzer: [], settings: { prefix: '28', gram: 1 },
   mode: 'ein', lagerort: '', dauer: true, scanner: null, running: false, paused: false,
   queue: [], sending: false, log: [], seq: 0, lastEan: '', lastSeen: 0, lastEntry: null,
-  bestand: [], ausgebucht: [], open: {}, tab: 'scan', sumSeq: 0, kunden: [], kunde: '', rechnungen: [], offene: []
+  bestand: [], ausgebucht: [], open: {}, tab: 'scan', sumSeq: 0, kunden: [], kunde: '', rechnungen: [], offene: [], wuensche: null, wView: 'art', wOpen: {}
 };
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -268,7 +286,7 @@ async function api(action, payload, opt) {
 /* ---------------------------------------------------------------- UI-Helfer */
 let toastT;
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.remove('hide'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.add('hide'), 3500); }
-function show(id) { ['login', 'scan', 'bestand', 'rech', 'stamm'].forEach(v => $('#v-' + v).classList.toggle('hide', v !== id)); }
+function show(id) { ['login', 'scan', 'bestand', 'rech', 'wunsch', 'stamm'].forEach(v => $('#v-' + v).classList.toggle('hide', v !== id)); }
 function openModal(html) { $('#modalBody').innerHTML = html; $('#modal').classList.remove('hide'); }
 function closeModal() { $('#modal').classList.add('hide'); $('#modalBody').innerHTML = ''; }
 let actx;
@@ -331,7 +349,7 @@ function applyInit(r) {
   const def = ls.get('wl_lager_' + S.user);
   const act = S.lagerorte.filter(l => l.aktiv);
   S.lagerort = act.some(l => l.name === def) ? def : (act[0] ? act[0].name : '');
-  renderLager(); renderKunden(); setTab(S.tab || 'scan');
+  renderLager(); renderKunden(); S.wuensche = null; loadWuenscheQuiet(); setTab(S.tab || 'scan');
 }
 
 /* -------------------------------------------------------------------- Tabs */
@@ -342,6 +360,7 @@ function setTab(t) {
   show(t);
   if (t === 'bestand') loadBestand();
   if (t === 'rech') loadRech();
+  if (t === 'wunsch') loadWunsch();
   if (t === 'stamm') renderStamm();
 }
 function renderLager() {
@@ -516,6 +535,7 @@ function updateCounters() {
   $('#sumAus').innerHTML = '<div><b>' + a.length + '</b><span>Packungen</span></div><div><b>' + fmtKg(ag) + '</b><span>Gewicht</span></div><div class="tot"><b>' + fmtEur(ae) + '</b><span>Summe</span></div>';
   const ks = Array.from(new Set(a.map(e => e.kunde)));
   $('#sumInfo').textContent = ks.length ? 'Kunde: ' + ks.join(', ') : 'Noch nichts ausgebucht.';
+  renderHint();
 }
 async function undo(tmp) {
   const e = S.log.find(x => x.tmp === tmp); if (!e || e.state !== 'ok') return;
@@ -572,11 +592,153 @@ function renderBestand() {
 }
 async function bestandAction(op, id) {
   try {
-    if (op === 'out') { const k = await askKundeWahl(); if (!k) return; await api('ausbuchen', { items: [{ id, ts: Date.now() }], kunde: k }); }
+    if (op === 'out') { const k = await askKundeWahl(); if (!k) return; const code = (S.bestand.filter(x => x.id === id)[0] || {}).artikelcode, g = (S.bestand.filter(x => x.id === id)[0] || {}).gewichtG || 0;
+      await api('ausbuchen', { items: [{ id, ts: Date.now() }], kunde: k });
+      if (code) { await loadWuenscheQuiet(); await offerWuensche(k, [{ code, g }]); } }
     if (op === 'del') { if (!confirm('Eintrag endgültig löschen?')) return; await api('korrektur', { id, op: 'loeschen' }); }
     if (op === 'back') await api('korrektur', { id, op: 'zurueck' });
     loadBestand();
   } catch (e) { toast(e.message); }
+}
+
+/* ----------------------------------------------------------------- Wünsche */
+const r3 = x => Math.round(x * 1000) / 1000;
+const fmtK = v => v.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 3 }) + ' kg';
+const aName = c => (S.artikel[c] || {}).bezeichnung || ('Artikel ' + c);
+const wOffen = () => (S.wuensche || []).filter(w => w.status === 'offen');
+function lagerKg(code) { return r3(S.bestand.filter(o => o.artikelcode === code).reduce((s, o) => s + o.gewichtG, 0) / 1000); }
+async function loadWuenscheQuiet() { try { S.wuensche = (await api('wuensche')).wuensche; renderHint(); } catch (e) {} }
+async function loadWunsch() {
+  try {
+    const r = await Promise.all([api('wuensche'), api('bestand')]);
+    S.wuensche = r[0].wuensche; S.bestand = r[1].bestand; renderWunsch();
+  } catch (e) { toast(e.message); }
+}
+function renderWunsch() {
+  document.querySelectorAll('[data-act=wView]').forEach(b => b.classList.toggle('on', b.dataset.v === S.wView));
+  const open = wOffen(), byArt = {};
+  open.forEach(w => { (byArt[w.artikelcode] = byArt[w.artikelcode] || []).push(w); });
+  const rows = Object.keys(byArt).map(code => {
+    const wunsch = r3(byArt[code].reduce((s, w) => s + w.menge, 0)), lager = lagerKg(code);
+    return { code, a: S.artikel[code] || { bezeichnung: 'Artikel ' + code, wildart: '' }, ws: byArt[code], wunsch, lager, fehl: Math.max(0, r3(wunsch - lager)) };
+  });
+  const tw = r3(rows.reduce((s, x) => s + x.wunsch, 0)), tf = r3(rows.reduce((s, x) => s + x.fehl, 0));
+  $('#wSum').innerHTML = '<div><b>' + open.length + '</b><span>offene Wünsche</span></div><div><b>' + fmtK(tw) + '</b><span>gewünscht</span></div><div class="tot"><b>' + fmtK(tf) + '</b><span>Fehlmenge</span></div>';
+  let h = '';
+  if (S.wView === 'art') {
+    if (!rows.length) h = '<p class="mut">Keine offenen Wünsche.</p>';
+    const wild = {};
+    rows.forEach(x => { const k = x.a.wildart || 'Sonstige'; (wild[k] = wild[k] || []).push(x); });
+    h += Object.keys(wild).sort((a, b) => a.localeCompare(b, 'de')).map(k => {
+      const L = wild[k].sort((a, b) => a.a.bezeichnung.localeCompare(b.a.bezeichnung, 'de'));
+      const sw = r3(L.reduce((s, x) => s + x.wunsch, 0)), sl = r3(L.reduce((s, x) => s + x.lager, 0)), sf = r3(L.reduce((s, x) => s + x.fehl, 0));
+      return '<div class="card"><h2>' + esc(k) + '</h2><p class="mut" style="margin:0 0 6px">Wunsch ' + fmtK(sw) + ' · Lager ' + fmtK(sl) + ' · Fehlmenge ' + fmtK(sf) + '</p>' +
+        L.map(x => {
+          const open = !!S.wOpen[x.code];
+          const d = open ? '<div class="d">' + x.ws.map(w => '<div><span>' + esc(w.kunde) + ' · ' + fmtK(w.menge) + '<br><small class="mut">' + esc(w.datum + ' · ' + w.von) + '</small></span><button class="btn sec sm fit" data-act="wEdit" data-id="' + esc(w.id) + '">Bearbeiten</button></div>').join('') + '</div>' : '';
+          return '<div class="grp"><div class="h" data-act="wToggle" data-code="' + x.code + '"><span class="n">' + esc(x.a.bezeichnung) + '<br><small class="mut">' + x.ws.length + ' Kunde' + (x.ws.length === 1 ? '' : 'n') + '</small></span>' +
+            '<span class="v">Wunsch ' + fmtK(x.wunsch) + '<br>Lager ' + fmtK(x.lager) + '<br>' + (x.fehl > 0 ? '<span class="fehl">Fehlt ' + fmtK(x.fehl) + '</span>' : '<span class="deckt">gedeckt</span>') + '</span></div>' + d + '</div>';
+        }).join('') + '</div>';
+    }).join('');
+  } else if (S.wView === 'kunde') {
+    const byK = {};
+    open.forEach(w => { (byK[w.kunde] = byK[w.kunde] || []).push(w); });
+    const ks = Object.keys(byK).sort((a, b) => a.localeCompare(b, 'de'));
+    h = ks.map(k => {
+      const L = byK[k].sort((a, b) => aName(a.artikelcode).localeCompare(aName(b.artikelcode), 'de'));
+      return '<div class="card"><div class="h" style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">' + esc(k) + '</h2><button class="btn sec sm fit" data-act="wCopy" data-kunde="' + esc(k) + '">Text kopieren</button></div>' +
+        '<div class="lst">' + L.map(w => {
+          const lg = lagerKg(w.artikelcode);
+          return '<div class="it"><div class="n">' + esc(aName(w.artikelcode)) + ' · <b>' + fmtK(w.menge) + '</b><small>' + w.datum + ' · Lager ' + fmtK(lg) + '</small></div>' +
+            '<button class="btn sec sm fit" data-act="wDone" data-id="' + esc(w.id) + '" aria-label="Erfüllt">✓</button><button class="btn sec sm fit" data-act="wEdit" data-id="' + esc(w.id) + '">Bearbeiten</button></div>';
+        }).join('') + '</div></div>';
+    }).join('') || '<p class="mut">Keine offenen Wünsche.</p>';
+  } else {
+    const done = (S.wuensche || []).filter(w => w.status !== 'offen').slice().reverse().slice(0, 100);
+    h = '<div class="card"><div class="lst">' + (done.map(w => '<div class="it"><div class="n">' + esc(w.kunde) + ' · ' + esc(aName(w.artikelcode)) + ' · ' + fmtK(w.menge) +
+      '<small><span class="st ' + (w.status === 'erfüllt' ? 'e' : 'v') + '">' + esc(w.status) + '</span> ' + esc(w.erledigt) + '</small></div><button class="btn sec sm fit" data-act="wEdit" data-id="' + esc(w.id) + '">Bearbeiten</button></div>').join('') || '<p class="mut">Noch nichts erledigt.</p>') + '</div></div>';
+  }
+  $('#wList').innerHTML = h;
+}
+function askWunsch(id, pre) {
+  const ex = id ? (S.wuensche || []).filter(w => w.id === id)[0] : null;
+  const kSel = ex ? ex.kunde : (pre && pre.kunde) || '', aSel = ex ? ex.artikelcode : '';
+  const ks = S.kunden.filter(k => k.aktiv || k.name === kSel);
+  const as = S.artikelList.filter(a => a.aktiv || a.code === aSel);
+  const wilds = Array.from(new Set(as.map(a => a.wildart || 'Sonstige'))).sort((a, b) => a.localeCompare(b, 'de'));
+  const aOpts = wilds.map(w => '<optgroup label="' + esc(w) + '">' + as.filter(a => (a.wildart || 'Sonstige') === w).sort((a, b) => a.bezeichnung.localeCompare(b.bezeichnung, 'de'))
+    .map(a => '<option value="' + a.code + '"' + (a.code === aSel ? ' selected' : '') + '>' + esc(a.bezeichnung) + '</option>').join('') + '</optgroup>').join('');
+  openModal('<h2>' + (ex ? 'Wunsch bearbeiten' : 'Neuer Wunsch') + '</h2>' +
+    '<label>Kunde</label><select id="wKd"><option value="">– wählen –</option>' + ks.map(k => '<option' + (k.name === kSel ? ' selected' : '') + '>' + esc(k.name) + '</option>').join('') + '</select>' +
+    '<label>Artikel</label><select id="wArt"><option value="">– wählen –</option>' + aOpts + '</select>' +
+    '<label>Menge (kg)</label><input id="wMenge" inputmode="decimal" placeholder="z. B. 2,5" value="' + (ex ? String(ex.menge).replace('.', ',') : '') + '">' +
+    (ex ? '<label>Status</label><select id="wSt">' + ['offen', 'erfüllt', 'verworfen'].map(x => '<option' + (x === ex.status ? ' selected' : '') + '>' + x + '</option>').join('') + '</select>' : '') +
+    '<p id="mErr" class="mut" style="color:var(--err)"></p>' +
+    '<div class="row"><button class="btn sec" id="mCancel">Abbrechen</button><button class="btn" id="mSave">Speichern</button></div>' +
+    (ex ? '<button class="btn sec" id="mDel" style="margin-top:8px;width:100%;color:var(--err)">Löschen</button>' : '<button class="btn sec" id="mMore" style="margin-top:8px;width:100%">Speichern + weiterer Wunsch</button>'));
+  $('#mCancel').onclick = closeModal;
+  const save = async more => {
+    const kunde = $('#wKd').value, artikelcode = $('#wArt').value, menge = $('#wMenge').value.trim().replace(',', '.');
+    if (!kunde || !artikelcode) { $('#mErr').textContent = 'Bitte Kunde und Artikel wählen.'; return; }
+    if (!(parseFloat(menge) > 0)) { $('#mErr').textContent = 'Bitte eine Menge in kg angeben.'; return; }
+    try {
+      await api('wunschSave', { id: ex ? ex.id : '', kunde, artikelcode, menge, status: ex ? $('#wSt').value : '' });
+      closeModal(); await loadWunsch(); toast('Wunsch gespeichert');
+      if (more) askWunsch('', { kunde });
+    } catch (e) { $('#mErr').textContent = e.message; }
+  };
+  $('#mSave').onclick = () => save(false);
+  if ($('#mMore')) $('#mMore').onclick = () => save(true);
+  if ($('#mDel')) $('#mDel').onclick = async () => {
+    if (!confirm('Wunsch endgültig löschen?')) return;
+    try { await api('wunschDelete', { id: ex.id }); closeModal(); await loadWunsch(); } catch (e) { $('#mErr').textContent = e.message; }
+  };
+}
+async function wunschStatus(ids, status) {
+  await api('wunschStatus', { ids, status });
+  await loadWuenscheQuiet();
+  if (S.tab === 'wunsch') renderWunsch();
+}
+function copyText(t) {
+  if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(t).then(() => true, () => false);
+  try { const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); const ok = document.execCommand('copy'); ta.remove(); return Promise.resolve(ok); } catch (e) { return Promise.resolve(false); }
+}
+async function wunschCopy(kunde) {
+  const L = wOffen().filter(w => w.kunde === kunde);
+  const t = 'Wunschliste ' + kunde + ':\n' + L.map(w => '• ' + aName(w.artikelcode) + ' ' + fmtK(w.menge)).join('\n');
+  toast((await copyText(t)) ? 'Text kopiert' : 'Kopieren nicht möglich');
+}
+// Offene Wünsche eines Kunden, die zu den ausgebuchten Artikeln passen
+function matchWuensche(kunde, items) {
+  const got = {}; items.forEach(i => { got[i.code] = r3((got[i.code] || 0) + i.g / 1000); });
+  return wOffen().filter(w => w.kunde === kunde && got[w.artikelcode] != null).map(w => ({ w, got: got[w.artikelcode] }));
+}
+function renderHint() {
+  const el = $('#wunschHint'); if (!el) return;
+  const a = S.log.filter(e => e.mode === 'aus' && e.state === 'ok' && e.tmp > S.sumSeq);
+  const byK = {};
+  a.forEach(e => { const k = byK[e.kunde] = byK[e.kunde] || {}; const c = e.res && e.res.artikelcode; if (c) k[c] = (k[c] || 0) + e.gewichtG; });
+  const hits = [];
+  Object.keys(byK).forEach(k => matchWuensche(k, Object.keys(byK[k]).map(c => ({ code: c, g: byK[k][c] }))).forEach(m => hits.push(m)));
+  if (!hits.length) { el.classList.add('hide'); el.innerHTML = ''; return; }
+  el.classList.remove('hide');
+  el.innerHTML = '<h2>Passende Wünsche</h2><div class="lst">' + hits.map(m => '<div class="it"><div class="n">' + esc(m.w.kunde) + ' · ' + esc(aName(m.w.artikelcode)) + '<small>gewünscht ' + fmtK(m.w.menge) + ' · jetzt ausgebucht ' + fmtK(m.got) + '</small></div>' +
+    '<button class="btn sec sm fit" data-act="wDone" data-id="' + esc(m.w.id) + '">Erfüllt</button></div>').join('') + '</div>';
+}
+function offerWuensche(kunde, items) {
+  return new Promise(resolve => {
+    const hits = matchWuensche(kunde, items);
+    if (!hits.length) return resolve();
+    openModal('<h2>Passende Wünsche abhaken?</h2><div class="lst">' + hits.map(m => '<label class="it" style="color:var(--txt);font-size:15px;margin:0"><input type="checkbox" class="wChk" value="' + esc(m.w.id) + '" checked><span class="n">' + esc(m.w.kunde) + ' · ' + esc(aName(m.w.artikelcode)) + '<small>gewünscht ' + fmtK(m.w.menge) + ' · ausgebucht ' + fmtK(m.got) + '</small></span></label>').join('') + '</div>' +
+      '<div class="row" style="margin-top:12px"><button class="btn sec" id="mCancel">Nein</button><button class="btn" id="mSave">Abhaken</button></div>');
+    $('#mCancel').onclick = () => { closeModal(); resolve(); };
+    $('#mSave').onclick = async () => {
+      const ids = Array.from(document.querySelectorAll('.wChk')).filter(c => c.checked).map(c => c.value);
+      closeModal();
+      try { if (ids.length) { await wunschStatus(ids, 'erfüllt'); toast(ids.length + ' Wunsch erfüllt'); } } catch (e) { toast(e.message); }
+      resolve();
+    };
+  });
 }
 
 /* -------------------------------------------------------------- Stammdaten */
@@ -731,6 +893,13 @@ document.addEventListener('click', e => {
     else if (a === 'kundeEdit') askKunde(t.dataset.name);
     else if (a === 'rechCreate') rechCreate(t.dataset.kunde);
     else if (a === 'rechOpen') rechOpen(t.dataset.nr);
+    else if (a === 'wNew') askWunsch('', null);
+    else if (a === 'wEdit') askWunsch(t.dataset.id, null);
+    else if (a === 'wReload') loadWunsch();
+    else if (a === 'wView') { S.wView = t.dataset.v; renderWunsch(); }
+    else if (a === 'wToggle') { S.wOpen[t.dataset.code] = !S.wOpen[t.dataset.code]; renderWunsch(); }
+    else if (a === 'wCopy') wunschCopy(t.dataset.kunde);
+    else if (a === 'wDone') wunschStatus([t.dataset.id], 'erfüllt').then(() => toast('Wunsch erfüllt'), e => toast(e.message));
   }
 });
 $('#btnCode').onclick = codeStep;
