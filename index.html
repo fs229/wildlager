@@ -4,12 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#1f3d2b">
+<script>try{var t=localStorage.getItem("wl_theme");if(!t)t=window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <title>Wildlager</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.52.0/dist/tabler-icons.min.css">
 <style>
-:root{--g:#1f3d2b;--g2:#2f5d41;--bg:#f2f4f0;--card:#fff;--line:#d9ded6;--txt:#1b231d;--mut:#667066;--ok:#1e8a46;--err:#c0392b;--warn:#b7791f}
+:root{--g:#1f3d2b;--g2:#2f5d41;--bg:#f2f4f0;--card:#fff;--line:#d9ded6;--txt:#1b231d;--mut:#667066;--ok:#1e8a46;--err:#c0392b;--warn:#b7791f;--inp:#fff;--btn2:#e4e9e1;--sumbg:#eef3ec;--okbg:#e9f7ee;--errbg:#fdecea;--acc:#2f5d41;color-scheme:light}
+:root[data-theme=dark]{--g:#14281b;--bg:#0f1511;--card:#1a221c;--line:#2e3a31;--txt:#e5ece6;--mut:#9aa89e;--ok:#4cc17b;--err:#ef7566;--warn:#e0a947;--inp:#232d25;--btn2:#2b372e;--sumbg:#232d25;--okbg:#15301f;--errbg:#3a1c18;--acc:#8ccfa3;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 header{background:var(--g);color:#fff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
@@ -23,10 +25,10 @@ main{padding:12px;max-width:760px;margin:0 auto;padding-bottom:80px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
 h2{margin:0 0 8px;font-size:17px}
 label{display:block;font-size:13px;color:var(--mut);margin:8px 0 3px}
-input,select{width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;font-size:16px;background:#fff;color:var(--txt)}
+input,select{width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;font-size:16px;background:var(--inp);color:var(--txt)}
 input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 .btn{display:inline-block;padding:12px 16px;border:0;border-radius:10px;background:var(--g2);color:#fff;font-size:16px;font-weight:600}
-.btn.sec{background:#e4e9e1;color:var(--txt)}
+.btn.sec{background:var(--btn2);color:var(--txt)}
 .btn.red{background:var(--err)}
 .btn.big{width:100%;padding:15px;font-size:18px}
 .btn.sm{padding:7px 11px;font-size:14px;border-radius:8px}
@@ -34,13 +36,13 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 .row>*{flex:1}
 .row>.fit{flex:0 0 auto}
 .seg{display:flex;border:1px solid var(--g2);border-radius:10px;overflow:hidden;margin-bottom:10px}
-.seg button{flex:1;padding:11px 4px;background:#fff;border:0;font-size:15px;font-weight:600;color:var(--g2)}
+.seg button{flex:1;padding:11px 4px;background:var(--inp);border:0;font-size:15px;font-weight:600;color:var(--acc)}
 .seg button.on{background:var(--g2);color:#fff}
 #reader{width:100%;min-height:120px;background:#111;border-radius:10px;overflow:hidden}
 #reader video{display:block;width:100%;max-height:60vh;object-fit:cover}
-.banner{border-radius:12px;padding:14px;margin:10px 0;text-align:center;border:2px solid var(--line);background:#fff;min-height:84px}
-.banner.ok{border-color:var(--ok);background:#e9f7ee}
-.banner.err{border-color:var(--err);background:#fdecea}
+.banner{border-radius:12px;padding:14px;margin:10px 0;text-align:center;border:2px solid var(--line);background:var(--card);min-height:84px}
+.banner.ok{border-color:var(--ok);background:var(--okbg)}
+.banner.err{border-color:var(--err);background:var(--errbg)}
 .banner .t{font-size:20px;font-weight:700}
 .banner .s{color:var(--mut);margin-top:2px}
 .log{list-style:none;margin:0;padding:0}
@@ -50,7 +52,7 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 .log .m small{display:block;color:var(--mut)}
 .pending .i{color:var(--warn)}.ok .i{color:var(--ok)}.err .i{color:var(--err)}.undone{opacity:.5;text-decoration:line-through}
 .sum{display:flex;gap:8px;text-align:center}
-.sum div{flex:1;background:#eef3ec;border-radius:10px;padding:8px}
+.sum div{flex:1;background:var(--sumbg);border-radius:10px;padding:8px}
 .sum b{display:block;font-size:18px}
 .sum .tot{background:var(--g2);color:#fff}.sum .tot span{color:#d6e6da}.sum .tot b{font-size:24px}
 .sum span{font-size:12px;color:var(--mut)}
@@ -61,12 +63,12 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 .grp .d{margin:8px 0 0 8px;font-size:14px}
 .grp .d div{display:flex;gap:6px;align-items:center;padding:5px 0;border-top:1px dashed var(--line)}
 .grp .d div span{flex:1}
-.chip{display:inline-block;background:#e4e9e1;border-radius:20px;padding:2px 9px;font-size:12px;margin:2px 3px 0 0}
+.chip{display:inline-block;background:var(--btn2);border-radius:20px;padding:2px 9px;font-size:12px;margin:2px 3px 0 0}
 .lst .it{display:flex;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
 .lst .it .n{flex:1}.lst .it small{color:var(--mut);display:block}
 .off{opacity:.5}
 .mod{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;z-index:20}
-.mod>div{background:#fff;width:100%;max-width:560px;border-radius:16px 16px 0 0;padding:16px;max-height:92vh;overflow:auto}
+.mod>div{background:var(--card);width:100%;max-width:560px;border-radius:16px 16px 0 0;padding:16px;max-height:92vh;overflow:auto}
 .mod h2{font-size:19px}
 .toast{position:fixed;left:12px;right:12px;bottom:16px;background:#222;color:#fff;border-radius:10px;padding:12px;z-index:30;text-align:center}
 .hide{display:none!important}
@@ -74,7 +76,7 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 </style>
 </head>
 <body>
-<header><b>Wildlager</b><span><small id="who"></small> <button class="btn sm sec hide" id="logout">Abmelden</button></span></header>
+<header><b>Wildlager</b><span><small id="who"></small> <button class="btn sm sec" id="btnWind" aria-label="Wind"><i class="ti ti-wind" aria-hidden="true"></i></button> <button class="btn sm sec" id="btnTheme" aria-label="Hell/Dunkel umschalten"></button> <button class="btn sm sec hide" id="logout">Abmelden</button></span></header>
 <nav id="nav" class="hide">
   <button data-tab="scan" class="on"><i class="ti ti-scan" aria-hidden="true"></i>Scannen</button>
   <button data-tab="bestand"><i class="ti ti-stack-2" aria-hidden="true"></i>Bestand</button>
@@ -214,7 +216,7 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 <script src="https://cdn.jsdelivr.net/npm/barcode-detector@3.2.4/dist/iife/ponyfill.js"></script>
 <script>
 /* Hier die Web-App-URL aus Google Apps Script eintragen (oder leer lassen, dann wird sie in der App abgefragt). */
-const CONFIG = { API_URL: 'https://script.google.com/macros/s/AKfycbw1PuF_n7MlVTeZ-E3jJimiT_uPmKVnkeNOu-72ufzSXXvyw_Y4qmOlt8BSGz8NZqq8/exec' };
+const CONFIG = { API_URL: 'https://script.google.com/macros/s/AKfycbw1PuF_n7MlVTeZ-E3jJimiT_uPmKVnkeNOu-72ufzSXXvyw_Y4qmOlt8BSGz8NZqq8/exec', WIND: { lat: 49.58886, lon: 9.15914, name: 'Revier' } };
 
 const S = {
   url: '', code: '', user: '', artikel: {}, artikelList: [], lagerorte: [], nutzer: [], settings: { prefix: '28', gram: 1 },
@@ -764,6 +766,67 @@ $('#inManual').addEventListener('keydown', e => { if (e.key === 'Enter') manual(
 $('#fText').oninput = renderBestand;
 $('#fOut').onchange = loadBestand;
 $('#btnReload').onclick = loadBestand;
+// ---- Wind ----
+const WIND_N = ['N','NNO','NO','ONO','O','OSO','SO','SSO','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+const windName = d => WIND_N[Math.round(((d % 360) + 360) % 360 / 22.5) % 16];
+let windGps = null;
+function windRose(dir) {
+  let t = '';
+  for (let i = 0; i < 16; i++) { const a = i * 22.5, big = i % 4 === 0;
+    t += '<line x1="110" y1="' + (big ? 18 : 22) + '" x2="110" y2="' + (big ? 30 : 28) + '" stroke="var(--mut)" stroke-width="' + (big ? 2 : 1) + '" transform="rotate(' + a + ' 110 110)"/>'; }
+  const lab = [['N',110,14],['O',208,115],['S',110,214],['W',12,115]].map(l => '<text x="' + l[1] + '" y="' + l[2] + '" text-anchor="middle" font-size="14" font-weight="700" fill="' + (l[0] === 'N' ? 'var(--err)' : 'var(--txt)') + '">' + l[0] + '</text>').join('');
+  return '<svg viewBox="0 0 220 220" width="220" height="220" role="img" aria-label="Windrose">' +
+    '<circle cx="110" cy="110" r="84" fill="var(--sumbg)" stroke="var(--line)" stroke-width="2"/>' + t + lab +
+    '<g transform="rotate(' + (dir + 180) + ' 110 110)"><path d="M110 40 L124 112 L110 102 L96 112 Z" fill="var(--acc)"/><rect x="106" y="108" width="8" height="36" rx="3" fill="var(--acc)"/></g>' +
+    '<circle cx="110" cy="110" r="5" fill="var(--card)" stroke="var(--acc)" stroke-width="2"/></svg>';
+}
+async function loadWind(loc) {
+  const box = $('#windBox'); if (!box) return;
+  box.innerHTML = '<p style="text-align:center">Lade …</p>';
+  try {
+    const u = 'https://api.open-meteo.com/v1/forecast?latitude=' + loc.lat.toFixed(5) + '&longitude=' + loc.lon.toFixed(5) +
+      '&current=wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&forecast_hours=7&wind_speed_unit=kmh&timezone=Europe%2FBerlin';
+    const r = await fetch(u); if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json(), c = d.current, h = d.hourly;
+    const rows = h.time.slice(1, 7).map((tm, i) => ({ t: tm.slice(11, 13) + ':00', v: h.wind_speed_10m[i + 1], g: h.wind_gusts_10m[i + 1], d: h.wind_direction_10m[i + 1] }));
+    if (!$('#windBox')) return;
+    $('#windBox').innerHTML =
+      '<div style="text-align:center">' + windRose(c.wind_direction_10m) +
+      '<div style="font-size:22px;font-weight:700">Wind aus ' + windName(c.wind_direction_10m) + ' (' + Math.round(c.wind_direction_10m) + '°)</div>' +
+      '<div>' + Math.round(c.wind_speed_10m) + ' km/h, Böen ' + Math.round(c.wind_gusts_10m) + ' km/h</div>' +
+      '<small style="color:var(--mut)">Stand ' + c.time.slice(11, 16) + ' Uhr · Pfeil zeigt die Windrichtung (wohin er weht)</small></div>' +
+      '<h4 style="margin:14px 0 6px">Nächste 6 Stunden</h4><div style="display:flex;gap:4px">' +
+      rows.map(x => '<div style="flex:1;text-align:center;background:var(--sumbg);border-radius:10px;padding:6px 2px;font-size:12px">' +
+        '<b>' + x.t + '</b><div><svg viewBox="0 0 24 24" width="26" height="26" style="transform:rotate(' + (x.d + 180) + 'deg)"><path d="M12 3 L18 16 L12 13 L6 16 Z" fill="var(--acc)"/></svg></div>' +
+        '<div>' + windName(x.d) + '</div><b>' + Math.round(x.v) + '</b><div style="color:var(--mut)">↑' + Math.round(x.g) + '</div></div>').join('') +
+      '</div><small style="color:var(--mut)">km/h, ↑ = Böen · Quelle: Open-Meteo</small>';
+  } catch (e) { box.innerHTML = '<p style="color:var(--err)">Winddaten nicht verfügbar (' + e.message + ').</p>'; }
+}
+function openWind() {
+  const base = CONFIG.WIND, loc = windGps || base;
+  openModal('<h3 style="margin:0 0 4px">Wind · ' + (windGps ? 'Mein Standort' : base.name) + '</h3>' +
+    '<div id="windBox"></div>' +
+    '<div style="display:flex;gap:8px;margin-top:12px"><button class="btn sec" id="wGps" style="flex:1">' + (windGps ? 'Revier' : 'Mein Standort') + '</button>' +
+    '<button class="btn sec" id="wRel" style="flex:1">Aktualisieren</button><button class="btn" id="wClose" style="flex:1">Schließen</button></div>');
+  $('#wClose').onclick = closeModal;
+  $('#wRel').onclick = () => loadWind(windGps || base);
+  $('#wGps').onclick = () => {
+    if (windGps) { windGps = null; openWind(); return; }
+    if (!navigator.geolocation) return toast('Standort nicht verfügbar');
+    navigator.geolocation.getCurrentPosition(p => { windGps = { lat: p.coords.latitude, lon: p.coords.longitude }; openWind(); },
+      () => toast('Standort nicht freigegeben'), { enableHighAccuracy: false, timeout: 10000 });
+  };
+  loadWind(loc);
+}
+$('#btnWind').onclick = openWind;
+function applyTheme(t, save) {
+  document.documentElement.setAttribute('data-theme', t);
+  $('#btnTheme').innerHTML = '<i class="ti ti-' + (t === 'dark' ? 'sun' : 'moon') + '" aria-hidden="true"></i>';
+  $('#btnTheme').title = t === 'dark' ? 'Hell' : 'Dunkel';
+  if (save) ls.set('wl_theme', t);
+}
+$('#btnTheme').onclick = () => applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark', true);
+applyTheme(document.documentElement.getAttribute('data-theme') || 'light', false);
 document.addEventListener('visibilitychange', () => { if (document.hidden) stopScan(); });
 start();
 </script>
