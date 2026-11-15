@@ -7,7 +7,11 @@
 <script>try{var t=localStorage.getItem("wl_theme");if(!t)t=window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Wildlager</title>
+<title>Wildhub</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20190%20190%22%20width=%22190%22%20height=%22190%22%3E%3Crect%20width=%22190%22%20height=%22190%22%20rx=%2240%22%20fill=%22%231f3d2b%22/%3E%3Cg%20transform=%22translate(95,93)%22%3E%3Ccircle%20r=%2272%22%20fill=%22none%22%20stroke=%22%23e0a73a%22%20stroke-width=%223%22/%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(-15,-6)%20rotate(7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(15,-6)%20rotate(-7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(-29,40)%20rotate(-12)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(29,40)%20rotate(12)%22%20fill=%22%23f2ead8%22/%3E%3C/g%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="Wildhub">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.52.0/dist/tabler-icons.min.css">
 <style>
 :root{--g:#1f3d2b;--g2:#2f5d41;--bg:#f2f4f0;--card:#fff;--line:#d9ded6;--txt:#1b231d;--mut:#667066;--ok:#1e8a46;--err:#c0392b;--warn:#b7791f;--inp:#fff;--btn2:#e4e9e1;--sumbg:#eef3ec;--okbg:#e9f7ee;--errbg:#fdecea;--acc:#2f5d41;color-scheme:light}
@@ -16,6 +20,8 @@
 html,body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 header{background:var(--g);color:#fff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
 header b{font-size:18px}
+.brand{display:flex;align-items:center;gap:8px}.brand img{border-radius:7px}
+.hero{text-align:center;padding:18px 0 6px}.hero img{border-radius:22px}.hero h1{margin:10px 0 0;font-size:28px;letter-spacing:.5px}.hero p{margin:2px 0 0;color:var(--mut)}
 header small{opacity:.85}
 nav{display:flex;background:var(--g2);position:sticky;top:46px;z-index:4}
 nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px 6px;background:none;border:0;color:#cfe0d3;font-size:11px;font-weight:600;border-bottom:3px solid transparent}
@@ -80,7 +86,7 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 </style>
 </head>
 <body>
-<header><b>Wildlager</b><span><small id="who"></small> <button class="btn sm sec" id="btnWind" aria-label="Wind"><i class="ti ti-wind" aria-hidden="true"></i></button> <button class="btn sm sec" id="btnTheme" aria-label="Hell/Dunkel umschalten"></button> <button class="btn sm sec hide" id="logout">Abmelden</button></span></header>
+<header><b class="brand"><img src="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20190%20190%22%20width=%22190%22%20height=%22190%22%3E%3Crect%20width=%22190%22%20height=%22190%22%20rx=%2240%22%20fill=%22%231f3d2b%22/%3E%3Cg%20transform=%22translate(95,93)%22%3E%3Ccircle%20r=%2272%22%20fill=%22none%22%20stroke=%22%23e0a73a%22%20stroke-width=%223%22/%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(-15,-6)%20rotate(7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(15,-6)%20rotate(-7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(-29,40)%20rotate(-12)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(29,40)%20rotate(12)%22%20fill=%22%23f2ead8%22/%3E%3C/g%3E%3C/svg%3E" width="28" height="28" alt=""> Wildhub</b><span><small id="who"></small> <button class="btn sm sec" id="btnWind" aria-label="Wind"><i class="ti ti-wind" aria-hidden="true"></i></button> <button class="btn sm sec" id="btnTheme" aria-label="Hell/Dunkel umschalten"></button> <button class="btn sm sec hide" id="logout">Abmelden</button></span></header>
 <nav id="nav" class="hide">
   <button data-tab="scan" class="on"><i class="ti ti-scan" aria-hidden="true"></i>Scannen</button>
   <button data-tab="bestand"><i class="ti ti-stack-2" aria-hidden="true"></i>Bestand</button>
@@ -91,6 +97,7 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 <main>
   <!-- Anmeldung -->
   <section id="v-login" class="hide">
+    <div class="hero"><img src="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20190%20190%22%20width=%22190%22%20height=%22190%22%3E%3Crect%20width=%22190%22%20height=%22190%22%20rx=%2240%22%20fill=%22%231f3d2b%22/%3E%3Cg%20transform=%22translate(95,93)%22%3E%3Ccircle%20r=%2272%22%20fill=%22none%22%20stroke=%22%23e0a73a%22%20stroke-width=%223%22/%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(-15,-6)%20rotate(7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(15,-6)%20rotate(-7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(-29,40)%20rotate(-12)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(29,40)%20rotate(12)%22%20fill=%22%23f2ead8%22/%3E%3C/g%3E%3C/svg%3E" width="88" height="88" alt="Wildhub"><h1>Wildhub</h1><p>Wild · Lager · Verkauf</p></div>
     <div class="card">
       <h2>Anmelden</h2>
       <div id="urlBox" class="hide">
