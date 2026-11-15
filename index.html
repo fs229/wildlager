@@ -76,6 +76,7 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 <nav id="nav" class="hide">
   <button data-tab="scan" class="on">Scannen</button>
   <button data-tab="bestand">Bestand</button>
+  <button data-tab="rech">Rechnungen</button>
   <button data-tab="stamm">Stammdaten</button>
 </nav>
 <main>
@@ -110,6 +111,10 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
         <label id="lagerLbl">Lagerort (Standard)</label>
         <select id="selLager"></select>
       </div>
+      <div id="kundeRow" class="hide">
+        <label>Kunde (Verkauf an)</label>
+        <div class="row"><select id="selKunde"></select><button class="btn sec fit" data-act="kundeNew">+ Neu</button></div>
+      </div>
       <label style="display:flex;align-items:center;margin-top:12px;color:var(--txt);font-size:15px">
         <input type="checkbox" id="chkDauer" checked> Dauerscan (Kamera bleibt an)
       </label>
@@ -131,7 +136,11 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
     </div>
     <div class="card hide" id="sumCard">
       <div class="sum" id="sumAus"></div>
-      <div style="margin-top:10px"><button class="btn sec sm" id="btnSumReset">Summe zurücksetzen (neue Rechnung)</button></div>
+      <div class="mut" id="sumInfo" style="margin-top:6px"></div>
+      <div style="margin-top:10px" class="row">
+        <button class="btn" id="btnRechnung">Rechnung erstellen</button>
+        <button class="btn sec fit" id="btnSumReset">Summe zurücksetzen</button>
+      </div>
     </div>
     <div class="card">
       <h2>Diese Sitzung <span class="mut" id="cnt"></span></h2>
@@ -159,12 +168,36 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
     <div class="card" id="bestandList"></div>
   </section>
 
+  <!-- Rechnungen -->
+  <section id="v-rech" class="hide">
+    <div class="card hide" id="offenCard">
+      <h2>Noch nicht abgerechnet</h2>
+      <div class="lst" id="offenList"></div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <div><label>Kunde</label><select id="rKunde"></select></div>
+        <div><label>Zeitraum</label><select id="rZeit">
+          <option value="">Alle</option><option value="monat">Dieser Monat</option><option value="30">Letzte 30 Tage</option><option value="jahr">Dieses Jahr</option>
+        </select></div>
+      </div>
+      <div class="sum" id="rSum" style="margin-top:10px"></div>
+    </div>
+    <div class="card"><h2>Pro Kunde</h2><div id="rKunden"></div></div>
+    <div class="card"><h2>Rechnungen</h2><div class="lst" id="rList"></div></div>
+  </section>
+
   <!-- Stammdaten -->
   <section id="v-stamm" class="hide">
     <div class="card">
       <h2>Lagerorte</h2>
       <div class="lst" id="lagerList"></div>
       <div style="margin-top:10px"><button class="btn sec" data-act="lagerNew">+ Lagerort</button></div>
+    </div>
+    <div class="card">
+      <h2>Kunden</h2>
+      <div class="lst" id="kundenList"></div>
+      <div style="margin-top:10px"><button class="btn sec" data-act="kundeNew">+ Kunde</button></div>
     </div>
     <div class="card">
       <h2>Artikel</h2>
@@ -179,13 +212,13 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 <script src="https://cdn.jsdelivr.net/npm/barcode-detector@3.2.4/dist/iife/ponyfill.js"></script>
 <script>
 /* Hier die Web-App-URL aus Google Apps Script eintragen (oder leer lassen, dann wird sie in der App abgefragt). */
-const CONFIG = { API_URL: 'https://script.google.com/macros/s/AKfycbziEyH6EZJxthixoqQc6fx-Rr3V_rjtPDHKR_d-394C38N2WrAI3rG6ww1KN_7B4-Qz/exec' };
+const CONFIG = { API_URL: 'https://script.google.com/macros/s/AKfycbw1PuF_n7MlVTeZ-E3jJimiT_uPmKVnkeNOu-72ufzSXXvyw_Y4qmOlt8BSGz8NZqq8/exec' };
 
 const S = {
   url: '', code: '', user: '', artikel: {}, artikelList: [], lagerorte: [], nutzer: [], settings: { prefix: '28', gram: 1 },
   mode: 'ein', lagerort: '', dauer: true, scanner: null, running: false, paused: false,
   queue: [], sending: false, log: [], seq: 0, lastEan: '', lastSeen: 0, lastEntry: null,
-  bestand: [], ausgebucht: [], open: {}, tab: 'scan', sumSeq: 0
+  bestand: [], ausgebucht: [], open: {}, tab: 'scan', sumSeq: 0, kunden: [], kunde: '', rechnungen: [], offene: []
 };
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -231,7 +264,7 @@ async function api(action, payload, opt) {
 /* ---------------------------------------------------------------- UI-Helfer */
 let toastT;
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.remove('hide'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.add('hide'), 3500); }
-function show(id) { ['login', 'scan', 'bestand', 'stamm'].forEach(v => $('#v-' + v).classList.toggle('hide', v !== id)); }
+function show(id) { ['login', 'scan', 'bestand', 'rech', 'stamm'].forEach(v => $('#v-' + v).classList.toggle('hide', v !== id)); }
 function openModal(html) { $('#modalBody').innerHTML = html; $('#modal').classList.remove('hide'); }
 function closeModal() { $('#modal').classList.add('hide'); $('#modalBody').innerHTML = ''; }
 let actx;
@@ -289,12 +322,12 @@ function logout(silent) {
 }
 function applyInit(r) {
   S.artikelList = r.artikel; S.artikel = {}; r.artikel.forEach(a => { S.artikel[a.code] = a; });
-  S.lagerorte = r.lagerorte; S.nutzer = r.nutzer; S.settings = r.settings;
+  S.lagerorte = r.lagerorte; S.nutzer = r.nutzer; S.settings = r.settings; S.kunden = r.kunden || []; S.kunde = '';
   $('#who').textContent = S.user; $('#logout').classList.remove('hide'); $('#nav').classList.remove('hide');
   const def = ls.get('wl_lager_' + S.user);
   const act = S.lagerorte.filter(l => l.aktiv);
   S.lagerort = act.some(l => l.name === def) ? def : (act[0] ? act[0].name : '');
-  renderLager(); setTab(S.tab || 'scan');
+  renderLager(); renderKunden(); setTab(S.tab || 'scan');
 }
 
 /* -------------------------------------------------------------------- Tabs */
@@ -304,6 +337,7 @@ function setTab(t) {
   document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
   show(t);
   if (t === 'bestand') loadBestand();
+  if (t === 'rech') loadRech();
   if (t === 'stamm') renderStamm();
 }
 function renderLager() {
@@ -314,11 +348,20 @@ function renderLager() {
   const wilds = Array.from(new Set(S.artikelList.map(a => a.wildart).filter(Boolean))).sort();
   const cw = $('#fWild').value; $('#fWild').innerHTML = '<option value="">Alle</option>' + wilds.map(w => '<option>' + esc(w) + '</option>').join(''); $('#fWild').value = cw;
 }
+function renderKunden() {
+  const act = S.kunden.filter(k => k.aktiv);
+  if (S.kunde && !act.some(k => k.name === S.kunde)) S.kunde = '';
+  $('#selKunde').innerHTML = '<option value="">– Kunde wählen –</option>' + act.map(k => '<option' + (k.name === S.kunde ? ' selected' : '') + '>' + esc(k.name) + '</option>').join('');
+  const cur = $('#rKunde').value;
+  $('#rKunde').innerHTML = '<option value="">Alle</option>' + S.kunden.map(k => '<option>' + esc(k.name) + '</option>').join('');
+  $('#rKunde').value = cur;
+}
 function setMode(m) {
   S.mode = m;
   document.querySelectorAll('#modeSeg button').forEach(b => b.classList.toggle('on', b.dataset.mode === m));
   $('#lagerRow').classList.toggle('hide', m === 'aus');
   $('#sumCard').classList.toggle('hide', m !== 'aus');
+  $('#kundeRow').classList.toggle('hide', m !== 'aus');
   $('#lagerLbl').textContent = m === 'um' ? 'Ziel-Lagerort' : 'Lagerort (Standard)';
   updateCounters(); renderLog();
 }
@@ -402,6 +445,7 @@ function handleCode(raw) {
 async function submitScan(raw) {
   const p = parseEan(raw);
   if (!p.ok) { flash(false, 'Ungültig', p.error); beep(false); return; }
+  if (S.mode === 'aus' && !S.kunde) { flash(false, 'Kunde fehlt', 'Bitte oben den Kunden wählen.'); beep(false); return; }
   if (S.mode !== 'aus' && !S.lagerort) { flash(false, 'Lagerort fehlt', 'Bitte oben einen Lagerort wählen.'); beep(false); return; }
   if (S.mode === 'ein' && !S.artikel[p.artikelcode]) {
     S.paused = true; beep(false);
@@ -409,11 +453,11 @@ async function submitScan(raw) {
     if (!S.artikel[p.artikelcode]) { flash(false, 'Nicht eingebucht', 'Artikel ' + p.artikelcode + ' nicht angelegt.'); return; }
   }
   const a = S.artikel[p.artikelcode];
-  const e = { tmp: ++S.seq, mode: S.mode, ean: p.ean, lagerort: S.mode === 'aus' ? null : S.lagerort, ts: Date.now(),
+  const e = { tmp: ++S.seq, mode: S.mode, ean: p.ean, lagerort: S.mode === 'aus' ? null : S.lagerort, kunde: S.mode === 'aus' ? S.kunde : null, ts: Date.now(),
     state: 'pending', name: a ? a.bezeichnung : 'Artikel ' + p.artikelcode, gewichtG: p.gewichtG };
   S.log.unshift(e); S.lastEntry = e;
   if (S.log.length > 200) S.log.length = 200;
-  flash(true, e.name, fmtKg(p.gewichtG) + (e.lagerort ? ' → ' + e.lagerort : ' ausgebucht'));
+  flash(true, e.name, fmtKg(p.gewichtG) + (e.lagerort ? ' → ' + e.lagerort : ' → ' + e.kunde));
   beep(true); $('#btnAgain').classList.remove('hide');
   S.queue.push(e); renderLog(); flushQueue();
   if (!S.dauer) stopScan();
@@ -424,10 +468,10 @@ async function flushQueue() {
   try {
     while (S.queue.length) {
       const first = S.queue[0], batch = [];
-      while (S.queue.length && S.queue[0].mode === first.mode && S.queue[0].lagerort === first.lagerort && batch.length < 25) batch.push(S.queue.shift());
+      while (S.queue.length && S.queue[0].mode === first.mode && S.queue[0].lagerort === first.lagerort && S.queue[0].kunde === first.kunde && batch.length < 25) batch.push(S.queue.shift());
       const action = first.mode === 'ein' ? 'einbuchen' : first.mode === 'aus' ? 'ausbuchen' : 'umlagern';
       let r;
-      try { r = await api(action, { items: batch.map(b => ({ ean: b.ean, ts: b.ts })), lagerort: first.lagerort }); }
+      try { r = await api(action, { items: batch.map(b => ({ ean: b.ean, ts: b.ts })), lagerort: first.lagerort, kunde: first.kunde }); }
       catch (err) {
         batch.forEach(b => { b.state = 'err'; b.error = err.message; b.net = !!err.net; });
         beep(false); flash(false, 'Fehler', err.message); renderLog(); updateCounters(); continue;
@@ -446,7 +490,7 @@ function renderLog() {
   $('#log').innerHTML = items.map(e => {
     const ic = e.state === 'ok' ? '✓' : e.state === 'err' ? '✗' : e.state === 'undone' ? '↩' : '…';
     const cls = e.state === 'undone' ? 'ok undone' : e.state;
-    const sub = e.state === 'err' ? esc(e.error) : esc(fmtKg(e.gewichtG) + (e.lagerort ? ' · ' + e.lagerort : '') + (e.res && e.res.von ? ' (von ' + e.res.von + ')' : '') + (e.mode === 'aus' && e.state === 'ok' ? ' · ' + fmtEur(eurOf(e)) : ''));
+    const sub = e.state === 'err' ? esc(e.error) : esc(fmtKg(e.gewichtG) + (e.lagerort ? ' · ' + e.lagerort : '') + (e.res && e.res.von ? ' (von ' + e.res.von + ')' : '') + (e.mode === 'aus' ? ' · ' + e.kunde : '') + (e.mode === 'aus' && e.state === 'ok' ? ' · ' + fmtEur(eurOf(e)) : ''));
     let btn = '';
     if (e.state === 'ok' && e.mode !== 'um') btn = '<button class="btn sec sm fit" data-act="undo" data-id="' + e.tmp + '">Rückgängig</button>';
     if (e.state === 'err' && e.net) btn = '<button class="btn sec sm fit" data-act="retry" data-id="' + e.tmp + '">Erneut</button>';
@@ -455,6 +499,7 @@ function renderLog() {
 }
 /* Preis einer Packung wie auf dem Etikett: Gewicht x Preis/kg, auf Cent gerundet */
 function eurOf(e) {
+  if (e.res && e.res.betrag != null) return e.res.betrag;
   const p = e.res && e.res.preis != null ? e.res.preis : ((e.res && S.artikel[e.res.artikelcode]) || {}).preis || 0;
   return Math.round(e.gewichtG * p / 1000 * 100) / 100;
 }
@@ -465,6 +510,8 @@ function updateCounters() {
   const a = S.log.filter(e => e.mode === 'aus' && e.state === 'ok' && e.tmp > S.sumSeq);
   const ag = a.reduce((s, e) => s + e.gewichtG, 0), ae = a.reduce((s, e) => s + eurOf(e), 0);
   $('#sumAus').innerHTML = '<div><b>' + a.length + '</b><span>Packungen</span></div><div><b>' + fmtKg(ag) + '</b><span>Gewicht</span></div><div class="tot"><b>' + fmtEur(ae) + '</b><span>Summe</span></div>';
+  const ks = Array.from(new Set(a.map(e => e.kunde)));
+  $('#sumInfo').textContent = ks.length ? 'Kunde: ' + ks.join(', ') : 'Noch nichts ausgebucht.';
 }
 async function undo(tmp) {
   const e = S.log.find(x => x.tmp === tmp); if (!e || e.state !== 'ok') return;
@@ -514,14 +561,14 @@ function renderBestand() {
     const o2 = S.ausgebucht.filter(pass);
     out = '<h2 style="margin-top:16px">Zuletzt ausgebucht</h2>' + (o2.map(o => {
       const a = S.artikel[o.artikelcode] || { bezeichnung: o.artikelcode };
-      return '<div class="grp"><div class="h"><span class="n">' + esc(a.bezeichnung) + '<br><small class="mut">' + esc(fmtKg(o.gewichtG) + ' · ' + o.lagerort + ' · ' + o.abDatum + ' ' + o.abUhrzeit + ' · ' + o.abNutzer) + '</small></span><button class="btn sec sm fit" data-act="back" data-id="' + esc(o.id) + '">Zurück ins Lager</button></div></div>';
+      return '<div class="grp"><div class="h"><span class="n">' + esc(a.bezeichnung) + '<br><small class="mut">' + esc(fmtKg(o.gewichtG) + ' · ' + o.lagerort + ' · ' + o.abDatum + ' ' + o.abUhrzeit + ' · ' + o.abNutzer + (o.kunde ? ' · an ' + o.kunde : '') + (o.rnr ? ' · ' + o.rnr : '')) + '</small></span><button class="btn sec sm fit" data-act="back" data-id="' + esc(o.id) + '">Zurück ins Lager</button></div></div>';
     }).join('') || '<p class="mut">Keine Einträge.</p>');
   }
   $('#bestandList').innerHTML = (list || '<p class="mut">Kein Bestand für diese Auswahl.</p>') + out;
 }
 async function bestandAction(op, id) {
   try {
-    if (op === 'out') { if (!confirm('Diese Packung ausbuchen?')) return; await api('ausbuchen', { items: [{ id, ts: Date.now() }] }); }
+    if (op === 'out') { const k = await askKundeWahl(); if (!k) return; await api('ausbuchen', { items: [{ id, ts: Date.now() }], kunde: k }); }
     if (op === 'del') { if (!confirm('Eintrag endgültig löschen?')) return; await api('korrektur', { id, op: 'loeschen' }); }
     if (op === 'back') await api('korrektur', { id, op: 'zurueck' });
     loadBestand();
@@ -530,6 +577,7 @@ async function bestandAction(op, id) {
 
 /* -------------------------------------------------------------- Stammdaten */
 function renderStamm() {
+  $('#kundenList').innerHTML = S.kunden.map(k => '<div class="it ' + (k.aktiv ? '' : 'off') + '"><div class="n">' + esc(k.name) + '<small>' + (k.aktiv ? 'aktiv' : 'inaktiv') + (k.notiz ? ' · ' + esc(k.notiz) : '') + '</small></div><button class="btn sec sm fit" data-act="kundeEdit" data-name="' + esc(k.name) + '">Bearbeiten</button></div>').join('') || '<p class="mut">Noch keine Kunden.</p>';
   $('#lagerList').innerHTML = S.lagerorte.map(l => '<div class="it ' + (l.aktiv ? '' : 'off') + '"><div class="n">' + esc(l.name) + '<small>' + (l.aktiv ? 'aktiv' : 'inaktiv') + '</small></div><button class="btn sec sm fit" data-act="lagerEdit" data-name="' + esc(l.name) + '">Bearbeiten</button></div>').join('') || '<p class="mut">Noch keine Lagerorte.</p>';
   $('#artList').innerHTML = S.artikelList.slice().sort((a, b) => a.code.localeCompare(b.code)).map(a => '<div class="it ' + (a.aktiv ? '' : 'off') + '"><div class="n">' + esc(a.bezeichnung) + '<small>' + a.code + ' · ' + fmtEur(a.preis) + '/kg' + (a.aktiv ? '' : ' · inaktiv') + '</small></div><button class="btn sec sm fit" data-act="artEdit" data-code="' + a.code + '">Bearbeiten</button></div>').join('') || '<p class="mut">Noch keine Artikel.</p>';
 }
@@ -558,6 +606,36 @@ function askArtikel(code, fromScan) {
     };
   });
 }
+function askKunde(name) {
+  return new Promise(resolve => {
+    const ex = S.kunden.filter(k => k.name === name)[0];
+    openModal('<h2>' + (ex ? 'Kunde bearbeiten' : 'Neuer Kunde') + '</h2>' +
+      '<label>Name</label><input id="kName" value="' + esc(ex ? ex.name : '') + '">' +
+      '<label>Notiz (optional)</label><input id="kNotiz" value="' + esc(ex ? ex.notiz : '') + '">' +
+      '<label style="display:flex;align-items:center;color:var(--txt);font-size:15px"><input type="checkbox" id="kAkt"' + (!ex || ex.aktiv ? ' checked' : '') + '> Aktiv</label>' +
+      (ex ? '<p class="mut">Beim Umbenennen werden Bestand und Rechnungen mit umbenannt.</p>' : '') +
+      '<p id="mErr" class="mut" style="color:var(--err)"></p>' +
+      '<div class="row"><button class="btn sec" id="mCancel">Abbrechen</button><button class="btn" id="mSave">Speichern</button></div>');
+    $('#mCancel').onclick = () => { closeModal(); resolve(''); };
+    $('#mSave').onclick = async () => {
+      try {
+        const nm = $('#kName').value.trim();
+        const r = await api('kundeSave', { name: nm, oldName: ex ? ex.name : '', notiz: $('#kNotiz').value, aktiv: $('#kAkt').checked });
+        S.kunden = r.kunden; if (ex && S.kunde === ex.name) S.kunde = nm;
+        renderKunden(); renderStamm(); closeModal(); resolve(nm);
+      } catch (e) { $('#mErr').textContent = e.message; }
+    };
+  });
+}
+function askKundeWahl() {
+  return new Promise(resolve => {
+    const act = S.kunden.filter(k => k.aktiv);
+    openModal('<h2>Ausbuchen an …</h2><label>Kunde</label><select id="wKunde"><option value="">– wählen –</option>' + act.map(k => '<option>' + esc(k.name) + '</option>').join('') + '</select>' +
+      '<p id="mErr" class="mut" style="color:var(--err)"></p><div class="row"><button class="btn sec" id="mCancel">Abbrechen</button><button class="btn" id="mSave">Ausbuchen</button></div>');
+    $('#mCancel').onclick = () => { closeModal(); resolve(''); };
+    $('#mSave').onclick = () => { const v = $('#wKunde').value; if (!v) { $('#mErr').textContent = 'Bitte Kunden wählen.'; return; } closeModal(); resolve(v); };
+  });
+}
 function askLager(name) {
   const ex = S.lagerorte.filter(l => l.name === name)[0];
   openModal('<h2>' + (ex ? 'Lagerort bearbeiten' : 'Neuer Lagerort') + '</h2>' +
@@ -577,6 +655,58 @@ function askLager(name) {
   };
 }
 
+/* ------------------------------------------------------------------ Rechnungen */
+const parseDe = d => { const m = /^(\d\d)\.(\d\d)\.(\d{4})$/.exec(d || ''); return m ? new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1])) : null; };
+async function loadRech() {
+  try {
+    const [a, b] = await Promise.all([api('rechnungen'), api('offene')]);
+    S.rechnungen = a.rechnungen; S.offene = b.offene; renderRech();
+  } catch (e) { toast(e.message); }
+}
+function renderRech() {
+  $('#offenCard').classList.toggle('hide', !S.offene.length);
+  $('#offenList').innerHTML = S.offene.map(g => '<div class="it"><div class="n">' + esc(g.kunde) + '<small>' + g.packungen + ' Packungen · ' + fmtKg(g.gewichtG) + ' · ' + fmtEur(g.summe) + '</small></div><button class="btn sm fit" data-act="rechCreate" data-kunde="' + esc(g.kunde) + '">Rechnung erstellen</button></div>').join('');
+  const kf = $('#rKunde').value, zf = $('#rZeit').value, now = new Date();
+  const list = S.rechnungen.filter(r => {
+    if (kf && r.kunde !== kf) return false;
+    const d = parseDe(r.datum);
+    if (zf && d) {
+      if (zf === 'jahr' && d.getFullYear() !== now.getFullYear()) return false;
+      if (zf === 'monat' && (d.getFullYear() !== now.getFullYear() || d.getMonth() !== now.getMonth())) return false;
+      if (zf === '30' && now - d > 30 * 86400000) return false;
+    }
+    return true;
+  });
+  const tg = list.reduce((s, r) => s + r.gewichtG, 0), te = list.reduce((s, r) => s + r.summe, 0), tp = list.reduce((s, r) => s + r.packungen, 0);
+  $('#rSum').innerHTML = '<div><b>' + list.length + '</b><span>Rechnungen</span></div><div><b>' + fmtKg(tg) + '</b><span>' + tp + ' Packungen</span></div><div class="tot"><b>' + fmtEur(te) + '</b><span>Umsatz</span></div>';
+  const per = {};
+  list.forEach(r => { const p = per[r.kunde] = per[r.kunde] || { n: 0, g: 0, e: 0, last: r.datum }; p.n++; p.g += r.gewichtG; p.e += r.summe; });
+  $('#rKunden').innerHTML = Object.keys(per).sort((a, b) => per[b].e - per[a].e).map(k => '<div class="it"><div class="n">' + esc(k) + '<small>' + per[k].n + ' Rechnungen · letzter Kauf ' + esc(per[k].last) + '</small></div><div style="text-align:right">' + fmtEur(per[k].e) + '<small style="display:block;color:var(--mut)">' + fmtKg(per[k].g) + '</small></div></div>').join('') || '<p class="mut">Keine Rechnungen.</p>';
+  $('#rList').innerHTML = list.map(r => '<div class="it" data-act="rechOpen" data-nr="' + esc(r.nr) + '" style="cursor:pointer"><div class="n">' + esc(r.nr) + ' · ' + esc(r.kunde) + '<small>' + esc(r.datum + ' ' + r.uhrzeit) + ' · ' + r.packungen + ' Pack. · ' + fmtKg(r.gewichtG) + '</small></div><b>' + fmtEur(r.summe) + '</b></div>').join('') || '<p class="mut">Keine Rechnungen.</p>';
+}
+async function rechCreate(kunde) {
+  const g = S.offene.filter(x => x.kunde === kunde)[0]; if (!g) return;
+  if (!confirm('Rechnung für ' + kunde + ' erstellen?\n' + g.packungen + ' Packungen, ' + fmtKg(g.gewichtG) + ', ' + fmtEur(g.summe))) return;
+  try { const r = await api('rechnungErstellen', { ids: g.ids }); toast('Rechnung erstellt: ' + r.rechnung.nr); loadRech(); } catch (e) { toast(e.message); }
+}
+async function rechOpen(nr) {
+  try {
+    const r = await api('rechnung', { nr });
+    const re = r.rechnung, pos = r.positionen;
+    const text = 'Rechnung ' + re.nr + ' · ' + re.datum + '\nKunde: ' + re.kunde + '\n' + pos.map(p => '- ' + p.bezeichnung + ' ' + fmtKg(p.gewichtG) + ' · ' + fmtEur(p.betrag)).join('\n') + '\nSumme: ' + fmtEur(re.summe) + ' (' + re.packungen + ' Packungen, ' + fmtKg(re.gewichtG) + ')';
+    openModal('<h2>' + esc(re.nr) + '</h2><p class="mut">' + esc(re.kunde + ' · ' + re.datum + ' ' + re.uhrzeit + ' · erstellt von ' + re.nutzer) + '</p>' +
+      '<div class="lst">' + pos.map(p => '<div class="it"><div class="n">' + esc(p.bezeichnung) + '<small>' + esc(fmtKg(p.gewichtG)) + ' · ' + esc(p.abDatum + ' ' + p.abUhrzeit) + '</small></div><span>' + fmtEur(p.betrag) + '</span></div>').join('') + '</div>' +
+      '<div class="sum" style="margin:10px 0"><div><b>' + re.packungen + '</b><span>Packungen</span></div><div><b>' + fmtKg(re.gewichtG) + '</b><span>Gewicht</span></div><div class="tot"><b>' + fmtEur(re.summe) + '</b><span>Summe</span></div></div>' +
+      '<div class="row"><button class="btn sec" id="mCopy">Text kopieren</button><button class="btn red" id="mStorno">Stornieren</button><button class="btn sec" id="mCancel">Schließen</button></div>');
+    $('#mCancel').onclick = closeModal;
+    $('#mCopy').onclick = async () => { try { await navigator.clipboard.writeText(text); toast('Kopiert'); } catch (e) { toast('Kopieren nicht möglich'); } };
+    $('#mStorno').onclick = async () => {
+      if (!confirm('Rechnung ' + re.nr + ' stornieren? Die Packungen bleiben an ' + re.kunde + ' ausgebucht und erscheinen wieder unter "Noch nicht abgerechnet".')) return;
+      try { await api('rechnungStorno', { nr: re.nr }); closeModal(); toast('Storniert'); loadRech(); } catch (e) { toast(e.message); }
+    };
+  } catch (e) { toast(e.message); }
+}
+
 /* ----------------------------------------------------------------- Ereignisse */
 document.addEventListener('click', e => {
   const t = e.target.closest('[data-tab],[data-mode],[data-user],[data-act]'); if (!t) return;
@@ -593,6 +723,10 @@ document.addEventListener('click', e => {
     else if (a === 'artEdit') askArtikel(t.dataset.code, false);
     else if (a === 'lagerNew') askLager('');
     else if (a === 'lagerEdit') askLager(t.dataset.name);
+    else if (a === 'kundeNew') askKunde('').then(n => { if (n && S.tab === 'scan') { S.kunde = n; renderKunden(); } });
+    else if (a === 'kundeEdit') askKunde(t.dataset.name);
+    else if (a === 'rechCreate') rechCreate(t.dataset.kunde);
+    else if (a === 'rechOpen') rechOpen(t.dataset.nr);
   }
 });
 $('#btnCode').onclick = codeStep;
@@ -600,13 +734,31 @@ $('#inCode').addEventListener('keydown', e => { if (e.key === 'Enter') codeStep(
 $('#logout').onclick = () => logout(false);
 $('#btnCam').onclick = () => (S.running ? stopScan() : startScan());
 $('#chkDauer').onchange = e => { S.dauer = e.target.checked; };
+$('#selKunde').onchange = e => { S.kunde = e.target.value; };
 $('#selLager').onchange = e => { S.lagerort = e.target.value; ls.set('wl_lager_' + S.user, S.lagerort); };
+$('#btnRechnung').onclick = async () => {
+  const live = S.log.filter(e => e.mode === 'aus' && e.tmp > S.sumSeq && e.state !== 'undone' && e.state !== 'err');
+  if (live.some(e => e.state === 'pending')) { toast('Bitte kurz warten, es wird noch gespeichert …'); return; }
+  const ok = live.filter(e => e.state === 'ok');
+  if (!ok.length) { toast('Nichts zum Abrechnen.'); return; }
+  const groups = {}; ok.forEach(e => { (groups[e.kunde] = groups[e.kunde] || []).push(e); });
+  const txt = Object.keys(groups).map(k => k + ': ' + groups[k].length + ' Packungen, ' + fmtKg(groups[k].reduce((s, e) => s + e.gewichtG, 0)) + ', ' + fmtEur(groups[k].reduce((s, e) => s + eurOf(e), 0))).join('\n');
+  if (!confirm('Rechnung erstellen?\n' + txt)) return;
+  const made = [];
+  try {
+    for (const k of Object.keys(groups)) { const r = await api('rechnungErstellen', { ids: groups[k].map(e => e.res.id) }); made.push(r.rechnung); }
+  } catch (er) { toast(er.message); return; }
+  S.sumSeq = S.seq; S.kunde = ''; renderKunden(); updateCounters();
+  flash(true, 'Rechnung ' + made.map(m => m.nr).join(', '), made.map(m => m.kunde + ' · ' + fmtEur(m.summe)).join(' | '));
+  toast('Rechnung erstellt: ' + made.map(m => m.nr).join(', '));
+};
 $('#btnSumReset').onclick = () => { S.sumSeq = S.seq; updateCounters(); toast('Summe zurückgesetzt'); };
 $('#btnAgain').onclick = () => { if (S.lastEntry) submitScan(S.lastEntry.ean); };
 function manual() { const v = $('#inManual').value; $('#inManual').value = ''; if (v) submitScan(v); }
 $('#btnManual').onclick = manual;
 $('#inManual').addEventListener('keydown', e => { if (e.key === 'Enter') manual(); });
 ['fLager', 'fWild'].forEach(id => $('#' + id).onchange = renderBestand);
+['rKunde', 'rZeit'].forEach(id => $('#' + id).onchange = renderRech);
 $('#fText').oninput = renderBestand;
 $('#fOut').onchange = loadBestand;
 $('#btnReload').onclick = loadBestand;
