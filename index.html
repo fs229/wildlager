@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f3d2b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Wildlager</title>
+<style>
+:root{--g:#1f3d2b;--g2:#2f5d41;--bg:#f2f4f0;--card:#fff;--line:#d9ded6;--txt:#1b231d;--mut:#667066;--ok:#1e8a46;--err:#c0392b;--warn:#b7791f}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+header{background:var(--g);color:#fff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+header b{font-size:18px}
+header small{opacity:.85}
+nav{display:flex;background:var(--g2);position:sticky;top:46px;z-index:4}
+nav button{flex:1;padding:12px 4px;background:none;border:0;color:#cfe0d3;font-size:15px;font-weight:600;border-bottom:3px solid transparent}
+nav button.on{color:#fff;border-bottom-color:#fff}
+main{padding:12px;max-width:760px;margin:0 auto;padding-bottom:80px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+h2{margin:0 0 8px;font-size:17px}
+label{display:block;font-size:13px;color:var(--mut);margin:8px 0 3px}
+input,select{width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;font-size:16px;background:#fff;color:var(--txt)}
+input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
+.btn{display:inline-block;padding:12px 16px;border:0;border-radius:10px;background:var(--g2);color:#fff;font-size:16px;font-weight:600}
+.btn.sec{background:#e4e9e1;color:var(--txt)}
+.btn.red{background:var(--err)}
+.btn.big{width:100%;padding:15px;font-size:18px}
+.btn.sm{padding:7px 11px;font-size:14px;border-radius:8px}
+.row{display:flex;gap:8px;align-items:center}
+.row>*{flex:1}
+.row>.fit{flex:0 0 auto}
+.seg{display:flex;border:1px solid var(--g2);border-radius:10px;overflow:hidden;margin-bottom:10px}
+.seg button{flex:1;padding:11px 4px;background:#fff;border:0;font-size:15px;font-weight:600;color:var(--g2)}
+.seg button.on{background:var(--g2);color:#fff}
+#reader{width:100%;min-height:120px;background:#111;border-radius:10px;overflow:hidden}
+#reader video{width:100%!important}
+.banner{border-radius:12px;padding:14px;margin:10px 0;text-align:center;border:2px solid var(--line);background:#fff;min-height:84px}
+.banner.ok{border-color:var(--ok);background:#e9f7ee}
+.banner.err{border-color:var(--err);background:#fdecea}
+.banner .t{font-size:20px;font-weight:700}
+.banner .s{color:var(--mut);margin-top:2px}
+.log{list-style:none;margin:0;padding:0}
+.log li{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
+.log .i{flex:0 0 22px;text-align:center;font-weight:700}
+.log .m{flex:1;min-width:0}
+.log .m small{display:block;color:var(--mut)}
+.pending .i{color:var(--warn)}.ok .i{color:var(--ok)}.err .i{color:var(--err)}.undone{opacity:.5;text-decoration:line-through}
+.sum{display:flex;gap:8px;text-align:center}
+.sum div{flex:1;background:#eef3ec;border-radius:10px;padding:8px}
+.sum b{display:block;font-size:18px}
+.sum .tot{background:var(--g2);color:#fff}.sum .tot span{color:#d6e6da}.sum .tot b{font-size:24px}
+.sum span{font-size:12px;color:var(--mut)}
+.grp{border-bottom:1px solid var(--line);padding:10px 0}
+.grp .h{display:flex;gap:8px;align-items:center;cursor:pointer}
+.grp .h .n{flex:1;font-weight:600}
+.grp .h .v{text-align:right;font-size:14px;color:var(--mut)}
+.grp .d{margin:8px 0 0 8px;font-size:14px}
+.grp .d div{display:flex;gap:6px;align-items:center;padding:5px 0;border-top:1px dashed var(--line)}
+.grp .d div span{flex:1}
+.chip{display:inline-block;background:#e4e9e1;border-radius:20px;padding:2px 9px;font-size:12px;margin:2px 3px 0 0}
+.lst .it{display:flex;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.lst .it .n{flex:1}.lst .it small{color:var(--mut);display:block}
+.off{opacity:.5}
+.mod{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.mod>div{background:#fff;width:100%;max-width:560px;border-radius:16px 16px 0 0;padding:16px;max-height:92vh;overflow:auto}
+.mod h2{font-size:19px}
+.toast{position:fixed;left:12px;right:12px;bottom:16px;background:#222;color:#fff;border-radius:10px;padding:12px;z-index:30;text-align:center}
+.hide{display:none!important}
+.mut{color:var(--mut);font-size:14px}
+</style>
+</head>
+<body>
+<header><b>Wildlager</b><span><small id="who"></small> <button class="btn sm sec hide" id="logout">Abmelden</button></span></header>
+<nav id="nav" class="hide">
+  <button data-tab="scan" class="on">Scannen</button>
+  <button data-tab="bestand">Bestand</button>
+  <button data-tab="stamm">Stammdaten</button>
+</nav>
+<main>
+  <!-- Anmeldung -->
+  <section id="v-login" class="hide">
+    <div class="card">
+      <h2>Anmelden</h2>
+      <div id="urlBox" class="hide">
+        <label>Server-Adresse (Web-App-URL aus Google Apps Script)</label>
+        <input id="inUrl" placeholder="https://script.google.com/macros/s/…/exec" autocapitalize="off" autocorrect="off">
+      </div>
+      <label>Zugangscode</label>
+      <input id="inCode" type="password" autocomplete="current-password">
+      <div style="margin-top:12px"><button class="btn big" id="btnCode">Weiter</button></div>
+      <div id="userBox" class="hide">
+        <label>Wer bist du?</label>
+        <div id="userBtns"></div>
+      </div>
+      <p class="mut" id="loginErr" style="color:var(--err)"></p>
+    </div>
+  </section>
+
+  <!-- Scannen -->
+  <section id="v-scan" class="hide">
+    <div class="seg" id="modeSeg">
+      <button data-mode="ein" class="on">Einbuchen</button>
+      <button data-mode="aus">Ausbuchen</button>
+      <button data-mode="um">Umlagern</button>
+    </div>
+    <div class="card">
+      <div id="lagerRow">
+        <label id="lagerLbl">Lagerort (Standard)</label>
+        <select id="selLager"></select>
+      </div>
+      <label style="display:flex;align-items:center;margin-top:12px;color:var(--txt);font-size:15px">
+        <input type="checkbox" id="chkDauer" checked> Dauerscan (Kamera bleibt an)
+      </label>
+    </div>
+    <div class="card">
+      <div id="reader"></div>
+      <div style="margin-top:10px" class="row">
+        <button class="btn big" id="btnCam">Kamera starten</button>
+      </div>
+      <div class="banner" id="banner"><div class="t">Bereit</div><div class="s">Kamera starten und Etiketten scannen</div></div>
+      <div class="row">
+        <button class="btn sec sm fit hide" id="btnAgain">+1 nochmal</button>
+      </div>
+      <label>Code manuell eingeben (oder Handscanner)</label>
+      <div class="row">
+        <input id="inManual" inputmode="numeric" placeholder="EAN-13">
+        <button class="btn sec fit" id="btnManual">OK</button>
+      </div>
+    </div>
+    <div class="card hide" id="sumCard">
+      <div class="sum" id="sumAus"></div>
+      <div style="margin-top:10px"><button class="btn sec sm" id="btnSumReset">Summe zurücksetzen (neue Rechnung)</button></div>
+    </div>
+    <div class="card">
+      <h2>Diese Sitzung <span class="mut" id="cnt"></span></h2>
+      <ul class="log" id="log"></ul>
+    </div>
+  </section>
+
+  <!-- Bestand -->
+  <section id="v-bestand" class="hide">
+    <div class="card">
+      <div class="row">
+        <div><label>Lagerort</label><select id="fLager"></select></div>
+        <div><label>Wildart</label><select id="fWild"></select></div>
+      </div>
+      <label>Suche</label>
+      <input id="fText" placeholder="z. B. Lende">
+      <div class="row" style="margin-top:10px">
+        <label style="display:flex;align-items:center;margin:0;color:var(--txt)"><input type="checkbox" id="fOut"> Ausgebuchte zeigen</label>
+        <button class="btn sec sm fit" id="btnReload">Aktualisieren</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="sum" id="sum"></div>
+    </div>
+    <div class="card" id="bestandList"></div>
+  </section>
+
+  <!-- Stammdaten -->
+  <section id="v-stamm" class="hide">
+    <div class="card">
+      <h2>Lagerorte</h2>
+      <div class="lst" id="lagerList"></div>
+      <div style="margin-top:10px"><button class="btn sec" data-act="lagerNew">+ Lagerort</button></div>
+    </div>
+    <div class="card">
+      <h2>Artikel</h2>
+      <div class="lst" id="artList"></div>
+      <div style="margin-top:10px"><button class="btn sec" data-act="artNew">+ Artikel</button></div>
+    </div>
+  </section>
+</main>
+<div id="modal" class="mod hide"><div id="modalBody"></div></div>
+<div id="toast" class="toast hide"></div>
+
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+/* Hier die Web-App-URL aus Google Apps Script eintragen (oder leer lassen, dann wird sie in der App abgefragt). */
+const CONFIG = { API_URL: 'https://script.google.com/macros/s/AKfycbziEyH6EZJxthixoqQc6fx-Rr3V_rjtPDHKR_d-394C38N2WrAI3rG6ww1KN_7B4-Qz/exec' };
+
+const S = {
+  url: '', code: '', user: '', artikel: {}, artikelList: [], lagerorte: [], nutzer: [], settings: { prefix: '28', gram: 1 },
+  mode: 'ein', lagerort: '', dauer: true, scanner: null, running: false, paused: false,
+  queue: [], sending: false, log: [], seq: 0, lastEan: '', lastSeen: 0, lastEntry: null,
+  bestand: [], ausgebucht: [], open: {}, tab: 'scan', sumSeq: 0
+};
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmtKg = g => (g / 1000).toLocaleString('de-DE', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) + ' kg';
+const fmtEur = v => v.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
+const ls = { get: k => { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
+
+/* ---------------------------------------------------------- EAN (wie im Backend) */
+function normEan(s) { return String(s == null ? '' : s).replace(/\D/g, ''); }
+function eanValid(s) {
+  if (!/^\d{13}$/.test(s)) return false;
+  let sum = 0; for (let i = 0; i < 12; i++) sum += Number(s[i]) * (i % 2 === 0 ? 1 : 3);
+  return (10 - (sum % 10)) % 10 === Number(s[12]);
+}
+function parseEan(raw) {
+  const ean = normEan(raw);
+  if (ean.length !== 13) return { ok: false, error: 'Kein EAN-13 (' + ean.length + ' Stellen)' };
+  if (!eanValid(ean)) return { ok: false, error: 'Prüfziffer ungültig – neu scannen' };
+  if (ean.substr(0, 2) !== S.settings.prefix) return { ok: false, error: 'Fremder Code (Präfix ' + ean.substr(0, 2) + ')' };
+  const g = Math.round(parseInt(ean.substr(7, 5), 10) * S.settings.gram);
+  if (!(g > 0)) return { ok: false, error: 'Gewicht 0 im Code' };
+  return { ok: true, ean, artikelcode: ean.substr(2, 5), gewichtG: g };
+}
+
+/* ------------------------------------------------------------------- Server */
+async function api(action, payload, opt) {
+  opt = opt || {};
+  const body = JSON.stringify(Object.assign({ action, code: S.code, user: S.user }, payload || {}));
+  let r;
+  try {
+    const resp = await fetch(S.url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body, redirect: 'follow' });
+    r = await resp.json();
+  } catch (e) {
+    const er = new Error('Keine Verbindung zum Server'); er.net = true; throw er;
+  }
+  if (!r.ok) {
+    if (r.auth === false && !opt.noAuthRedirect) { logout(true); }
+    throw new Error(r.error || 'Fehler');
+  }
+  return r;
+}
+
+/* ---------------------------------------------------------------- UI-Helfer */
+let toastT;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.remove('hide'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.add('hide'), 3500); }
+function show(id) { ['login', 'scan', 'bestand', 'stamm'].forEach(v => $('#v-' + v).classList.toggle('hide', v !== id)); }
+function openModal(html) { $('#modalBody').innerHTML = html; $('#modal').classList.remove('hide'); }
+function closeModal() { $('#modal').classList.add('hide'); $('#modalBody').innerHTML = ''; }
+let actx;
+function beep(ok) {
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.frequency.value = ok ? 880 : 200; g.gain.value = 0.15; o.connect(g); g.connect(actx.destination);
+    o.start(); o.stop(actx.currentTime + (ok ? 0.08 : 0.3));
+  } catch (e) {}
+  try { if (navigator.vibrate) navigator.vibrate(ok ? 30 : [80, 60, 80]); } catch (e) {}
+}
+function flash(ok, title, sub) {
+  const b = $('#banner');
+  b.className = 'banner ' + (ok ? 'ok' : 'err');
+  b.innerHTML = '<div class="t">' + esc(title) + '</div><div class="s">' + esc(sub || '') + '</div>';
+}
+
+/* ------------------------------------------------------------------ Anmeldung */
+function start() {
+  S.url = CONFIG.API_URL || ls.get('wl_url');
+  S.code = ls.get('wl_code'); S.user = ls.get('wl_user');
+  if (S.url && S.code && S.user) {
+    api('init', {}, { noAuthRedirect: true }).then(applyInit).catch(() => showLogin());
+  } else showLogin();
+}
+function showLogin(msg) {
+  $('#nav').classList.add('hide'); $('#logout').classList.add('hide'); $('#who').textContent = '';
+  $('#urlBox').classList.toggle('hide', !!CONFIG.API_URL);
+  $('#inUrl').value = S.url || ''; $('#userBox').classList.add('hide'); $('#loginErr').textContent = msg || '';
+  show('login');
+}
+async function codeStep() {
+  const url = CONFIG.API_URL || $('#inUrl').value.trim(); const code = $('#inCode').value;
+  if (!url || !code) { $('#loginErr').textContent = 'Bitte Adresse und Zugangscode eingeben.'; return; }
+  S.url = url; S.code = code; $('#loginErr').textContent = 'Prüfe …';
+  try {
+    const r = await api('nutzer', {}, { noAuthRedirect: true });
+    $('#loginErr').textContent = '';
+    $('#userBtns').innerHTML = r.nutzer.map(n => '<button class="btn sec" style="margin:4px 6px 0 0" data-user="' + esc(n) + '">' + esc(n) + '</button>').join('');
+    $('#userBox').classList.remove('hide');
+  } catch (e) { $('#loginErr').textContent = e.message; }
+}
+async function pickUser(name) {
+  S.user = name;
+  try {
+    const r = await api('init', {}, { noAuthRedirect: true });
+    ls.set('wl_url', S.url); ls.set('wl_code', S.code); ls.set('wl_user', S.user);
+    applyInit(r);
+  } catch (e) { $('#loginErr').textContent = e.message; }
+}
+function logout(silent) {
+  stopScan(); ls.set('wl_code', ''); ls.set('wl_user', ''); S.code = ''; S.user = '';
+  showLogin(silent ? 'Bitte neu anmelden.' : '');
+}
+function applyInit(r) {
+  S.artikelList = r.artikel; S.artikel = {}; r.artikel.forEach(a => { S.artikel[a.code] = a; });
+  S.lagerorte = r.lagerorte; S.nutzer = r.nutzer; S.settings = r.settings;
+  $('#who').textContent = S.user; $('#logout').classList.remove('hide'); $('#nav').classList.remove('hide');
+  const def = ls.get('wl_lager_' + S.user);
+  const act = S.lagerorte.filter(l => l.aktiv);
+  S.lagerort = act.some(l => l.name === def) ? def : (act[0] ? act[0].name : '');
+  renderLager(); setTab(S.tab || 'scan');
+}
+
+/* -------------------------------------------------------------------- Tabs */
+function setTab(t) {
+  S.tab = t;
+  if (t !== 'scan') stopScan();
+  document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+  show(t);
+  if (t === 'bestand') loadBestand();
+  if (t === 'stamm') renderStamm();
+}
+function renderLager() {
+  const act = S.lagerorte.filter(l => l.aktiv);
+  $('#selLager').innerHTML = act.map(l => '<option' + (l.name === S.lagerort ? ' selected' : '') + '>' + esc(l.name) + '</option>').join('');
+  const all = '<option value="">Alle</option>' + S.lagerorte.map(l => '<option>' + esc(l.name) + '</option>').join('');
+  const cur = $('#fLager').value; $('#fLager').innerHTML = all; $('#fLager').value = cur;
+  const wilds = Array.from(new Set(S.artikelList.map(a => a.wildart).filter(Boolean))).sort();
+  const cw = $('#fWild').value; $('#fWild').innerHTML = '<option value="">Alle</option>' + wilds.map(w => '<option>' + esc(w) + '</option>').join(''); $('#fWild').value = cw;
+}
+function setMode(m) {
+  S.mode = m;
+  document.querySelectorAll('#modeSeg button').forEach(b => b.classList.toggle('on', b.dataset.mode === m));
+  $('#lagerRow').classList.toggle('hide', m === 'aus');
+  $('#sumCard').classList.toggle('hide', m !== 'aus');
+  $('#lagerLbl').textContent = m === 'um' ? 'Ziel-Lagerort' : 'Lagerort (Standard)';
+  updateCounters(); renderLog();
+}
+
+/* ---------------------------------------------------------------- Scannen */
+async function startScan() {
+  if (S.running) return;
+  if (!window.Html5Qrcode) { toast('Scanner-Bibliothek nicht geladen – Internet prüfen.'); return; }
+  try {
+    S.scanner = S.scanner || new Html5Qrcode('reader', {
+      formatsToSupport: [Html5QrcodeSupportedFormats.EAN_13],
+      experimentalFeatures: { useBarCodeDetectorIfSupported: true }, verbose: false
+    });
+    await S.scanner.start({ facingMode: 'environment' }, {
+      fps: 12, aspectRatio: 1.5,
+      qrbox: (w, h) => ({ width: Math.floor(Math.min(w * 0.92, 400)), height: Math.floor(Math.min(h * 0.55, 150)) })
+    }, txt => handleCode(txt), () => {});
+    S.running = true; $('#btnCam').textContent = 'Kamera stoppen';
+  } catch (e) {
+    toast('Kamera nicht verfügbar: ' + (e && e.message ? e.message : e));
+  }
+}
+async function stopScan() {
+  if (!S.running) return;
+  S.running = false; $('#btnCam').textContent = 'Kamera starten';
+  try { await S.scanner.stop(); S.scanner.clear(); } catch (e) {}
+}
+function handleCode(raw) {
+  if (S.paused) return;
+  const now = Date.now(), ean = normEan(raw);
+  const same = ean === S.lastEan && now - S.lastSeen < 1000;   // gleicher Code noch im Bild
+  S.lastEan = ean; S.lastSeen = now;
+  if (!same) submitScan(ean);
+}
+async function submitScan(raw) {
+  const p = parseEan(raw);
+  if (!p.ok) { flash(false, 'Ungültig', p.error); beep(false); return; }
+  if (S.mode !== 'aus' && !S.lagerort) { flash(false, 'Lagerort fehlt', 'Bitte oben einen Lagerort wählen.'); beep(false); return; }
+  if (S.mode === 'ein' && !S.artikel[p.artikelcode]) {
+    S.paused = true; beep(false);
+    try { await askArtikel(p.artikelcode, true); } finally { S.paused = false; S.lastSeen = Date.now(); }
+    if (!S.artikel[p.artikelcode]) { flash(false, 'Nicht eingebucht', 'Artikel ' + p.artikelcode + ' nicht angelegt.'); return; }
+  }
+  const a = S.artikel[p.artikelcode];
+  const e = { tmp: ++S.seq, mode: S.mode, ean: p.ean, lagerort: S.mode === 'aus' ? null : S.lagerort, ts: Date.now(),
+    state: 'pending', name: a ? a.bezeichnung : 'Artikel ' + p.artikelcode, gewichtG: p.gewichtG };
+  S.log.unshift(e); S.lastEntry = e;
+  if (S.log.length > 200) S.log.length = 200;
+  flash(true, e.name, fmtKg(p.gewichtG) + (e.lagerort ? ' → ' + e.lagerort : ' ausgebucht'));
+  beep(true); $('#btnAgain').classList.remove('hide');
+  S.queue.push(e); renderLog(); flushQueue();
+  if (!S.dauer) stopScan();
+}
+async function flushQueue() {
+  if (S.sending) return;
+  S.sending = true;
+  try {
+    while (S.queue.length) {
+      const first = S.queue[0], batch = [];
+      while (S.queue.length && S.queue[0].mode === first.mode && S.queue[0].lagerort === first.lagerort && batch.length < 25) batch.push(S.queue.shift());
+      const action = first.mode === 'ein' ? 'einbuchen' : first.mode === 'aus' ? 'ausbuchen' : 'umlagern';
+      let r;
+      try { r = await api(action, { items: batch.map(b => ({ ean: b.ean, ts: b.ts })), lagerort: first.lagerort }); }
+      catch (err) {
+        batch.forEach(b => { b.state = 'err'; b.error = err.message; b.net = !!err.net; });
+        beep(false); flash(false, 'Fehler', err.message); renderLog(); updateCounters(); continue;
+      }
+      batch.forEach((b, i) => {
+        const x = r.results[i];
+        if (x && x.ok) { b.state = 'ok'; b.res = x; b.name = x.bezeichnung || b.name; }
+        else { b.state = 'err'; b.error = x ? x.error : 'Keine Antwort'; beep(false); flash(false, b.name, b.error); }
+      });
+      renderLog(); updateCounters();
+    }
+  } finally { S.sending = false; }
+}
+function renderLog() {
+  const items = S.log.filter(e => e.mode === S.mode).slice(0, 40);
+  $('#log').innerHTML = items.map(e => {
+    const ic = e.state === 'ok' ? '✓' : e.state === 'err' ? '✗' : e.state === 'undone' ? '↩' : '…';
+    const cls = e.state === 'undone' ? 'ok undone' : e.state;
+    const sub = e.state === 'err' ? esc(e.error) : esc(fmtKg(e.gewichtG) + (e.lagerort ? ' · ' + e.lagerort : '') + (e.res && e.res.von ? ' (von ' + e.res.von + ')' : '') + (e.mode === 'aus' && e.state === 'ok' ? ' · ' + fmtEur(eurOf(e)) : ''));
+    let btn = '';
+    if (e.state === 'ok' && e.mode !== 'um') btn = '<button class="btn sec sm fit" data-act="undo" data-id="' + e.tmp + '">Rückgängig</button>';
+    if (e.state === 'err' && e.net) btn = '<button class="btn sec sm fit" data-act="retry" data-id="' + e.tmp + '">Erneut</button>';
+    return '<li class="' + cls + '"><span class="i">' + ic + '</span><span class="m">' + esc(e.name) + '<small>' + sub + '</small></span>' + btn + '</li>';
+  }).join('') || '<li class="mut">Noch nichts gescannt.</li>';
+}
+/* Preis einer Packung wie auf dem Etikett: Gewicht x Preis/kg, auf Cent gerundet */
+function eurOf(e) {
+  const p = e.res && e.res.preis != null ? e.res.preis : ((e.res && S.artikel[e.res.artikelcode]) || {}).preis || 0;
+  return Math.round(e.gewichtG * p / 1000 * 100) / 100;
+}
+function updateCounters() {
+  const ok = S.log.filter(e => e.mode === S.mode && e.state === 'ok');
+  const g = ok.reduce((s, e) => s + e.gewichtG, 0);
+  $('#cnt').textContent = ok.length ? '· ' + ok.length + ' Stück · ' + fmtKg(g) : '';
+  const a = S.log.filter(e => e.mode === 'aus' && e.state === 'ok' && e.tmp > S.sumSeq);
+  const ag = a.reduce((s, e) => s + e.gewichtG, 0), ae = a.reduce((s, e) => s + eurOf(e), 0);
+  $('#sumAus').innerHTML = '<div><b>' + a.length + '</b><span>Packungen</span></div><div><b>' + fmtKg(ag) + '</b><span>Gewicht</span></div><div class="tot"><b>' + fmtEur(ae) + '</b><span>Summe</span></div>';
+}
+async function undo(tmp) {
+  const e = S.log.find(x => x.tmp === tmp); if (!e || e.state !== 'ok') return;
+  try { await api('korrektur', { id: e.res.id, op: e.mode === 'ein' ? 'loeschen' : 'zurueck' }); e.state = 'undone'; renderLog(); updateCounters(); toast('Rückgängig gemacht'); }
+  catch (er) { toast(er.message); }
+}
+function retry(tmp) {
+  const e = S.log.find(x => x.tmp === tmp); if (!e) return;
+  e.state = 'pending'; e.error = ''; e.net = false; S.queue.push(e); renderLog(); flushQueue();
+}
+
+/* ---------------------------------------------------------------- Bestand */
+async function loadBestand() {
+  try {
+    const r = await api('bestand', { history: $('#fOut').checked });
+    S.bestand = r.bestand; S.ausgebucht = r.ausgebucht; renderBestand();
+  } catch (e) { toast(e.message); }
+}
+function renderBestand() {
+  const lag = $('#fLager').value, wild = $('#fWild').value, q = $('#fText').value.trim().toLowerCase();
+  const pass = o => {
+    const a = S.artikel[o.artikelcode] || { bezeichnung: o.artikelcode, wildart: '', preis: 0 };
+    if (lag && o.lagerort !== lag) return false;
+    if (wild && a.wildart !== wild) return false;
+    if (q && (a.bezeichnung + ' ' + o.artikelcode + ' ' + o.lagerort).toLowerCase().indexOf(q) < 0) return false;
+    return true;
+  };
+  const rows = S.bestand.filter(pass), groups = {};
+  rows.forEach(o => {
+    const a = S.artikel[o.artikelcode] || { bezeichnung: 'Artikel ' + o.artikelcode, preis: 0 };
+    const g = groups[o.artikelcode] = groups[o.artikelcode] || { a, items: [], g: 0, wert: 0, lag: {} };
+    g.items.push(o); g.g += o.gewichtG; g.wert += o.gewichtG / 1000 * a.preis; g.lag[o.lagerort] = (g.lag[o.lagerort] || 0) + 1;
+  });
+  const tg = rows.reduce((s, o) => s + o.gewichtG, 0);
+  const tw = Object.values(groups).reduce((s, g) => s + g.wert, 0);
+  $('#sum').innerHTML = '<div><b>' + rows.length + '</b><span>Packungen</span></div><div><b>' + fmtKg(tg) + '</b><span>Gewicht</span></div><div><b>' + fmtEur(tw) + '</b><span>Wert</span></div>';
+  const list = Object.keys(groups).sort((x, y) => groups[x].a.bezeichnung.localeCompare(groups[y].a.bezeichnung, 'de')).map(code => {
+    const g = groups[code], open = !!S.open[code];
+    const chips = Object.keys(g.lag).map(l => '<span class="chip">' + esc(l) + ': ' + g.lag[l] + '</span>').join('');
+    let d = '';
+    if (open) d = '<div class="d">' + g.items.map(o => '<div><span>' + fmtKg(o.gewichtG) + ' · ' + esc(o.lagerort) + '<br><small class="mut">' + esc(o.datum + ' ' + o.uhrzeit + ' · ' + o.nutzer) + '</small></span>' +
+      '<button class="btn sec sm fit" data-act="out" data-id="' + esc(o.id) + '">Ausbuchen</button><button class="btn sec sm fit" data-act="del" data-id="' + esc(o.id) + '">Löschen</button></div>').join('') + '</div>';
+    return '<div class="grp"><div class="h" data-act="toggle" data-code="' + code + '"><span class="n">' + esc(g.a.bezeichnung) + '<br>' + chips + '</span><span class="v">' + g.items.length + ' Stk<br>' + fmtKg(g.g) + '<br>' + fmtEur(g.wert) + '</span></div>' + d + '</div>';
+  }).join('');
+  let out = '';
+  if ($('#fOut').checked) {
+    const o2 = S.ausgebucht.filter(pass);
+    out = '<h2 style="margin-top:16px">Zuletzt ausgebucht</h2>' + (o2.map(o => {
+      const a = S.artikel[o.artikelcode] || { bezeichnung: o.artikelcode };
+      return '<div class="grp"><div class="h"><span class="n">' + esc(a.bezeichnung) + '<br><small class="mut">' + esc(fmtKg(o.gewichtG) + ' · ' + o.lagerort + ' · ' + o.abDatum + ' ' + o.abUhrzeit + ' · ' + o.abNutzer) + '</small></span><button class="btn sec sm fit" data-act="back" data-id="' + esc(o.id) + '">Zurück ins Lager</button></div></div>';
+    }).join('') || '<p class="mut">Keine Einträge.</p>');
+  }
+  $('#bestandList').innerHTML = (list || '<p class="mut">Kein Bestand für diese Auswahl.</p>') + out;
+}
+async function bestandAction(op, id) {
+  try {
+    if (op === 'out') { if (!confirm('Diese Packung ausbuchen?')) return; await api('ausbuchen', { items: [{ id, ts: Date.now() }] }); }
+    if (op === 'del') { if (!confirm('Eintrag endgültig löschen?')) return; await api('korrektur', { id, op: 'loeschen' }); }
+    if (op === 'back') await api('korrektur', { id, op: 'zurueck' });
+    loadBestand();
+  } catch (e) { toast(e.message); }
+}
+
+/* -------------------------------------------------------------- Stammdaten */
+function renderStamm() {
+  $('#lagerList').innerHTML = S.lagerorte.map(l => '<div class="it ' + (l.aktiv ? '' : 'off') + '"><div class="n">' + esc(l.name) + '<small>' + (l.aktiv ? 'aktiv' : 'inaktiv') + '</small></div><button class="btn sec sm fit" data-act="lagerEdit" data-name="' + esc(l.name) + '">Bearbeiten</button></div>').join('') || '<p class="mut">Noch keine Lagerorte.</p>';
+  $('#artList').innerHTML = S.artikelList.slice().sort((a, b) => a.code.localeCompare(b.code)).map(a => '<div class="it ' + (a.aktiv ? '' : 'off') + '"><div class="n">' + esc(a.bezeichnung) + '<small>' + a.code + ' · ' + fmtEur(a.preis) + '/kg' + (a.aktiv ? '' : ' · inaktiv') + '</small></div><button class="btn sec sm fit" data-act="artEdit" data-code="' + a.code + '">Bearbeiten</button></div>').join('') || '<p class="mut">Noch keine Artikel.</p>';
+}
+function askArtikel(code, fromScan) {
+  return new Promise(resolve => {
+    const ex = S.artikel[code];
+    const sib = S.artikelList.filter(a => a.code.substr(0, 2) === code.substr(0, 2) && a.wildart)[0];
+    const v = ex || { code, bezeichnung: '', wildart: sib ? sib.wildart : '', fleischart: '', preis: '', aktiv: true };
+    openModal('<h2>' + (ex ? 'Artikel bearbeiten' : fromScan ? 'Neuer Artikel ' + code + ' (aus Scan)' : 'Neuer Artikel') + '</h2>' +
+      '<label>Artikelcode (5 Ziffern: Wildart 2 + Fleischart 3)</label><input id="aCode" inputmode="numeric" maxlength="5" value="' + esc(v.code) + '"' + (ex || fromScan ? ' disabled' : '') + '>' +
+      '<label>Wildart</label><input id="aWild" value="' + esc(v.wildart) + '" placeholder="z. B. Schwarzwild">' +
+      '<label>Fleischart</label><input id="aFleisch" value="' + esc(v.fleischart) + '" placeholder="z. B. Lende">' +
+      '<label>Bezeichnung (leer = Wildart + Fleischart)</label><input id="aBez" value="' + esc(v.bezeichnung) + '">' +
+      '<label>Preis pro kg (€)</label><input id="aPreis" inputmode="decimal" value="' + esc(v.preis) + '">' +
+      '<label style="display:flex;align-items:center;color:var(--txt);font-size:15px"><input type="checkbox" id="aAkt"' + (v.aktiv ? ' checked' : '') + '> Aktiv</label>' +
+      '<p id="mErr" class="mut" style="color:var(--err)"></p>' +
+      '<div class="row"><button class="btn sec" id="mCancel">Abbrechen</button><button class="btn" id="mSave">Speichern</button></div>');
+    $('#mCancel').onclick = () => { closeModal(); resolve(false); };
+    $('#mSave').onclick = async () => {
+      const art = { code: $('#aCode').value.trim(), wildart: $('#aWild').value, fleischart: $('#aFleisch').value, bezeichnung: $('#aBez').value, preis: $('#aPreis').value, aktiv: $('#aAkt').checked };
+      try {
+        const r = await api('artikelSave', { artikel: art });
+        S.artikelList = r.artikel; S.artikel = {}; r.artikel.forEach(a => { S.artikel[a.code] = a; });
+        renderLager(); renderStamm(); closeModal(); resolve(true);
+      } catch (e) { $('#mErr').textContent = e.message; }
+    };
+  });
+}
+function askLager(name) {
+  const ex = S.lagerorte.filter(l => l.name === name)[0];
+  openModal('<h2>' + (ex ? 'Lagerort bearbeiten' : 'Neuer Lagerort') + '</h2>' +
+    '<label>Name</label><input id="lName" value="' + esc(ex ? ex.name : '') + '">' +
+    '<label style="display:flex;align-items:center;color:var(--txt);font-size:15px"><input type="checkbox" id="lAkt"' + (!ex || ex.aktiv ? ' checked' : '') + '> Aktiv</label>' +
+    (ex ? '<p class="mut">Beim Umbenennen werden alle Bestandseinträge mit umbenannt.</p>' : '') +
+    '<p id="mErr" class="mut" style="color:var(--err)"></p>' +
+    '<div class="row"><button class="btn sec" id="mCancel">Abbrechen</button><button class="btn" id="mSave">Speichern</button></div>');
+  $('#mCancel').onclick = closeModal;
+  $('#mSave').onclick = async () => {
+    try {
+      const r = await api('lagerortSave', { name: $('#lName').value, oldName: ex ? ex.name : '', aktiv: $('#lAkt').checked });
+      S.lagerorte = r.lagerorte;
+      if (!S.lagerorte.some(l => l.name === S.lagerort && l.aktiv)) { const a = S.lagerorte.filter(l => l.aktiv)[0]; S.lagerort = a ? a.name : ''; }
+      renderLager(); renderStamm(); closeModal();
+    } catch (e) { $('#mErr').textContent = e.message; }
+  };
+}
+
+/* ----------------------------------------------------------------- Ereignisse */
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-tab],[data-mode],[data-user],[data-act]'); if (!t) return;
+  if (t.dataset.tab) setTab(t.dataset.tab);
+  else if (t.dataset.mode) setMode(t.dataset.mode);
+  else if (t.dataset.user) pickUser(t.dataset.user);
+  else {
+    const a = t.dataset.act;
+    if (a === 'undo') undo(Number(t.dataset.id));
+    else if (a === 'retry') retry(Number(t.dataset.id));
+    else if (a === 'toggle') { S.open[t.dataset.code] = !S.open[t.dataset.code]; renderBestand(); }
+    else if (a === 'out' || a === 'del' || a === 'back') bestandAction(a, t.dataset.id);
+    else if (a === 'artNew') askArtikel('', false);
+    else if (a === 'artEdit') askArtikel(t.dataset.code, false);
+    else if (a === 'lagerNew') askLager('');
+    else if (a === 'lagerEdit') askLager(t.dataset.name);
+  }
+});
+$('#btnCode').onclick = codeStep;
+$('#inCode').addEventListener('keydown', e => { if (e.key === 'Enter') codeStep(); });
+$('#logout').onclick = () => logout(false);
+$('#btnCam').onclick = () => (S.running ? stopScan() : startScan());
+$('#chkDauer').onchange = e => { S.dauer = e.target.checked; };
+$('#selLager').onchange = e => { S.lagerort = e.target.value; ls.set('wl_lager_' + S.user, S.lagerort); };
+$('#btnSumReset').onclick = () => { S.sumSeq = S.seq; updateCounters(); toast('Summe zurückgesetzt'); };
+$('#btnAgain').onclick = () => { if (S.lastEntry) submitScan(S.lastEntry.ean); };
+function manual() { const v = $('#inManual').value; $('#inManual').value = ''; if (v) submitScan(v); }
+$('#btnManual').onclick = manual;
+$('#inManual').addEventListener('keydown', e => { if (e.key === 'Enter') manual(); });
+['fLager', 'fWild'].forEach(id => $('#' + id).onchange = renderBestand);
+$('#fText').oninput = renderBestand;
+$('#fOut').onchange = loadBestand;
+$('#btnReload').onclick = loadBestand;
+document.addEventListener('visibilitychange', () => { if (document.hidden) stopScan(); });
+start();
+</script>
+</body>
+</html>
