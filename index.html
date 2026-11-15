@@ -7,6 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <title>Wildlager</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.52.0/dist/tabler-icons.min.css">
 <style>
 :root{--g:#1f3d2b;--g2:#2f5d41;--bg:#f2f4f0;--card:#fff;--line:#d9ded6;--txt:#1b231d;--mut:#667066;--ok:#1e8a46;--err:#c0392b;--warn:#b7791f}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -15,7 +16,8 @@ header{background:var(--g);color:#fff;padding:10px 14px;display:flex;align-items
 header b{font-size:18px}
 header small{opacity:.85}
 nav{display:flex;background:var(--g2);position:sticky;top:46px;z-index:4}
-nav button{flex:1;padding:12px 4px;background:none;border:0;color:#cfe0d3;font-size:15px;font-weight:600;border-bottom:3px solid transparent}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px 6px;background:none;border:0;color:#cfe0d3;font-size:12px;font-weight:600;border-bottom:3px solid transparent}
+nav button i{font-size:24px;line-height:1}
 nav button.on{color:#fff;border-bottom-color:#fff}
 main{padding:12px;max-width:760px;margin:0 auto;padding-bottom:80px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
@@ -74,10 +76,10 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 <body>
 <header><b>Wildlager</b><span><small id="who"></small> <button class="btn sm sec hide" id="logout">Abmelden</button></span></header>
 <nav id="nav" class="hide">
-  <button data-tab="scan" class="on">Scannen</button>
-  <button data-tab="bestand">Bestand</button>
-  <button data-tab="rech">Rechnungen</button>
-  <button data-tab="stamm">Stammdaten</button>
+  <button data-tab="scan" class="on"><i class="ti ti-scan" aria-hidden="true"></i>Scannen</button>
+  <button data-tab="bestand"><i class="ti ti-stack-2" aria-hidden="true"></i>Bestand</button>
+  <button data-tab="rech"><i class="ti ti-file-invoice" aria-hidden="true"></i>Rechnungen</button>
+  <button data-tab="stamm"><i class="ti ti-adjustments" aria-hidden="true"></i>Stammdaten</button>
 </nav>
 <main>
   <!-- Anmeldung -->
