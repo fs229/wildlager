@@ -1,4 +1,4 @@
-# Wildhub – Einrichtung (ca. 20 Minuten)
+# Waidr – Einrichtung (ca. 20 Minuten)
 
 Du brauchst: ein Google-Konto, ein GitHub-Konto (oder Netlify) und die Datei `Code.gs` für Google und für GitHub `index.html` samt Logo-Dateien (`apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `icon.svg`, `manifest.webmanifest`).
 
@@ -80,11 +80,11 @@ Hinweis: Ein öffentliches Repository ist für jeden einsehbar, die Server-URL s
 - Preise einer Rechnung ändern sich nie nachträglich, auch wenn du später den Preis pro kg im Blatt "Artikel" änderst.
 
 **Wünsche** (eigener Tab)
-- **+ Wunsch:** Kunde, Artikel und Menge in kg. Wünschbar sind nur aktive Artikel aus den Stammdaten. **Speichern + weiterer Wunsch** erfasst mehrere Zeilen für denselben Kunden hintereinander.
-- **Nach Artikel:** der Bedarf je Wildart und Artikel: gewünschte Menge, aktueller Lagerbestand und Fehlmenge. Antippen zeigt, welche Kunden was wollen. Damit planst du Zerlegungs- und Wurstbereitungstermine. Diese Übersicht gibt es nur in diesem Tab.
+- **+ Wunsch:** Kunde, Artikel und Menge. Neben dem Mengenfeld wählst du die Einheit **kg** (eine Nachkommastelle, 0,1 bis 99,9) oder **Stück** (ganze Zahl, 1 bis 999). Ein Stück entspricht einer Packung. Zum selben Artikel kann ein Kunde Wünsche in beiden Einheiten haben. Wünschbar sind nur aktive Artikel aus den Stammdaten. **Speichern + weiterer Wunsch** erfasst mehrere Zeilen für denselben Kunden hintereinander.
+- **Nach Artikel:** der Bedarf je Wildart und Artikel: gewünschte Menge (kg und Stück getrennt), aktueller Lagerbestand (kg und Anzahl Packungen) und Fehlmenge. Stück-Wünsche werden für die Fehlmenge mit dem Durchschnittsgewicht einer Packung dieses Artikels in kg umgerechnet (erst aus dem Lager, sonst aus den zuletzt ausgebuchten Packungen) und mit ≈ gekennzeichnet. Gibt es kein Durchschnittsgewicht, steht dort "Fehlt ≥ …" und die Stück zählen nicht mit. Antippen zeigt, welche Kunden was wollen. Damit planst du Zerlegungs- und Wurstbereitungstermine. Diese Übersicht gibt es nur in diesem Tab.
 - **Nach Kunde:** offene Wünsche je Kunde mit **✓** (erfüllt) und **Bearbeiten**. **Text kopieren** legt die Wunschliste für WhatsApp in die Zwischenablage.
 - **Erledigt:** erfüllte und verworfene Wünsche. Über **Bearbeiten** kannst du sie wieder öffnen.
-- **Abhaken beim Ausbuchen:** Buchst du an einen Kunden aus und er hat einen offenen Wunsch zu diesem Artikel, schlägt die App das Abhaken vor. Im Scan-Tab erscheint dafür die Karte **Passende Wünsche** mit Knopf **Erfüllt**, im Bestand-Tab ein Auswahlfenster. Nichts wird automatisch abgehakt.
+- **Abhaken beim Ausbuchen:** Buchst du an einen Kunden aus und er hat einen offenen Wunsch zu diesem Artikel, schlägt die App das Abhaken vor. Bei Stück-Wünschen zählt die App die ausgebuchten Packungen. Im Scan-Tab erscheint dafür die Karte **Passende Wünsche** mit Knopf **Erfüllt**, im Bestand-Tab ein Auswahlfenster. Nichts wird automatisch abgehakt.
 - Wünsche reservieren nichts im Lager und haben keine Termine.
 
 **Stammdaten**
@@ -95,7 +95,7 @@ Hinweis: Ein öffentliches Repository ist für jeden einsehbar, die Server-URL s
 
 **Datenfelder je Packung (Blatt „Bestand")**: ID, EAN, Artikelcode, Gewicht (g), Lagerort, Scandatum, Scanuhrzeit, Eingebucht von, Status, Ausbuchdatum, Ausbuchuhrzeit, Ausgebucht von, Kunde (Verkauf), Preis (€), Rechnungsnr.
 
-**Blatt „Wünsche"**: ID, Datum, Kunde, Artikelcode, Menge (kg), Status (offen, erfüllt, verworfen), Erledigt am, Erfasst von.
+**Blatt „Wünsche"**: ID, Datum, Kunde, Artikelcode, Menge, Status (offen, erfüllt, verworfen), Erledigt am, Erfasst von, Einheit (kg oder Stk; leer gilt als kg).
 
 **Blatt „Rechnungen"**: Rechnungsnr, Datum, Uhrzeit, Kunde, Packungen, Gewicht (g), Summe (€), Erstellt von. Die einzelnen Positionen findest du im Blatt „Bestand" über die Spalte Rechnungsnr. Das Blatt **Kunden** (Name, Aktiv, Notiz) kannst du auch direkt im Sheet pflegen.
 
@@ -111,7 +111,7 @@ Aufbau des Codes (13 Stellen, nach deinen Etiketten): `28` + Wildart (2) + Fleis
 
 ---
 
-## Update einer bestehenden Installation (zuletzt: Wünsche, Darkmode, Wind)
+## Update einer bestehenden Installation (zuletzt: Wünsche in kg und Stück)
 
 1. Im Apps-Script-Editor den **kompletten Code ersetzen** durch den neuen `Code.gs`, speichern.
 2. **Bereitstellen > Bereitstellungen verwalten > Bearbeiten (Stift) > Version: Neue Version > Bereitstellen**. Die URL bleibt gleich.
