@@ -97,6 +97,7 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 .hb .val{grid-column:2;font-size:12px;color:var(--mut)}
 #tip{position:fixed;z-index:30;background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:12px;box-shadow:0 2px 10px rgba(0,0,0,.25);pointer-events:none;max-width:220px}
 #tip b{display:block;font-size:14px}
+details.fold>summary{display:flex;align-items:center;gap:8px;cursor:pointer;list-style:none}details.fold>summary::-webkit-details-marker{display:none}details.fold>summary h2{margin:0;flex:1}details.fold>summary::before{content:'';width:8px;height:8px;border-right:2px solid var(--mut);border-bottom:2px solid var(--mut);transform:rotate(-45deg);transition:transform .15s}details.fold[open]>summary::before{transform:rotate(45deg)}details.fold[open]>summary h2{margin-bottom:8px}
 .stat details{margin-top:8px;font-size:12px}.stat table{width:100%;border-collapse:collapse;margin-top:6px}.stat td,.stat th{padding:3px 4px;text-align:right;border-top:1px solid var(--line)}.stat td:first-child,.stat th:first-child{text-align:left}
 </style>
 </head>
@@ -105,6 +106,7 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 <nav id="nav" class="hide">
   <button data-tab="scan" class="on"><i class="ti ti-scan" aria-hidden="true"></i>Scannen</button>
   <button data-tab="bestand"><i class="ti ti-stack-2" aria-hidden="true"></i>Bestand</button>
+  <button data-tab="strecke"><i class="ti ti-target-arrow" aria-hidden="true"></i>Strecke</button>
   <button data-tab="rech"><i class="ti ti-file-invoice" aria-hidden="true"></i>Rechnungen</button>
   <button data-tab="wunsch"><i class="ti ti-clipboard-list" aria-hidden="true"></i>Wünsche</button>
   <button data-tab="stamm"><i class="ti ti-adjustments" aria-hidden="true"></i>Stammdaten</button>
@@ -141,6 +143,10 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
       <div id="lagerRow">
         <label id="lagerLbl">Lagerort (Standard)</label>
         <select id="selLager"></select>
+      </div>
+      <div id="erlRow">
+        <label>Erlegung (optional, Herkunft der Packungen)</label>
+        <div class="row"><select id="selErl"></select><button class="btn sec fit" data-act="strNewScan">+ Neu</button></div>
       </div>
       <div id="kundeRow" class="hide">
         <label>Kunde (Verkauf an)</label>
@@ -200,6 +206,20 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
     <div class="card" id="bestandList"></div>
   </section>
 
+  <!-- Strecke -->
+  <section id="v-strecke" class="hide">
+    <div class="card">
+      <button class="btn big" data-act="strNew">+ Erlegung erfassen</button>
+      <div class="row" style="margin-top:10px">
+        <div><label>Jagdjahr (1.4.–31.3.)</label><select id="sJahr"></select></div>
+        <div><label>Wildart</label><select id="sWild"></select></div>
+      </div>
+      <div class="sum" id="sSum" style="margin-top:10px"></div>
+      <div id="sChips" style="margin-top:8px"></div>
+    </div>
+    <div class="card"><h2>Streckenliste</h2><div class="lst" id="sList"></div></div>
+  </section>
+
   <!-- Rechnungen -->
   <section id="v-rech" class="hide">
     <div class="card hide" id="offenCard">
@@ -234,21 +254,21 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
   <section id="v-stamm" class="hide">
     <div class="seg" id="svSeg" style="margin-bottom:10px"><button data-sv="daten" class="on">Stammdaten</button><button data-sv="stat">Statistik</button></div>
     <div id="svDaten">
-    <div class="card">
-      <h2>Lagerorte</h2>
+    <div class="card"><details class="fold" data-fold="lager">
+      <summary><h2>Lagerorte</h2><span class="mut" id="cnt_lager"></span></summary>
       <div class="lst" id="lagerList"></div>
       <div style="margin-top:10px"><button class="btn sec" data-act="lagerNew">+ Lagerort</button></div>
-    </div>
-    <div class="card">
-      <h2>Kunden</h2>
+    </details></div>
+    <div class="card"><details class="fold" data-fold="kunden">
+      <summary><h2>Kunden</h2><span class="mut" id="cnt_kunden"></span></summary>
       <div class="lst" id="kundenList"></div>
       <div style="margin-top:10px"><button class="btn sec" data-act="kundeNew">+ Kunde</button></div>
-    </div>
-    <div class="card">
-      <h2>Artikel</h2>
+    </details></div>
+    <div class="card"><details class="fold" data-fold="art">
+      <summary><h2>Artikel</h2><span class="mut" id="cnt_art"></span></summary>
       <div class="lst" id="artList"></div>
       <div style="margin-top:10px"><button class="btn sec" data-act="artNew">+ Artikel</button></div>
-    </div>
+    </details></div>
     </div>
     <div id="svStat" class="stat hide">
     <div class="yr"><button class="btn sec sm fit" id="yPrev" aria-label="Vorjahr"><i class="ti ti-chevron-left" aria-hidden="true"></i></button><b id="yLbl"></b><button class="btn sec sm fit" id="yNext" aria-label="Folgejahr"><i class="ti ti-chevron-right" aria-hidden="true"></i></button></div>
@@ -321,7 +341,7 @@ async function api(action, payload, opt) {
 /* ---------------------------------------------------------------- UI-Helfer */
 let toastT;
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.remove('hide'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.add('hide'), 3500); }
-function show(id) { ['login', 'scan', 'bestand', 'rech', 'wunsch', 'stamm'].forEach(v => $('#v-' + v).classList.toggle('hide', v !== id)); }
+function show(id) { ['login', 'scan', 'bestand', 'strecke', 'rech', 'wunsch', 'stamm'].forEach(v => $('#v-' + v).classList.toggle('hide', v !== id)); }
 function openModal(html) { $('#modalBody').innerHTML = html; $('#modal').classList.remove('hide'); }
 function closeModal() { $('#modal').classList.add('hide'); $('#modalBody').innerHTML = ''; }
 let actx;
@@ -384,7 +404,7 @@ function applyInit(r) {
   const def = ls.get('wl_lager_' + S.user);
   const act = S.lagerorte.filter(l => l.aktiv);
   S.lagerort = act.some(l => l.name === def) ? def : (act[0] ? act[0].name : '');
-  renderLager(); renderKunden(); S.wuensche = null; loadWuenscheQuiet(); setTab(S.tab || 'scan');
+  renderLager(); renderKunden(); S.wuensche = null; S.strecke = null; S.erl = ''; loadStreckeQuiet(); loadWuenscheQuiet(); setTab(S.tab || 'scan');
 }
 
 /* -------------------------------------------------------------------- Tabs */
@@ -467,6 +487,81 @@ function renderStat() {
 $('#yPrev').onclick = () => { const i = S.stat.jahre.indexOf(S.stat.jahr); if (i > 0) loadStat(S.stat.jahre[i - 1]); };
 $('#yNext').onclick = () => { const i = S.stat.jahre.indexOf(S.stat.jahr); if (i < S.stat.jahre.length - 1) loadStat(S.stat.jahre[i + 1]); };
 
+/* ---------- Strecke ---------- */
+const jagdjahr = d => { const m = Number(String(d).slice(3, 5)), y = Number(String(d).slice(6, 10)); return m >= 4 ? y : y - 1; };
+const jjLabel = y => y + '/' + String((y + 1) % 100).padStart(2, '0');
+const strLabel = x => x.datum.slice(0, 6) + ' ' + x.wildart + (x.geschlecht && x.geschlecht !== 'unbekannt' ? ' ' + x.geschlecht : '') + ' · ' + x.erleger;
+async function loadStreckeQuiet() { try { const r = await api('strecke'); S.strecke = r.strecke; S.strOpt = { g: r.geschlechter }; renderErl(); } catch (e) {} }
+async function loadStrecke() { await loadStreckeQuiet(); renderStrecke(); }
+const todayDe = () => new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+function renderErl() {
+  const all = S.strecke || [], cj = jagdjahr(todayDe());
+  if (S.erl && !all.some(x => x.id === S.erl)) S.erl = '';
+  const list = all.filter(x => jagdjahr(x.datum) >= cj || x.id === S.erl).slice(0, 40);
+  $('#selErl').innerHTML = '<option value="">– keine –</option>' + list.map(x => '<option value="' + x.id + '"' + (x.id === S.erl ? ' selected' : '') + '>' + esc(strLabel(x)) + '</option>').join('');
+}
+$('#selErl').onchange = e => { S.erl = e.target.value; };
+function renderStrecke() {
+  const all = S.strecke || [];
+  const jj = Array.from(new Set(all.map(x => jagdjahr(x.datum)).concat([jagdjahr(todayDe())]))).sort((a, b) => b - a);
+  const curJ = $('#sJahr').value, curW = $('#sWild').value;
+  $('#sJahr').innerHTML = jj.map(y => '<option value="' + y + '">' + jjLabel(y) + '</option>').join('') + '<option value="all">Alle</option>';
+  $('#sJahr').value = curJ && (curJ === 'all' || jj.indexOf(Number(curJ)) >= 0) ? curJ : String(jj[0]);
+  const inJ = all.filter(x => $('#sJahr').value === 'all' || jagdjahr(x.datum) === Number($('#sJahr').value));
+  const wilds = Array.from(new Set(inJ.map(x => x.wildart))).sort((a, b) => a.localeCompare(b, 'de'));
+  $('#sWild').innerHTML = '<option value="">Alle</option>' + wilds.map(w => '<option>' + esc(w) + '</option>').join('');
+  $('#sWild').value = wilds.indexOf(curW) >= 0 ? curW : '';
+  const list = inJ.filter(x => !$('#sWild').value || x.wildart === $('#sWild').value);
+  const kg = list.reduce((a, x) => a + (x.gewichtKg || 0), 0), wn = list.filter(x => x.gewichtKg != null).length;
+  $('#sSum').innerHTML = '<div class="tot"><b>' + list.length + '</b><span>Stück</span></div><div><b>' + kg.toLocaleString('de-DE', { maximumFractionDigits: 1 }) + ' kg</b><span>' + wn + ' gewogen</span></div>';
+  const per = {}; list.forEach(x => { per[x.wildart] = (per[x.wildart] || 0) + 1; });
+  $('#sChips').innerHTML = Object.keys(per).sort((a, b) => per[b] - per[a]).map(w => '<span class="chip">' + esc(w) + ': ' + per[w] + '</span>').join(' ');
+  $('#sList').innerHTML = list.map(x => {
+    const pk = x.packN ? '<small>' + x.packN + ' Packung' + (x.packN === 1 ? '' : 'en') + ' · ' + fmtKg(x.packG) + ' eingelagert' + (x.packLager ? ' (' + x.packLager + ' auf Lager)' : ' (alle ausgebucht)') + (x.gewichtKg ? ' · ' + Math.round(x.packG / 10 / x.gewichtKg) + ' % des Gewichts' : '') + '</small>' : '';
+    return '<div class="it" data-act="strEdit" data-id="' + esc(x.id) + '" style="cursor:pointer"><div class="n"><b>' + esc(x.datum + ' ' + x.uhrzeit + ' · ' + x.wildart) + '</b><small>' +
+      esc([x.geschlecht, /^\d+$/.test(x.alter) ? x.alter + ' J.' : x.alter, x.erleger, x.gewichtKg != null ? x.gewichtKg.toLocaleString('de-DE') + ' kg' : '', x.marke ? 'Marke ' + x.marke : ''].filter(Boolean).join(' · ')) + '</small>' + pk + '</div></div>';
+  }).join('') || '<p class="mut">Keine Erlegungen in dieser Auswahl.</p>';
+}
+$('#sJahr').onchange = renderStrecke; $('#sWild').onchange = renderStrecke;
+function askErlegung(id) {
+  return new Promise(resolve => {
+    const ex = id ? (S.strecke || []).filter(x => x.id === id)[0] : null;
+    const now = new Date(), p2 = n => String(n).padStart(2, '0');
+    const iso = ex ? ex.datum.slice(6, 10) + '-' + ex.datum.slice(3, 5) + '-' + ex.datum.slice(0, 2) : now.getFullYear() + '-' + p2(now.getMonth() + 1) + '-' + p2(now.getDate());
+    const tm = ex ? ex.uhrzeit : p2(now.getHours()) + ':' + p2(now.getMinutes());
+    const opt = S.strOpt || { g: ['männlich', 'weiblich', 'unbekannt'], a: ['Jungtier', 'Mittel', 'Alt', 'unbekannt'] };
+    const wl = Array.from(new Set(S.artikelList.map(a => a.wildart).concat((S.strecke || []).map(x => x.wildart)).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'de'));
+    const names = (S.nutzer || []).map(n => typeof n === 'string' ? n : n.name).filter(Boolean);
+    const sel = (idn, arr, v) => '<select id="' + idn + '">' + arr.map(o => '<option' + (o === v ? ' selected' : '') + '>' + esc(o) + '</option>').join('') + '</select>';
+    openModal('<h2>' + (ex ? 'Erlegung bearbeiten' : 'Erlegung erfassen') + '</h2>' +
+      '<div class="row"><div><label>Datum</label><input id="eDat" type="date" value="' + iso + '"></div><div><label>Uhrzeit</label><input id="eZeit" type="time" value="' + tm + '"></div></div>' +
+      '<label>Wildart</label><input id="eWild" list="eWl" autocomplete="off" value="' + esc(ex ? ex.wildart : '') + '"><datalist id="eWl">' + wl.map(w => '<option value="' + esc(w) + '">').join('') + '</datalist>' +
+      '<div class="row"><div><label>Geschlecht</label>' + sel('eGe', opt.g, ex ? ex.geschlecht : 'unbekannt') + '</div><div><label>Alter (Jahre)</label><input id="eAl" type="number" inputmode="numeric" min="0" max="99" step="1" placeholder="optional" value="' + esc(ex ? ex.alter : '') + '"></div></div>' +
+      '<label>Erleger</label><input id="eEr" list="eEl" autocomplete="off" value="' + esc(ex ? ex.erleger : S.user) + '"><datalist id="eEl">' + names.map(n => '<option value="' + esc(n) + '">').join('') + '</datalist>' +
+      '<div class="row"><div><label>Gewicht in kg (optional)</label><input id="eGew" inputmode="decimal" placeholder="z. B. 45,5" value="' + (ex && ex.gewichtKg != null ? String(ex.gewichtKg).replace('.', ',') : '') + '"></div>' +
+      '<div><label>Wildmarke (optional)</label><input id="eMa" maxlength="30" value="' + esc(ex ? ex.marke : '') + '"></div></div>' +
+      '<p id="mErr" class="mut" style="color:var(--err)"></p><div class="row"><button class="btn sec" id="mCancel">Abbrechen</button><button class="btn" id="mSave">Speichern</button></div>' +
+      (ex ? '<button class="btn sec" id="mDel" style="margin-top:8px;width:100%;color:var(--err)">Löschen</button>' : ''));
+    $('#mCancel').onclick = () => { closeModal(); resolve(null); };
+    $('#mSave').onclick = async () => {
+      const d = $('#eDat').value; if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) { $('#mErr').textContent = 'Bitte ein Datum wählen.'; return; }
+      const wild = $('#eWild').value.trim(), er = $('#eEr').value.trim(), gew = $('#eGew').value.trim().replace(',', '.');
+      if (!wild) { $('#mErr').textContent = 'Bitte die Wildart angeben.'; return; }
+      if (!er) { $('#mErr').textContent = 'Bitte den Erleger angeben.'; return; }
+      if (gew !== '' && !(parseFloat(gew) >= 0.1 && parseFloat(gew) <= 999.9)) { $('#mErr').textContent = 'Gewicht in kg von 0,1 bis 999,9 angeben (z. B. 45,5).'; return; }
+      try {
+        const r = await api('streckeSave', { id: ex ? ex.id : '', datum: d.slice(8, 10) + '.' + d.slice(5, 7) + '.' + d.slice(0, 4), uhrzeit: $('#eZeit').value, wildart: wild,
+          geschlecht: $('#eGe').value, alter: $('#eAl').value, erleger: er, gewicht: gew, marke: $('#eMa').value.trim() });
+        closeModal(); await loadStreckeQuiet(); if (S.tab === 'strecke') renderStrecke(); toast('Erlegung gespeichert'); resolve(r.id);
+      } catch (e) { $('#mErr').textContent = e.message; }
+    };
+    if ($('#mDel')) $('#mDel').onclick = async () => {
+      if (!confirm('Erlegung endgültig löschen?')) return;
+      try { await api('streckeDelete', { id: ex.id }); closeModal(); await loadStreckeQuiet(); renderStrecke(); resolve(null); } catch (e) { $('#mErr').textContent = e.message; }
+    };
+  });
+}
+
 function setSv(v) {
   S.sv = v;
   document.querySelectorAll('#svSeg button').forEach(b => b.classList.toggle('on', b.dataset.sv === v));
@@ -480,6 +575,7 @@ function setTab(t) {
   document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
   show(t);
   if (t === 'bestand') loadBestand();
+  if (t === 'strecke') loadStrecke();
   if (t === 'rech') loadRech();
   if (t === 'wunsch') loadWunsch();
   if (t === 'stamm') { setSv(S.sv || 'daten'); renderStamm(); }
@@ -506,6 +602,7 @@ function setMode(m) {
   $('#lagerRow').classList.toggle('hide', m === 'aus');
   $('#sumCard').classList.toggle('hide', m !== 'aus');
   $('#kundeRow').classList.toggle('hide', m !== 'aus');
+  $('#erlRow').classList.toggle('hide', m !== 'ein');
   $('#lagerLbl').textContent = m === 'um' ? 'Ziel-Lagerort' : 'Lagerort (Standard)';
   updateCounters(); renderLog();
 }
@@ -597,7 +694,7 @@ async function submitScan(raw) {
     if (!S.artikel[p.artikelcode]) { flash(false, 'Nicht eingebucht', 'Artikel ' + p.artikelcode + ' nicht angelegt.'); return; }
   }
   const a = S.artikel[p.artikelcode];
-  const e = { tmp: ++S.seq, mode: S.mode, ean: p.ean, lagerort: S.mode === 'aus' ? null : S.lagerort, kunde: S.mode === 'aus' ? S.kunde : null, ts: Date.now(),
+  const e = { tmp: ++S.seq, mode: S.mode, ean: p.ean, lagerort: S.mode === 'aus' ? null : S.lagerort, kunde: S.mode === 'aus' ? S.kunde : null, erl: S.mode === 'ein' ? (S.erl || '') : null, ts: Date.now(),
     state: 'pending', name: a ? a.bezeichnung : 'Artikel ' + p.artikelcode, gewichtG: p.gewichtG };
   S.log.unshift(e); S.lastEntry = e;
   if (S.log.length > 200) S.log.length = 200;
@@ -612,10 +709,10 @@ async function flushQueue() {
   try {
     while (S.queue.length) {
       const first = S.queue[0], batch = [];
-      while (S.queue.length && S.queue[0].mode === first.mode && S.queue[0].lagerort === first.lagerort && S.queue[0].kunde === first.kunde && batch.length < 25) batch.push(S.queue.shift());
+      while (S.queue.length && S.queue[0].mode === first.mode && S.queue[0].lagerort === first.lagerort && S.queue[0].kunde === first.kunde && S.queue[0].erl === first.erl && batch.length < 25) batch.push(S.queue.shift());
       const action = first.mode === 'ein' ? 'einbuchen' : first.mode === 'aus' ? 'ausbuchen' : 'umlagern';
       let r;
-      try { r = await api(action, { items: batch.map(b => ({ ean: b.ean, ts: b.ts })), lagerort: first.lagerort, kunde: first.kunde }); }
+      try { r = await api(action, { items: batch.map(b => ({ ean: b.ean, ts: b.ts })), lagerort: first.lagerort, kunde: first.kunde, erlegung: first.erl || '' }); }
       catch (err) {
         batch.forEach(b => { b.state = 'err'; b.error = err.message; b.net = !!err.net; });
         beep(false); flash(false, 'Fehler', err.message); renderLog(); updateCounters(); continue;
@@ -697,7 +794,7 @@ function renderBestand() {
     const g = groups[code], open = !!S.open[code];
     const chips = Object.keys(g.lag).map(l => '<span class="chip">' + esc(l) + ': ' + g.lag[l] + '</span>').join('');
     let d = '';
-    if (open) d = '<div class="d">' + g.items.map(o => '<div><span>' + fmtKg(o.gewichtG) + ' · ' + esc(o.lagerort) + '<br><small class="mut">' + esc(o.datum + ' ' + o.uhrzeit + ' · ' + o.nutzer) + '</small></span><em class="pr">' + fmtEur(o.gewichtG / 1000 * g.a.preis) + '</em>' +
+    if (open) d = '<div class="d">' + g.items.map(o => '<div><span>' + fmtKg(o.gewichtG) + ' · ' + esc(o.lagerort) + '<br><small class="mut">' + esc(o.datum + ' ' + o.uhrzeit + ' · ' + o.nutzer + (o.herkunft ? ' · ' + o.herkunft : '')) + '</small></span><em class="pr">' + fmtEur(o.gewichtG / 1000 * g.a.preis) + '</em>' +
       '<button class="btn sec sm fit" data-act="out" data-id="' + esc(o.id) + '">Ausbuchen</button><button class="btn sec sm fit" data-act="del" data-id="' + esc(o.id) + '">Löschen</button></div>').join('') + '</div>';
     return '<div class="grp"><div class="h" data-act="toggle" data-code="' + code + '"><span class="n">' + esc(g.a.bezeichnung) + '<br>' + chips + '</span><span class="v">' + g.items.length + ' Stk<br>' + fmtKg(g.g) + '<br>' + fmtEur(g.wert) + '</span></div>' + d + '</div>';
   }).join('');
@@ -897,6 +994,14 @@ function renderStamm() {
   $('#kundenList').innerHTML = S.kunden.map(k => '<div class="it ' + (k.aktiv ? '' : 'off') + '"><div class="n">' + esc(k.name) + '<small>' + (k.aktiv ? 'aktiv' : 'inaktiv') + (k.notiz ? ' · ' + esc(k.notiz) : '') + '</small></div><button class="btn sec sm fit" data-act="kundeEdit" data-name="' + esc(k.name) + '">Bearbeiten</button></div>').join('') || '<p class="mut">Noch keine Kunden.</p>';
   $('#lagerList').innerHTML = S.lagerorte.map(l => '<div class="it ' + (l.aktiv ? '' : 'off') + '"><div class="n">' + esc(l.name) + '<small>' + (l.aktiv ? 'aktiv' : 'inaktiv') + '</small></div><button class="btn sec sm fit" data-act="lagerEdit" data-name="' + esc(l.name) + '">Bearbeiten</button></div>').join('') || '<p class="mut">Noch keine Lagerorte.</p>';
   $('#artList').innerHTML = S.artikelList.slice().sort((a, b) => a.code.localeCompare(b.code)).map(a => '<div class="it ' + (a.aktiv ? '' : 'off') + '"><div class="n">' + esc(a.bezeichnung) + '<small>' + a.code + ' · ' + fmtEur(a.preis) + '/kg' + (a.aktiv ? '' : ' · inaktiv') + '</small></div><button class="btn sec sm fit" data-act="artEdit" data-code="' + a.code + '">Bearbeiten</button></div>').join('') || '<p class="mut">Noch keine Artikel.</p>';
+  $('#cnt_lager').textContent = S.lagerorte.length; $('#cnt_kunden').textContent = S.kunden.length; $('#cnt_art').textContent = S.artikelList.length;
+  document.querySelectorAll('details.fold').forEach(d => {
+    if (!d.dataset.init) {
+      d.dataset.init = '1';
+      try { d.open = localStorage.getItem('waidr_fold_' + d.dataset.fold) === '1'; } catch (e) {}
+      d.addEventListener('toggle', () => { try { localStorage.setItem('waidr_fold_' + d.dataset.fold, d.open ? '1' : '0'); } catch (e) {} });
+    }
+  });
 }
 function askArtikel(code, fromScan) {
   return new Promise(resolve => {
@@ -1041,6 +1146,9 @@ document.addEventListener('click', e => {
     else if (a === 'kundeEdit') askKunde(t.dataset.name);
     else if (a === 'rechCreate') rechCreate(t.dataset.kunde);
     else if (a === 'rechOpen') rechOpen(t.dataset.nr);
+    else if (a === 'strNew') askErlegung('');
+    else if (a === 'strEdit') askErlegung(t.dataset.id);
+    else if (a === 'strNewScan') askErlegung('').then(id => { if (id) { S.erl = id; renderErl(); } });
     else if (a === 'wNew') askWunsch('', null);
     else if (a === 'wEdit') askWunsch(t.dataset.id, null);
     else if (a === 'wReload') loadWunsch();

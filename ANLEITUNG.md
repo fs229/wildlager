@@ -93,9 +93,15 @@ Hinweis: Ein öffentliches Repository ist für jeden einsehbar, die Server-URL s
 - Artikel anlegen oder ändern (Preis, Bezeichnung, aktiv/inaktiv).
 - Alles liegt auch direkt im Google Sheet und kann dort bearbeitet werden. Die Blätter-Überschriften nicht ändern.
 
+**Tab Strecke**: Streckenliste der Erlegungen. Mit **+ Erlegung erfassen** gibst du Datum, Uhrzeit, Wildart, Geschlecht, Alter in Jahren (ganze Zahl, optional), Erleger und optional Gewicht (kg) und Wildmarke ein. Oben filterst du nach Jagdjahr (1. April bis 31. März) und Wildart und siehst Stückzahl, Gewicht und die Zahl je Wildart. Antippen einer Erlegung öffnet sie zum Bearbeiten oder Löschen. Löschen geht nicht, solange Packungen daran hängen.
+
+**Herkunft der Packungen**: Im Tab Scannen gibt es beim **Einbuchen** das Feld **Erlegung (optional)**. Wählst du dort eine Erlegung, bekommen alle folgenden Packungen diese Herkunft, bis du die Auswahl änderst oder auf „keine" stellst. Mit **+ Neu** legst du die Erlegung gleich an. Die Wahl gilt nur für die aktuelle Sitzung und wird beim nächsten Anmelden zurückgesetzt. Im Bestand steht die Herkunft bei jeder Packung, in der Strecke siehst du je Erlegung, wie viele Packungen und wie viel kg eingelagert sind. Der Prozentwert dort ist das eingelagerte Gewicht im Verhältnis zum erfassten Gewicht des Stücks.
+
 **Stammdaten > Statistik** (Umschalter oben im Tab Stammdaten): Jahresauswertung mit Pfeilen zum Wechseln des Jahres. Oben Eingang, Ausgang und Umsatz mit Vergleich zum Vorjahr und Durchschnittspreis je kg. Darunter Diagramme für Eingang/Ausgang und Umsatz je Monat, die Auswertung nach Wildart sowie die Top-Artikel und Top-Kunden nach Umsatz. Antippen eines Balkens zeigt die genauen Werte, unten gibt es alle Monate als Tabelle. Der Eingang zählt nach Scandatum, Ausgang und Umsatz nach Ausbuchdatum. Gelöschte Packungen tauchen nicht mehr auf.
 
 **Datenfelder je Packung (Blatt „Bestand")**: ID, EAN, Artikelcode, Gewicht (g), Lagerort, Scandatum, Scanuhrzeit, Eingebucht von, Status, Ausbuchdatum, Ausbuchuhrzeit, Ausgebucht von, Kunde (Verkauf), Preis (€), Rechnungsnr.
+
+**Blatt „Strecke"**: ID, Datum, Uhrzeit, Wildart, Geschlecht, Alter in Jahren (ganze Zahl, optional), Erleger, Gewicht (kg), Wildmarke, Erfasst von. Im Blatt „Bestand" gibt es dazu die Spalte Erlegung mit der ID der Erlegung.
 
 **Blatt „Wünsche"**: ID, Datum, Kunde, Artikelcode, Menge, Status (offen, erfüllt, verworfen), Erledigt am, Erfasst von, Einheit (kg oder Stk; leer gilt als kg).
 
@@ -126,12 +132,12 @@ Zurückspielen: die gewünschte Kopie aus dem Ordner öffnen, die Blätter bei B
 
 ---
 
-## Update einer bestehenden Installation (zuletzt: Statistik und Backup)
+## Update einer bestehenden Installation (zuletzt: Streckenliste)
 
 1. Im Apps-Script-Editor den **kompletten Code ersetzen** durch den neuen `Code.gs`, speichern.
 2. **Bereitstellen > Bereitstellungen verwalten > Bearbeiten (Stift) > Version: Neue Version > Bereitstellen**. Die URL bleibt gleich.
 3. Neue `index.html` und die Logo-Dateien (`apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `icon.svg`, `manifest.webmanifest`) auf GitHub hochladen (ersetzen bzw. neu hinzufügen). Wer die App schon auf dem Homescreen hat, entfernt das alte Symbol und legt es neu an, damit Name und Logo übernommen werden.
-4. App auf dem Handy neu laden. Beim Öffnen legt das Backend automatisch fehlende Blätter an (**Kunden**, **Rechnungen**, **Wünsche**) sowie die Spalten für Kunde, Preis und Rechnungsnr im Blatt **Bestand**. Vorhandene Daten bleiben unverändert. Alte Ausbuchungen haben keinen Kunden und erscheinen nicht unter "Noch nicht abgerechnet".
+4. App auf dem Handy neu laden. Beim Öffnen legt das Backend automatisch fehlende Blätter an (**Kunden**, **Rechnungen**, **Wünsche**, **Strecke**) sowie die Spalten für Kunde, Preis, Rechnungsnr und Erlegung im Blatt **Bestand**. Vorhandene Daten bleiben unverändert. Alte Ausbuchungen haben keinen Kunden und erscheinen nicht unter "Noch nicht abgerechnet".
 
 ---
 
