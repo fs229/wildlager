@@ -93,6 +93,8 @@ Hinweis: Ein öffentliches Repository ist für jeden einsehbar, die Server-URL s
 - Artikel anlegen oder ändern (Preis, Bezeichnung, aktiv/inaktiv).
 - Alles liegt auch direkt im Google Sheet und kann dort bearbeitet werden. Die Blätter-Überschriften nicht ändern.
 
+**Stammdaten > Statistik** (Umschalter oben im Tab Stammdaten): Jahresauswertung mit Pfeilen zum Wechseln des Jahres. Oben Eingang, Ausgang und Umsatz mit Vergleich zum Vorjahr und Durchschnittspreis je kg. Darunter Diagramme für Eingang/Ausgang und Umsatz je Monat, die Auswertung nach Wildart sowie die Top-Artikel und Top-Kunden nach Umsatz. Antippen eines Balkens zeigt die genauen Werte, unten gibt es alle Monate als Tabelle. Der Eingang zählt nach Scandatum, Ausgang und Umsatz nach Ausbuchdatum. Gelöschte Packungen tauchen nicht mehr auf.
+
 **Datenfelder je Packung (Blatt „Bestand")**: ID, EAN, Artikelcode, Gewicht (g), Lagerort, Scandatum, Scanuhrzeit, Eingebucht von, Status, Ausbuchdatum, Ausbuchuhrzeit, Ausgebucht von, Kunde (Verkauf), Preis (€), Rechnungsnr.
 
 **Blatt „Wünsche"**: ID, Datum, Kunde, Artikelcode, Menge, Status (offen, erfüllt, verworfen), Erledigt am, Erfasst von, Einheit (kg oder Stk; leer gilt als kg).
@@ -111,7 +113,20 @@ Aufbau des Codes (13 Stellen, nach deinen Etiketten): `28` + Wildart (2) + Fleis
 
 ---
 
-## Update einer bestehenden Installation (zuletzt: Wünsche in kg und Stück)
+## Automatisches Backup (einmalig einrichten)
+
+Das Backup legt eine Kopie des gesamten Google Sheets im Drive-Ordner **Waidr Backups** ab. Es bleiben die letzten 12 Kopien, ältere werden automatisch in den Papierkorb verschoben.
+
+1. Neuen `Code.gs` einspielen und neue Version bereitstellen (siehe Update unten).
+2. Google Sheet **neu laden** (F5). Es erscheint das Menü **Waidr**.
+3. **Waidr > Wöchentliches Backup einschalten**. Beim ersten Mal fragt Google nach Berechtigungen (Zugriff auf Drive und Trigger). Mit deinem Konto **Zulassen**. Bei "Google hat diese App nicht überprüft" auf **Erweitert > Weiter** gehen, denn das Skript gehört dir.
+4. Ab jetzt läuft das Backup sonntags gegen 3 Uhr. Mit **Waidr > Backup jetzt erstellen** erzeugst du sofort eine Kopie, mit **Wöchentliches Backup ausschalten** stoppst du es.
+
+Zurückspielen: die gewünschte Kopie aus dem Ordner öffnen, die Blätter bei Bedarf in das Original kopieren. Die Zeitplanung gilt nur für die Tabelle, an die das Skript gebunden ist.
+
+---
+
+## Update einer bestehenden Installation (zuletzt: Statistik und Backup)
 
 1. Im Apps-Script-Editor den **kompletten Code ersetzen** durch den neuen `Code.gs`, speichern.
 2. **Bereitstellen > Bereitstellungen verwalten > Bearbeiten (Stift) > Version: Neue Version > Bereitstellen**. Die URL bleibt gleich.
