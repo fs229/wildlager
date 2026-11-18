@@ -31,7 +31,7 @@ main{padding:12px;max-width:760px;margin:0 auto;padding-bottom:80px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
 h2{margin:0 0 8px;font-size:17px}
 label{display:block;font-size:13px;color:var(--mut);margin:8px 0 3px}
-input,select{width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;font-size:16px;background:var(--inp);color:var(--txt)}
+input,select,textarea{width:100%;font-family:inherit;padding:11px;border:1px solid var(--line);border-radius:9px;font-size:16px;background:var(--inp);color:var(--txt)}
 input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 .btn{display:inline-block;padding:12px 16px;border:0;border-radius:10px;background:var(--g2);color:#fff;font-size:16px;font-weight:600}
 .btn.sec{background:var(--btn2);color:var(--txt)}
@@ -42,7 +42,7 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 .row>*{flex:1}
 .row>.fit{flex:0 0 auto}
 .seg{display:flex;border:1px solid var(--g2);border-radius:10px;overflow:hidden;margin-bottom:10px}
-.seg button{flex:1;padding:11px 4px;background:var(--inp);border:0;font-size:15px;font-weight:600;color:var(--acc)}
+.seg button{flex:1;padding:11px 2px;background:var(--inp);border:0;font-size:15px;font-weight:600;color:var(--acc)}
 .seg button.on{background:var(--g2);color:#fff}
 #reader{width:100%;min-height:120px;background:#111;border-radius:10px;overflow:hidden}
 #reader video{display:block;width:100%;max-height:60vh;object-fit:cover}
@@ -102,11 +102,11 @@ details.fold>summary{display:flex;align-items:center;gap:8px;cursor:pointer;list
 </style>
 </head>
 <body>
-<header><b class="brand"><img src="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20190%20190%22%20width=%22190%22%20height=%22190%22%3E%3Crect%20width=%22190%22%20height=%22190%22%20rx=%2240%22%20fill=%22%231f3d2b%22/%3E%3Cg%20transform=%22translate(95,95)%22%3E%3Ccircle%20r=%2272%22%20fill=%22none%22%20stroke=%22%23e0a73a%22%20stroke-width=%223%22/%3E%3Cg%20transform=%22translate(0,-6.25)%22%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(-15,-6)%20rotate(7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(15,-6)%20rotate(-7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(-29,40)%20rotate(-12)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(29,40)%20rotate(12)%22%20fill=%22%23f2ead8%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E" width="28" height="28" alt=""> Waidr</b><span><small id="who"></small> <button class="btn sm sec" id="btnWind" aria-label="Wind"><i class="ti ti-wind" aria-hidden="true"></i></button> <button class="btn sm sec" id="btnTheme" aria-label="Hell/Dunkel umschalten"></button> <button class="btn sm sec hide" id="logout" aria-label="Abmelden" title="Abmelden"><i class="ti ti-logout" aria-hidden="true"></i></button></span></header>
+<header><b class="brand"><img src="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20190%20190%22%20width=%22190%22%20height=%22190%22%3E%3Crect%20width=%22190%22%20height=%22190%22%20rx=%2240%22%20fill=%22%231f3d2b%22/%3E%3Cg%20transform=%22translate(95,95)%22%3E%3Ccircle%20r=%2272%22%20fill=%22none%22%20stroke=%22%23e0a73a%22%20stroke-width=%223%22/%3E%3Cg%20transform=%22translate(0,-6.25)%22%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(-15,-6)%20rotate(7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(15,-6)%20rotate(-7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(-29,40)%20rotate(-12)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(29,40)%20rotate(12)%22%20fill=%22%23f2ead8%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E" width="28" height="28" alt=""> Waidr</b><span><small id="who"></small> <button class="btn sm sec" id="btnTheme" aria-label="Hell/Dunkel umschalten"></button> <button class="btn sm sec hide" id="logout" aria-label="Abmelden" title="Abmelden"><i class="ti ti-logout" aria-hidden="true"></i></button></span></header>
 <nav id="nav" class="hide">
   <button data-tab="scan" class="on"><i class="ti ti-scan" aria-hidden="true"></i>Scannen</button>
   <button data-tab="bestand"><i class="ti ti-stack-2" aria-hidden="true"></i>Bestand</button>
-  <button data-tab="strecke"><i class="ti ti-target-arrow" aria-hidden="true"></i>Strecke</button>
+  <button data-tab="strecke"><i class="ti ti-target-arrow" aria-hidden="true"></i>Revier</button>
   <button data-tab="rech"><i class="ti ti-file-invoice" aria-hidden="true"></i>Rechnungen</button>
   <button data-tab="wunsch"><i class="ti ti-clipboard-list" aria-hidden="true"></i>Wünsche</button>
   <button data-tab="stamm"><i class="ti ti-adjustments" aria-hidden="true"></i>Stammdaten</button>
@@ -208,6 +208,8 @@ details.fold>summary{display:flex;align-items:center;gap:8px;cursor:pointer;list
 
   <!-- Strecke -->
   <section id="v-strecke" class="hide">
+    <div class="seg" id="rvSeg"><button data-rv="strecke" class="on">Strecke</button><button data-rv="aufg">Aufgaben</button><button data-rv="plan">Abschussplan</button><button data-rv="wind">Wind</button></div>
+    <div id="rvStrecke">
     <div class="card">
       <button class="btn big" data-act="strNew">+ Erlegung erfassen</button>
       <div class="row" style="margin-top:10px">
@@ -218,6 +220,31 @@ details.fold>summary{display:flex;align-items:center;gap:8px;cursor:pointer;list
       <div id="sChips" style="margin-top:8px"></div>
     </div>
     <div class="card"><h2>Streckenliste</h2><div class="lst" id="sList"></div></div>
+    </div>
+    <div id="rvPlan" class="hide">
+      <div class="card">
+        <label>Jagdjahr (1.4.–31.3.)</label><select id="pJahr"></select>
+        <div class="sum" id="pSum" style="margin-top:10px"></div>
+        <div style="margin-top:10px"><button class="btn sec" data-act="planEdit">Soll bearbeiten</button></div>
+      </div>
+      <div id="pList"></div>
+    </div>
+    <div id="rvWind" class="hide">
+      <div class="card">
+        <h2 id="windTitle">Wind</h2>
+        <div id="windBox"></div>
+        <div style="display:flex;gap:8px;margin-top:12px"><button class="btn sec" id="wGps" style="flex:1"></button><button class="btn sec" id="wRel" style="flex:1">Aktualisieren</button></div>
+      </div>
+    </div>
+    <div id="rvAufg" class="hide">
+      <div class="card">
+        <button class="btn big" data-act="aufNew">+ Aufgabe</button>
+        <div class="seg" id="aStSeg" style="margin:10px 0"><button data-ast="offen" class="on">Offen</button><button data-ast="erledigt">Erledigt</button></div>
+        <label>Verantwortlich</label><select id="aWer"></select>
+        <div class="sum" id="aSum" style="margin-top:10px"></div>
+      </div>
+      <div class="card"><div class="lst" id="aList"></div></div>
+    </div>
   </section>
 
   <!-- Rechnungen -->
@@ -404,7 +431,7 @@ function applyInit(r) {
   const def = ls.get('wl_lager_' + S.user);
   const act = S.lagerorte.filter(l => l.aktiv);
   S.lagerort = act.some(l => l.name === def) ? def : (act[0] ? act[0].name : '');
-  renderLager(); renderKunden(); S.wuensche = null; S.strecke = null; S.erl = ''; loadStreckeQuiet(); loadWuenscheQuiet(); setTab(S.tab || 'scan');
+  renderLager(); renderKunden(); S.wuensche = null; S.strecke = null; S.aufg = null; S.plan = null; S.rv = 'strecke'; S.ast = 'offen'; S.erl = ''; loadStreckeQuiet(); loadWuenscheQuiet(); setTab(S.tab || 'scan');
 }
 
 /* -------------------------------------------------------------------- Tabs */
@@ -491,7 +518,7 @@ $('#yNext').onclick = () => { const i = S.stat.jahre.indexOf(S.stat.jahr); if (i
 const jagdjahr = d => { const m = Number(String(d).slice(3, 5)), y = Number(String(d).slice(6, 10)); return m >= 4 ? y : y - 1; };
 const jjLabel = y => y + '/' + String((y + 1) % 100).padStart(2, '0');
 const strLabel = x => x.datum.slice(0, 6) + ' ' + x.wildart + (x.geschlecht && x.geschlecht !== 'unbekannt' ? ' ' + x.geschlecht : '') + ' · ' + x.erleger;
-async function loadStreckeQuiet() { try { const r = await api('strecke'); S.strecke = r.strecke; S.strOpt = { g: r.geschlechter }; renderErl(); } catch (e) {} }
+async function loadStreckeQuiet() { try { const r = await api('strecke'); S.strecke = r.strecke; S.strOpt = { g: r.geschlechter }; S.plankat = r.plankategorien || {}; renderErl(); } catch (e) {} }
 async function loadStrecke() { await loadStreckeQuiet(); renderStrecke(); }
 const todayDe = () => new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
 function renderErl() {
@@ -519,7 +546,7 @@ function renderStrecke() {
   $('#sList').innerHTML = list.map(x => {
     const pk = x.packN ? '<small>' + x.packN + ' Packung' + (x.packN === 1 ? '' : 'en') + ' · ' + fmtKg(x.packG) + ' eingelagert' + (x.packLager ? ' (' + x.packLager + ' auf Lager)' : ' (alle ausgebucht)') + (x.gewichtKg ? ' · ' + Math.round(x.packG / 10 / x.gewichtKg) + ' % des Gewichts' : '') + '</small>' : '';
     return '<div class="it" data-act="strEdit" data-id="' + esc(x.id) + '" style="cursor:pointer"><div class="n"><b>' + esc(x.datum + ' ' + x.uhrzeit + ' · ' + x.wildart) + '</b><small>' +
-      esc([x.geschlecht, /^\d+$/.test(x.alter) ? x.alter + ' J.' : x.alter, x.erleger, x.gewichtKg != null ? x.gewichtKg.toLocaleString('de-DE') + ' kg' : '', x.marke ? 'Marke ' + x.marke : ''].filter(Boolean).join(' · ')) + '</small>' + pk + '</div></div>';
+      esc([x.geschlecht, /^\d+$/.test(x.alter) ? x.alter + ' J.' : x.alter, x.erleger, x.gewichtKg != null ? x.gewichtKg.toLocaleString('de-DE') + ' kg' : '', x.marke ? 'Marke ' + x.marke : '', x.plankat ? 'Plan: ' + x.plankat : ''].filter(Boolean).join(' · ')) + '</small>' + pk + '</div></div>';
   }).join('') || '<p class="mut">Keine Erlegungen in dieser Auswahl.</p>';
 }
 $('#sJahr').onchange = renderStrecke; $('#sWild').onchange = renderStrecke;
@@ -537,20 +564,29 @@ function askErlegung(id) {
       '<div class="row"><div><label>Datum</label><input id="eDat" type="date" value="' + iso + '"></div><div><label>Uhrzeit</label><input id="eZeit" type="time" value="' + tm + '"></div></div>' +
       '<label>Wildart</label><input id="eWild" list="eWl" autocomplete="off" value="' + esc(ex ? ex.wildart : '') + '"><datalist id="eWl">' + wl.map(w => '<option value="' + esc(w) + '">').join('') + '</datalist>' +
       '<div class="row"><div><label>Geschlecht</label>' + sel('eGe', opt.g, ex ? ex.geschlecht : 'unbekannt') + '</div><div><label>Alter (Jahre)</label><input id="eAl" type="number" inputmode="numeric" min="0" max="99" step="1" placeholder="optional" value="' + esc(ex ? ex.alter : '') + '"></div></div>' +
+      '<label>Zählt ein auf (Abschussplan)</label><select id="eKat"></select>' +
       '<label>Erleger</label><input id="eEr" list="eEl" autocomplete="off" value="' + esc(ex ? ex.erleger : S.user) + '"><datalist id="eEl">' + names.map(n => '<option value="' + esc(n) + '">').join('') + '</datalist>' +
       '<div class="row"><div><label>Gewicht in kg (optional)</label><input id="eGew" inputmode="decimal" placeholder="z. B. 45,5" value="' + (ex && ex.gewichtKg != null ? String(ex.gewichtKg).replace('.', ',') : '') + '"></div>' +
       '<div><label>Wildmarke (optional)</label><input id="eMa" maxlength="30" value="' + esc(ex ? ex.marke : '') + '"></div></div>' +
       '<p id="mErr" class="mut" style="color:var(--err)"></p><div class="row"><button class="btn sec" id="mCancel">Abbrechen</button><button class="btn" id="mSave">Speichern</button></div>' +
       (ex ? '<button class="btn sec" id="mDel" style="margin-top:8px;width:100%;color:var(--err)">Löschen</button>' : ''));
+    const canon = v => Object.keys(S.plankat || {}).filter(k => k.toLowerCase() === v.trim().toLowerCase())[0] || v.trim();
+    const fillKat = () => {
+      const ks = (S.plankat || {})[canon($('#eWild').value)] || [], cur = $('#eKat').value || (ex ? ex.plankat : '');
+      $('#eKat').innerHTML = '<option value="">' + (ks.length ? '– bitte wählen –' : '– kein Plan für diese Wildart –') + '</option>' + ks.map(k => '<option' + (k === cur ? ' selected' : '') + '>' + esc(k) + '</option>').join('');
+      $('#eKat').disabled = !ks.length;
+    };
+    fillKat(); $('#eWild').oninput = fillKat; $('#eWild').onchange = fillKat;
     $('#mCancel').onclick = () => { closeModal(); resolve(null); };
     $('#mSave').onclick = async () => {
       const d = $('#eDat').value; if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) { $('#mErr').textContent = 'Bitte ein Datum wählen.'; return; }
       const wild = $('#eWild').value.trim(), er = $('#eEr').value.trim(), gew = $('#eGew').value.trim().replace(',', '.');
       if (!wild) { $('#mErr').textContent = 'Bitte die Wildart angeben.'; return; }
       if (!er) { $('#mErr').textContent = 'Bitte den Erleger angeben.'; return; }
+      if ((S.plankat || {})[canon(wild)] && !$('#eKat').value) { $('#mErr').textContent = 'Bitte die Kategorie wählen, auf die die Erlegung einzahlt.'; return; }
       if (gew !== '' && !(parseFloat(gew) >= 0.1 && parseFloat(gew) <= 999.9)) { $('#mErr').textContent = 'Gewicht in kg von 0,1 bis 999,9 angeben (z. B. 45,5).'; return; }
       try {
-        const r = await api('streckeSave', { id: ex ? ex.id : '', datum: d.slice(8, 10) + '.' + d.slice(5, 7) + '.' + d.slice(0, 4), uhrzeit: $('#eZeit').value, wildart: wild,
+        const r = await api('streckeSave', { id: ex ? ex.id : '', datum: d.slice(8, 10) + '.' + d.slice(5, 7) + '.' + d.slice(0, 4), uhrzeit: $('#eZeit').value, wildart: canon(wild), plankat: $('#eKat').value,
           geschlecht: $('#eGe').value, alter: $('#eAl').value, erleger: er, gewicht: gew, marke: $('#eMa').value.trim() });
         closeModal(); await loadStreckeQuiet(); if (S.tab === 'strecke') renderStrecke(); toast('Erlegung gespeichert'); resolve(r.id);
       } catch (e) { $('#mErr').textContent = e.message; }
@@ -561,6 +597,126 @@ function askErlegung(id) {
     };
   });
 }
+
+/* ---- Abschussplan */
+async function loadPlan() {
+  try { const [p] = await Promise.all([api('abschuss'), loadStreckeQuiet()]); S.plan = p.plan; S.plankat = p.kategorien; } catch (e) { toast(e.message); }
+  renderPlan();
+}
+const planSoll = (jahr, w, k) => { const x = (S.plan || []).filter(p => p.jahr === jahr && p.wildart === w && p.kategorie === k)[0]; return x ? x.soll : null; };
+function renderPlan() {
+  const kats = S.plankat || {}, all = S.strecke || [];
+  const jj = Array.from(new Set(all.map(x => jagdjahr(x.datum)).concat((S.plan || []).map(p => p.jahr), [jagdjahr(todayDe())]))).sort((a, b) => b - a);
+  const cur = $('#pJahr').value;
+  $('#pJahr').innerHTML = jj.map(y => '<option value="' + y + '">' + jjLabel(y) + '</option>').join('');
+  $('#pJahr').value = cur && jj.indexOf(Number(cur)) >= 0 ? cur : String(jagdjahr(todayDe()));
+  const jahr = Number($('#pJahr').value), inJ = all.filter(x => jagdjahr(x.datum) === jahr);
+  let sumSoll = 0, sumIst = 0, sumOhne = 0, html = '';
+  Object.keys(kats).forEach(w => {
+    const ws = inJ.filter(x => x.wildart === w);
+    const ohne = ws.filter(x => !x.plankat).length; sumOhne += ohne;
+    let wSoll = 0, wIst = 0, rows = '';
+    kats[w].forEach(k => {
+      const ist = ws.filter(x => x.plankat === k).length, soll = planSoll(jahr, w, k);
+      wIst += ist; if (soll !== null) wSoll += soll;
+      let txt, bar = '';
+      if (soll === null) txt = ist + ' erlegt · kein Soll';
+      else {
+        const rest = soll - ist;
+        txt = ist + ' von ' + soll + (rest > 0 ? ' · noch ' + rest : rest === 0 ? ' · erfüllt' : ' · ' + (-rest) + ' über Soll');
+        const pc = soll ? Math.min(100, Math.round(ist / soll * 100)) : (ist ? 100 : 0);
+        bar = '<div style="height:8px;border-radius:4px;background:var(--line);margin-top:5px;overflow:hidden"><div style="height:100%;width:' + pc + '%;background:' + (rest < 0 ? 'var(--err)' : 'var(--g2)') + ';border-radius:4px"></div></div>';
+      }
+      rows += '<div class="it" style="display:block"><div style="display:flex;justify-content:space-between;gap:8px"><b>' + esc(k) + '</b><span' + (soll !== null && ist > soll ? ' style="color:var(--err)"' : '') + '>' + esc(txt) + '</span></div>' + bar + '</div>';
+    });
+    sumSoll += wSoll; sumIst += ws.filter(x => x.plankat).length;
+    html += '<div class="card"><h2>' + esc(w) + ' <span class="mut">' + ws.filter(x => x.plankat).length + ' von ' + wSoll + '</span></h2><div class="lst">' + rows + '</div>' +
+      (ohne ? '<p class="mut" style="margin:8px 0 0">' + ohne + ' ' + esc(w) + '-Erlegung' + (ohne === 1 ? '' : 'en') + ' ohne Plankategorie (zählt nicht mit)</p>' : '') + '</div>';
+  });
+  $('#pSum').innerHTML = '<div class="tot"><b>' + sumIst + '</b><span>von ' + sumSoll + ' Soll</span></div><div><b>' + Math.max(0, sumSoll - sumIst) + '</b><span>noch offen</span></div>' + (sumOhne ? '<div><b>' + sumOhne + '</b><span>ohne Kategorie</span></div>' : '');
+  $('#pList').innerHTML = html;
+}
+$('#pJahr').onchange = renderPlan;
+function askPlan() {
+  const jahr = Number($('#pJahr').value), kats = S.plankat || {};
+  let h = '<h2>Soll ' + jjLabel(jahr) + '</h2><p class="mut" style="margin-top:0">Leer lassen, wenn es kein Soll gibt. Grau: Vorjahr.</p>', n = 0;
+  Object.keys(kats).forEach(w => {
+    h += '<h3 style="margin:12px 0 4px">' + esc(w) + '</h3>';
+    kats[w].forEach(k => {
+      const v = planSoll(jahr, w, k), pv = planSoll(jahr - 1, w, k);
+      h += '<div class="row" style="align-items:center"><label style="margin:0">' + esc(k) + '</label><input class="pS" type="number" inputmode="numeric" min="0" max="999" step="1" data-w="' + esc(w) + '" data-k="' + esc(k) + '" placeholder="' + (pv !== null ? pv : '') + '" value="' + (v !== null ? v : '') + '"></div>'; n++;
+    });
+  });
+  openModal(h + '<p id="mErr" class="mut" style="color:var(--err)"></p><div class="row"><button class="btn sec" id="mCancel">Abbrechen</button><button class="btn" id="mSave">Speichern</button></div>');
+  $('#mCancel').onclick = closeModal;
+  $('#mSave').onclick = async () => {
+    const items = Array.from(document.querySelectorAll('.pS')).map(i => ({ wildart: i.dataset.w, kategorie: i.dataset.k, soll: i.value.trim() }));
+    try { await api('abschussSave', { jahr: String(jahr), items: items }); closeModal(); await loadPlan(); toast('Abschussplan gespeichert'); } catch (e) { $('#mErr').textContent = e.message; }
+  };
+}
+
+/* ---- Aufgaben (Revierarbeit) */
+async function loadAufgaben() { try { const r = await api('aufgaben'); S.aufg = r.aufgaben; } catch (e) { toast(e.message); } renderAufgaben(); }
+function setRv(v) {
+  S.rv = v;
+  document.querySelectorAll('#rvSeg button').forEach(b => b.classList.toggle('on', b.dataset.rv === v));
+  $('#rvStrecke').classList.toggle('hide', v !== 'strecke'); $('#rvAufg').classList.toggle('hide', v !== 'aufg'); $('#rvPlan').classList.toggle('hide', v !== 'plan'); $('#rvWind').classList.toggle('hide', v !== 'wind');
+  if (v === 'aufg') loadAufgaben(); else if (v === 'plan') loadPlan(); else if (v === 'wind') showWind(); else renderStrecke();
+}
+document.querySelectorAll('#rvSeg button').forEach(b => { b.onclick = () => setRv(b.dataset.rv); });
+document.querySelectorAll('#aStSeg button').forEach(b => { b.onclick = () => { S.ast = b.dataset.ast; renderAufgaben(); }; });
+$('#aWer').onchange = renderAufgaben;
+const deKey = d => d ? d.slice(6, 10) + d.slice(3, 5) + d.slice(0, 2) : '99999999';
+function renderAufgaben() {
+  const all = S.aufg || [], st = S.ast || 'offen', me = S.user;
+  document.querySelectorAll('#aStSeg button').forEach(b => b.classList.toggle('on', b.dataset.ast === st));
+  const names = (S.nutzer || []).map(n => typeof n === 'string' ? n : n.name).filter(Boolean);
+  const cur = $('#aWer').value;
+  $('#aWer').innerHTML = '<option value="">Alle</option><option value="__me">Meine</option><option value="__none">Ohne Zuständigen</option>' + names.map(n => '<option>' + esc(n) + '</option>').join('');
+  $('#aWer').value = cur && Array.from($('#aWer').options).some(o => o.value === cur) ? cur : '';
+  const w = $('#aWer').value;
+  const wf = x => !w || (w === '__me' ? x.verantwortlich === me : w === '__none' ? !x.verantwortlich : x.verantwortlich === w);
+  const base = all.filter(wf), open = base.filter(x => x.status === 'offen'), done = base.filter(x => x.status === 'erledigt');
+  const today = deKey(todayDe()), over = open.filter(x => x.faellig && deKey(x.faellig) < today).length;
+  $('#aSum').innerHTML = '<div class="tot"><b>' + open.length + '</b><span>offen</span></div><div><b' + (over ? ' style="color:var(--err)"' : '') + '>' + over + '</b><span>überfällig</span></div><div><b>' + done.length + '</b><span>erledigt</span></div>';
+  const list = (st === 'offen' ? open : done).slice().sort(st === 'offen'
+    ? (a, b) => deKey(a.faellig).localeCompare(deKey(b.faellig)) || a.titel.localeCompare(b.titel, 'de')
+    : (a, b) => deKey(b.erledigtAm).localeCompare(deKey(a.erledigtAm)));
+  $('#aList').innerHTML = list.map(x => {
+    const late = st === 'offen' && x.faellig && deKey(x.faellig) < today;
+    const meta = st === 'offen'
+      ? [x.verantwortlich, x.faellig ? (late ? 'überfällig seit ' : 'fällig ') + x.faellig : ''].filter(Boolean).join(' · ')
+      : ['erledigt ' + x.erledigtAm + (x.erledigtVon ? ' von ' + x.erledigtVon : ''), x.verantwortlich].filter(Boolean).join(' · ');
+    return '<div class="it"><button class="btn sec sm fit" data-act="aufCheck" data-id="' + esc(x.id) + '" data-done="' + (st === 'offen' ? '1' : '0') + '" aria-label="' + (st === 'offen' ? 'Als erledigt markieren' : 'Wieder öffnen') + '"><i class="ti ' + (st === 'offen' ? 'ti-square' : 'ti-square-check') + '" aria-hidden="true"></i></button>' +
+      '<div class="n" data-act="aufEdit" data-id="' + esc(x.id) + '" style="cursor:pointer;flex:1"><b>' + esc(x.titel) + '</b><small' + (late ? ' style="color:var(--err)"' : '') + '>' + esc(meta) + '</small>' + (x.notiz ? '<small>' + esc(x.notiz) + '</small>' : '') + '</div></div>';
+  }).join('') || '<p class="mut">' + (st === 'offen' ? 'Keine offenen Aufgaben.' : 'Noch nichts erledigt.') + '</p>';
+}
+function askAufgabe(id) {
+  const ex = id ? (S.aufg || []).filter(x => x.id === id)[0] : null;
+  const names = (S.nutzer || []).map(n => typeof n === 'string' ? n : n.name).filter(Boolean);
+  const iso = ex && ex.faellig ? ex.faellig.slice(6, 10) + '-' + ex.faellig.slice(3, 5) + '-' + ex.faellig.slice(0, 2) : '';
+  openModal('<h2>' + (ex ? 'Aufgabe bearbeiten' : 'Neue Aufgabe') + '</h2>' +
+    '<label>Titel</label><input id="aTit" maxlength="120" autocomplete="off" placeholder="z. B. Kanzel Nord reparieren" value="' + esc(ex ? ex.titel : '') + '">' +
+    '<label>Notiz (optional)</label><textarea id="aNot" rows="3" maxlength="500">' + esc(ex ? ex.notiz : '') + '</textarea>' +
+    '<div class="row"><div><label>Verantwortlich (optional)</label><select id="aVer"><option value="">– niemand –</option>' + names.map(n => '<option' + (ex && ex.verantwortlich === n ? ' selected' : '') + '>' + esc(n) + '</option>').join('') + '</select></div>' +
+    '<div><label>Fällig (optional)</label><input id="aFael" type="date" value="' + iso + '"></div></div>' +
+    '<p id="mErr" class="mut" style="color:var(--err)"></p><div class="row"><button class="btn sec" id="mCancel">Abbrechen</button><button class="btn" id="mSave">Speichern</button></div>' +
+    (ex ? '<button class="btn sec" id="mDel" style="margin-top:8px;width:100%;color:var(--err)">Löschen</button>' : ''));
+  $('#mCancel').onclick = closeModal;
+  $('#mSave').onclick = async () => {
+    const t = $('#aTit').value.trim(); if (!t) { $('#mErr').textContent = 'Bitte einen Titel angeben.'; return; }
+    const d = $('#aFael').value;
+    try {
+      await api('aufgabeSave', { id: ex ? ex.id : '', titel: t, notiz: $('#aNot').value.trim(), verantwortlich: $('#aVer').value, faellig: d ? d.slice(8, 10) + '.' + d.slice(5, 7) + '.' + d.slice(0, 4) : '' });
+      closeModal(); await loadAufgaben(); toast('Aufgabe gespeichert');
+    } catch (e) { $('#mErr').textContent = e.message; }
+  };
+  if ($('#mDel')) $('#mDel').onclick = async () => {
+    if (!confirm('Aufgabe endgültig löschen?')) return;
+    try { await api('aufgabeDelete', { id: ex.id }); closeModal(); await loadAufgaben(); } catch (e) { $('#mErr').textContent = e.message; }
+  };
+}
+async function aufCheck(id, done) { try { await api('aufgabeStatus', { id: id, erledigt: done }); await loadAufgaben(); } catch (e) { toast(e.message); } }
 
 function setSv(v) {
   S.sv = v;
@@ -575,7 +731,7 @@ function setTab(t) {
   document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
   show(t);
   if (t === 'bestand') loadBestand();
-  if (t === 'strecke') loadStrecke();
+  if (t === 'strecke') { if (S.rv === 'aufg') loadAufgaben(); else if (S.rv === 'plan') loadPlan(); else if (S.rv === 'wind') showWind(); else loadStrecke(); }
   if (t === 'rech') loadRech();
   if (t === 'wunsch') loadWunsch();
   if (t === 'stamm') { setSv(S.sv || 'daten'); renderStamm(); }
@@ -1148,6 +1304,10 @@ document.addEventListener('click', e => {
     else if (a === 'rechOpen') rechOpen(t.dataset.nr);
     else if (a === 'strNew') askErlegung('');
     else if (a === 'strEdit') askErlegung(t.dataset.id);
+    else if (a === 'planEdit') askPlan();
+    else if (a === 'aufNew') askAufgabe('');
+    else if (a === 'aufEdit') askAufgabe(t.dataset.id);
+    else if (a === 'aufCheck') aufCheck(t.dataset.id, t.dataset.done === '1');
     else if (a === 'strNewScan') askErlegung('').then(id => { if (id) { S.erl = id; renderErl(); } });
     else if (a === 'wNew') askWunsch('', null);
     else if (a === 'wEdit') askWunsch(t.dataset.id, null);
@@ -1227,23 +1387,21 @@ async function loadWind(loc) {
       '</div><small style="color:var(--mut)">km/h, ↑ = Böen · Quelle: Open-Meteo</small>';
   } catch (e) { box.innerHTML = '<p style="color:var(--err)">Winddaten nicht verfügbar (' + e.message + ').</p>'; }
 }
-function openWind() {
+function showWind() {
   const base = CONFIG.WIND, loc = windGps || base;
-  openModal('<h3 style="margin:0 0 4px">Wind · ' + (windGps ? 'Mein Standort' : base.name) + '</h3>' +
-    '<div id="windBox"></div>' +
-    '<div style="display:flex;gap:8px;margin-top:12px"><button class="btn sec" id="wGps" style="flex:1">' + (windGps ? 'Revier' : 'Mein Standort') + '</button>' +
-    '<button class="btn sec" id="wRel" style="flex:1">Aktualisieren</button><button class="btn" id="wClose" style="flex:1">Schließen</button></div>');
-  $('#wClose').onclick = closeModal;
-  $('#wRel').onclick = () => loadWind(windGps || base);
-  $('#wGps').onclick = () => {
-    if (windGps) { windGps = null; openWind(); return; }
-    if (!navigator.geolocation) return toast('Standort nicht verfügbar');
-    navigator.geolocation.getCurrentPosition(p => { windGps = { lat: p.coords.latitude, lon: p.coords.longitude }; openWind(); },
-      () => toast('Standort nicht freigegeben'), { enableHighAccuracy: false, timeout: 10000 });
-  };
+  $('#windTitle').textContent = 'Wind · ' + (windGps ? 'Mein Standort' : base.name);
+  $('#wGps').textContent = windGps ? 'Revier' : 'Mein Standort';
+  $('#windBox').innerHTML = '<p class="mut">Lade …</p>';
   loadWind(loc);
 }
-$('#btnWind').onclick = openWind;
+$('#wRel').onclick = () => loadWind(windGps || CONFIG.WIND);
+$('#wGps').onclick = () => {
+  if (windGps) { windGps = null; showWind(); return; }
+  if (!navigator.geolocation) return toast('Standort nicht verfügbar');
+  navigator.geolocation.getCurrentPosition(p => { windGps = { lat: p.coords.latitude, lon: p.coords.longitude }; showWind(); },
+    () => toast('Standort nicht freigegeben'), { enableHighAccuracy: false, timeout: 10000 });
+};
+
 function applyTheme(t, save) {
   document.documentElement.setAttribute('data-theme', t);
   $('#btnTheme').innerHTML = '<i class="ti ti-' + (t === 'dark' ? 'sun' : 'moon') + '" aria-hidden="true"></i>';

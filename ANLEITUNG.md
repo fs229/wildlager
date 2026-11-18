@@ -93,7 +93,13 @@ Hinweis: Ein öffentliches Repository ist für jeden einsehbar, die Server-URL s
 - Artikel anlegen oder ändern (Preis, Bezeichnung, aktiv/inaktiv).
 - Alles liegt auch direkt im Google Sheet und kann dort bearbeitet werden. Die Blätter-Überschriften nicht ändern.
 
-**Tab Strecke**: Streckenliste der Erlegungen. Mit **+ Erlegung erfassen** gibst du Datum, Uhrzeit, Wildart, Geschlecht, Alter in Jahren (ganze Zahl, optional), Erleger und optional Gewicht (kg) und Wildmarke ein. Oben filterst du nach Jagdjahr (1. April bis 31. März) und Wildart und siehst Stückzahl, Gewicht und die Zahl je Wildart. Antippen einer Erlegung öffnet sie zum Bearbeiten oder Löschen. Löschen geht nicht, solange Packungen daran hängen.
+**Tab Revier** hat vier Ansichten: **Strecke**, **Aufgaben**, **Abschussplan** und **Wind**. Der Wind liegt nicht mehr oben in der Kopfzeile, sondern hier: Windrichtung und -stärke für das Revier mit Vorhersage der nächsten 6 Stunden, per Knopf auch für den eigenen Standort.
+
+**Revier > Strecke**: Streckenliste der Erlegungen. Mit **+ Erlegung erfassen** gibst du Datum, Uhrzeit, Wildart, Geschlecht, Alter in Jahren (ganze Zahl, optional), Erleger und optional Gewicht (kg) und Wildmarke ein. Oben filterst du nach Jagdjahr (1. April bis 31. März) und Wildart und siehst Stückzahl, Gewicht und die Zahl je Wildart. Antippen einer Erlegung öffnet sie zum Bearbeiten oder Löschen. Löschen geht nicht, solange Packungen daran hängen.
+
+**Revier > Aufgaben**: Aufgabenliste für die Revierarbeit (z. B. Kanzel reparieren, Kirrung auffüllen). Mit **+ Aufgabe** legst du Titel, optional Notiz, Verantwortlichen und Fälligkeitsdatum an. Das Kästchen links hakt eine Aufgabe ab, nochmal antippen öffnet sie wieder. Antippen des Titels öffnet Bearbeiten und Löschen. Oben wechselst du zwischen **Offen** und **Erledigt** und filterst nach Verantwortlich (Alle, Meine, Ohne Zuständigen oder eine Person). Offene Aufgaben sind nach Fälligkeit sortiert, überfällige stehen rot markiert oben. Erledigt zeigt, wer wann abgehakt hat.
+
+**Revier > Abschussplan**: Soll und Erfüllung je Jagdjahr (1. April bis 31. März). Kategorien Rehwild: Geiß, Schmalreh, Bock, Kitz. Rotwild: Alttier, Schmaltier, Hirsch Klasse 1, 2, 3, Kalb. Mit **Soll bearbeiten** trägst du die Zahlen aus dem Plan ein (leer = kein Soll, grau steht das Vorjahr). Pro Kategorie siehst du „x von Soll", wie viele noch fehlen und einen Balken; Überschreitungen sind rot markiert. In der Strecke wählst du beim Erfassen unter **Zählt ein auf** die Kategorie. Bei Rehwild und Rotwild ist die Auswahl Pflicht, bei anderen Wildarten gibt es sie nicht. Ältere Erlegungen ohne Kategorie zählen im Plan nicht mit, der Plan weist sie als Hinweis aus, und sie lassen sich nur mit Kategorie neu speichern. Das Jagdjahr ergibt sich aus dem Datum der Erlegung.
 
 **Herkunft der Packungen**: Im Tab Scannen gibt es beim **Einbuchen** das Feld **Erlegung (optional)**. Wählst du dort eine Erlegung, bekommen alle folgenden Packungen diese Herkunft, bis du die Auswahl änderst oder auf „keine" stellst. Mit **+ Neu** legst du die Erlegung gleich an. Die Wahl gilt nur für die aktuelle Sitzung und wird beim nächsten Anmelden zurückgesetzt. Im Bestand steht die Herkunft bei jeder Packung, in der Strecke siehst du je Erlegung, wie viele Packungen und wie viel kg eingelagert sind. Der Prozentwert dort ist das eingelagerte Gewicht im Verhältnis zum erfassten Gewicht des Stücks.
 
@@ -101,7 +107,11 @@ Hinweis: Ein öffentliches Repository ist für jeden einsehbar, die Server-URL s
 
 **Datenfelder je Packung (Blatt „Bestand")**: ID, EAN, Artikelcode, Gewicht (g), Lagerort, Scandatum, Scanuhrzeit, Eingebucht von, Status, Ausbuchdatum, Ausbuchuhrzeit, Ausgebucht von, Kunde (Verkauf), Preis (€), Rechnungsnr.
 
-**Blatt „Strecke"**: ID, Datum, Uhrzeit, Wildart, Geschlecht, Alter in Jahren (ganze Zahl, optional), Erleger, Gewicht (kg), Wildmarke, Erfasst von. Im Blatt „Bestand" gibt es dazu die Spalte Erlegung mit der ID der Erlegung.
+**Blatt „Strecke"**: ID, Datum, Uhrzeit, Wildart, Geschlecht, Alter in Jahren (ganze Zahl, optional), Erleger, Gewicht (kg), Wildmarke, Erfasst von, Plankategorie. Im Blatt „Bestand" gibt es dazu die Spalte Erlegung mit der ID der Erlegung.
+
+**Blatt „Abschussplan"**: Jagdjahr (Startjahr), Wildart, Kategorie, Soll.
+
+**Blatt „Aufgaben"**: ID, Titel, Notiz, Verantwortlich, Fällig, Status, Erfasst von/am, Erledigt von/am.
 
 **Blatt „Wünsche"**: ID, Datum, Kunde, Artikelcode, Menge, Status (offen, erfüllt, verworfen), Erledigt am, Erfasst von, Einheit (kg oder Stk; leer gilt als kg).
 
@@ -132,7 +142,7 @@ Zurückspielen: die gewünschte Kopie aus dem Ordner öffnen, die Blätter bei B
 
 ---
 
-## Update einer bestehenden Installation (zuletzt: Streckenliste)
+## Update einer bestehenden Installation (zuletzt: Abschussplan)
 
 1. Im Apps-Script-Editor den **kompletten Code ersetzen** durch den neuen `Code.gs`, speichern.
 2. **Bereitstellen > Bereitstellungen verwalten > Bearbeiten (Stift) > Version: Neue Version > Bereitstellen**. Die URL bleibt gleich.
