@@ -62,6 +62,7 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 .sum b{display:block;font-size:18px}
 .sum .tot{background:var(--g2);color:#fff}.sum .tot span{color:#d6e6da}.sum .tot b{font-size:24px}
 .sum span{font-size:12px;color:var(--mut)}
+.sum div{display:flex;flex-direction:column;justify-content:center;align-items:center}#pSum b,#aSum b,#sSum b{font-size:24px;line-height:1.2}#pSum span,#aSum span,#sSum span{font-size:13px}
 .grp{border-bottom:1px solid var(--line);padding:10px 0}
 .grp .h{display:flex;gap:8px;align-items:center;cursor:pointer}
 .grp .h .n{flex:1;font-weight:600}
@@ -235,6 +236,7 @@ details.fold>summary{display:flex;align-items:center;gap:8px;cursor:pointer;list
         <div id="windBox"></div>
         <div style="display:flex;gap:8px;margin-top:12px"><button class="btn sec" id="wGps" style="flex:1"></button><button class="btn sec" id="wRel" style="flex:1">Aktualisieren</button></div>
       </div>
+      <div class="card" id="windAns"></div>
     </div>
     <div id="rvAufg" class="hide">
       <div class="card">
@@ -295,6 +297,11 @@ details.fold>summary{display:flex;align-items:center;gap:8px;cursor:pointer;list
       <summary><h2>Artikel</h2><span class="mut" id="cnt_art"></span></summary>
       <div class="lst" id="artList"></div>
       <div style="margin-top:10px"><button class="btn sec" data-act="artNew">+ Artikel</button></div>
+    </details></div>
+    <div class="card"><details class="fold" data-fold="ans">
+      <summary><h2>Ansitzeinrichtungen</h2><span class="mut" id="cnt_ans"></span></summary>
+      <div class="lst" id="ansList"></div>
+      <div style="margin-top:10px"><button class="btn sec" data-act="ansNew">+ Ansitzeinrichtung</button></div>
     </details></div>
     </div>
     <div id="svStat" class="stat hide">
@@ -431,7 +438,7 @@ function applyInit(r) {
   const def = ls.get('wl_lager_' + S.user);
   const act = S.lagerorte.filter(l => l.aktiv);
   S.lagerort = act.some(l => l.name === def) ? def : (act[0] ? act[0].name : '');
-  renderLager(); renderKunden(); S.wuensche = null; S.strecke = null; S.aufg = null; S.plan = null; S.rv = 'strecke'; S.ast = 'offen'; S.erl = ''; loadStreckeQuiet(); loadWuenscheQuiet(); setTab(S.tab || 'scan');
+  renderLager(); renderKunden(); S.wuensche = null; S.strecke = null; S.aufg = null; S.plan = null; S.ansitze = []; S.windNow = null; loadAnsitzeQuiet(); S.rv = 'strecke'; S.ast = 'offen'; S.erl = ''; loadStreckeQuiet(); loadWuenscheQuiet(); setTab(S.tab || 'scan');
 }
 
 /* -------------------------------------------------------------------- Tabs */
@@ -519,6 +526,7 @@ const jagdjahr = d => { const m = Number(String(d).slice(3, 5)), y = Number(Stri
 const jjLabel = y => y + '/' + String((y + 1) % 100).padStart(2, '0');
 const strLabel = x => x.datum.slice(0, 6) + ' ' + x.wildart + (x.geschlecht && x.geschlecht !== 'unbekannt' ? ' ' + x.geschlecht : '') + ' · ' + x.erleger;
 async function loadStreckeQuiet() { try { const r = await api('strecke'); S.strecke = r.strecke; S.strOpt = { g: r.geschlechter }; S.plankat = r.plankategorien || {}; renderErl(); } catch (e) {} }
+async function loadAnsitzeQuiet() { try { const r = await api('ansitze'); S.ansitze = r.ansitze; S.ansOpt = { typen: r.typen, richtungen: r.richtungen }; if (S.tab === 'stamm') renderStamm(); } catch (e) {} }
 async function loadStrecke() { await loadStreckeQuiet(); renderStrecke(); }
 const todayDe = () => new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
 function renderErl() {
@@ -546,7 +554,7 @@ function renderStrecke() {
   $('#sList').innerHTML = list.map(x => {
     const pk = x.packN ? '<small>' + x.packN + ' Packung' + (x.packN === 1 ? '' : 'en') + ' · ' + fmtKg(x.packG) + ' eingelagert' + (x.packLager ? ' (' + x.packLager + ' auf Lager)' : ' (alle ausgebucht)') + (x.gewichtKg ? ' · ' + Math.round(x.packG / 10 / x.gewichtKg) + ' % des Gewichts' : '') + '</small>' : '';
     return '<div class="it" data-act="strEdit" data-id="' + esc(x.id) + '" style="cursor:pointer"><div class="n"><b>' + esc(x.datum + ' ' + x.uhrzeit + ' · ' + x.wildart) + '</b><small>' +
-      esc([x.geschlecht, /^\d+$/.test(x.alter) ? x.alter + ' J.' : x.alter, x.erleger, x.gewichtKg != null ? x.gewichtKg.toLocaleString('de-DE') + ' kg' : '', x.marke ? 'Marke ' + x.marke : '', x.plankat ? 'Plan: ' + x.plankat : ''].filter(Boolean).join(' · ')) + '</small>' + pk + '</div></div>';
+      esc([x.geschlecht, /^\d+$/.test(x.alter) ? x.alter + ' J.' : x.alter, x.erleger, x.gewichtKg != null ? x.gewichtKg.toLocaleString('de-DE') + ' kg' : '', x.marke ? 'Marke ' + x.marke : '', x.plankat ? 'Plan: ' + x.plankat : '', x.ansitz ? 'Ansitz: ' + ((S.ansitze || []).filter(a => a.id === x.ansitz)[0] || { name: '?' }).name : ''].filter(Boolean).join(' · ')) + '</small>' + pk + '</div></div>';
   }).join('') || '<p class="mut">Keine Erlegungen in dieser Auswahl.</p>';
 }
 $('#sJahr').onchange = renderStrecke; $('#sWild').onchange = renderStrecke;
@@ -565,6 +573,7 @@ function askErlegung(id) {
       '<label>Wildart</label><input id="eWild" list="eWl" autocomplete="off" value="' + esc(ex ? ex.wildart : '') + '"><datalist id="eWl">' + wl.map(w => '<option value="' + esc(w) + '">').join('') + '</datalist>' +
       '<div class="row"><div><label>Geschlecht</label>' + sel('eGe', opt.g, ex ? ex.geschlecht : 'unbekannt') + '</div><div><label>Alter (Jahre)</label><input id="eAl" type="number" inputmode="numeric" min="0" max="99" step="1" placeholder="optional" value="' + esc(ex ? ex.alter : '') + '"></div></div>' +
       '<label>Zählt ein auf (Abschussplan)</label><select id="eKat"></select>' +
+      '<label>Ansitzeinrichtung (optional)</label><select id="eAns"></select><small id="eAnsHint" class="mut" style="display:block"></small>' +
       '<label>Erleger</label><input id="eEr" list="eEl" autocomplete="off" value="' + esc(ex ? ex.erleger : S.user) + '"><datalist id="eEl">' + names.map(n => '<option value="' + esc(n) + '">').join('') + '</datalist>' +
       '<div class="row"><div><label>Gewicht in kg (optional)</label><input id="eGew" inputmode="decimal" placeholder="z. B. 45,5" value="' + (ex && ex.gewichtKg != null ? String(ex.gewichtKg).replace('.', ',') : '') + '"></div>' +
       '<div><label>Wildmarke (optional)</label><input id="eMa" maxlength="30" value="' + esc(ex ? ex.marke : '') + '"></div></div>' +
@@ -577,6 +586,25 @@ function askErlegung(id) {
       $('#eKat').disabled = !ks.length;
     };
     fillKat(); $('#eWild').oninput = fillKat; $('#eWild').onchange = fillKat;
+    let ansSel = ex ? ex.ansitz : '';
+    const fillAns = async () => {
+      if (!$('#eAns')) return;
+      const today = $('#eDat').value === new Date().getFullYear() + '-' + p2(new Date().getMonth() + 1) + '-' + p2(new Date().getDate());
+      const list = (S.ansitze || []).filter(a => a.aktiv || a.id === ansSel);
+      const o = a => '<option value="' + esc(a.id) + '"' + (a.id === ansSel ? ' selected' : '') + '>' + esc(a.name + (a.blick.length ? ' (' + ansBlick(a) + ')' : '')) + '</option>';
+      let w = null;
+      if (today) { $('#eAnsHint').textContent = 'Wind wird geladen …'; w = await getWindNow(); if (!$('#eAns')) return; }
+      if (w) {
+        const g = ansGroups(list, w.dir), grp = (t, k) => g[k].length ? '<optgroup label="' + t + '">' + g[k].map(x => o(x.a)).join('') + '</optgroup>' : '';
+        $('#eAns').innerHTML = '<option value="">– keine –</option>' + grp('Passt zum Wind', 'passt') + grp('Bedingt (Seitenwind)', 'bedingt') + grp('Wind ungünstig', 'nicht') + grp('Ohne Blickrichtung', 'unbekannt');
+        $('#eAnsHint').textContent = 'Wind jetzt aus ' + windName(w.dir) + ' (' + Math.round(w.dir) + '°), ' + Math.round(w.v) + ' km/h. Vorschläge nach Blickrichtung.';
+      } else {
+        $('#eAns').innerHTML = '<option value="">– keine –</option>' + list.slice().sort((a, b) => a.name.localeCompare(b.name, 'de')).map(o).join('');
+        $('#eAnsHint').textContent = today ? 'Winddaten nicht verfügbar, alphabetische Liste.' : 'Windvorschlag nur für Erlegungen von heute.';
+      }
+      $('#eAns').value = ansSel;
+    };
+    fillAns(); $('#eDat').onchange = fillAns; $('#eAns').onchange = () => { ansSel = $('#eAns').value; };
     $('#mCancel').onclick = () => { closeModal(); resolve(null); };
     $('#mSave').onclick = async () => {
       const d = $('#eDat').value; if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) { $('#mErr').textContent = 'Bitte ein Datum wählen.'; return; }
@@ -586,7 +614,7 @@ function askErlegung(id) {
       if ((S.plankat || {})[canon(wild)] && !$('#eKat').value) { $('#mErr').textContent = 'Bitte die Kategorie wählen, auf die die Erlegung einzahlt.'; return; }
       if (gew !== '' && !(parseFloat(gew) >= 0.1 && parseFloat(gew) <= 999.9)) { $('#mErr').textContent = 'Gewicht in kg von 0,1 bis 999,9 angeben (z. B. 45,5).'; return; }
       try {
-        const r = await api('streckeSave', { id: ex ? ex.id : '', datum: d.slice(8, 10) + '.' + d.slice(5, 7) + '.' + d.slice(0, 4), uhrzeit: $('#eZeit').value, wildart: canon(wild), plankat: $('#eKat').value,
+        const r = await api('streckeSave', { id: ex ? ex.id : '', datum: d.slice(8, 10) + '.' + d.slice(5, 7) + '.' + d.slice(0, 4), uhrzeit: $('#eZeit').value, wildart: canon(wild), plankat: $('#eKat').value, ansitz: $('#eAns').value,
           geschlecht: $('#eGe').value, alter: $('#eAl').value, erleger: er, gewicht: gew, marke: $('#eMa').value.trim() });
         closeModal(); await loadStreckeQuiet(); if (S.tab === 'strecke') renderStrecke(); toast('Erlegung gespeichert'); resolve(r.id);
       } catch (e) { $('#mErr').textContent = e.message; }
@@ -596,6 +624,63 @@ function askErlegung(id) {
       try { await api('streckeDelete', { id: ex.id }); closeModal(); await loadStreckeQuiet(); renderStrecke(); resolve(null); } catch (e) { $('#mErr').textContent = e.message; }
     };
   });
+}
+
+/* ---- Ansitzeinrichtungen & Wind */
+const ANS_DEG = { 'Norden': 0, 'Nord-Ost': 45, 'Osten': 90, 'Süd-Ost': 135, 'Süden': 180, 'Süd-West': 225, 'Westen': 270, 'Nord-West': 315 };
+const ANS_ABK = { 'Norden': 'N', 'Nord-Ost': 'NO', 'Osten': 'O', 'Süd-Ost': 'SO', 'Süden': 'S', 'Süd-West': 'SW', 'Westen': 'W', 'Nord-West': 'NW' };
+const ansBlick = a => (a.blick || []).map(d => ANS_ABK[d] || d).join('/');
+// Wind kommt aus Richtung dir. Passt, wenn er aus Blickrichtung (±45°) kommt = Wind von vorn; bis 90° = Seitenwind; sonst von hinten/schräg hinten.
+function ansDiff(a, dir) {
+  if (!a.blick || !a.blick.length) return null;
+  return Math.min.apply(null, a.blick.map(d => { const x = Math.abs(((dir - ANS_DEG[d]) % 360 + 360) % 360); return x > 180 ? 360 - x : x; }));
+}
+function ansGroups(list, dir) {
+  const g = { passt: [], bedingt: [], nicht: [], unbekannt: [] };
+  list.forEach(a => { const d = ansDiff(a, dir); (d === null ? g.unbekannt : d <= 45 ? g.passt : d <= 90 ? g.bedingt : g.nicht).push({ a: a, d: d }); });
+  ['passt', 'bedingt', 'nicht'].forEach(k => g[k].sort((x, y) => x.d - y.d || x.a.name.localeCompare(y.a.name, 'de')));
+  g.unbekannt.sort((x, y) => x.a.name.localeCompare(y.a.name, 'de'));
+  return g;
+}
+async function getWindNow() {
+  if (S.windNow && Date.now() - S.windNow.ts < 600000) return S.windNow;
+  const loc = windGps || CONFIG.WIND;
+  try {
+    const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=' + loc.lat.toFixed(5) + '&longitude=' + loc.lon.toFixed(5) + '&current=wind_speed_10m,wind_direction_10m&wind_speed_unit=kmh&timezone=Europe%2FBerlin');
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const c = (await r.json()).current;
+    return (S.windNow = { dir: c.wind_direction_10m, v: c.wind_speed_10m, t: c.time.slice(11, 16), ts: Date.now() });
+  } catch (e) { return null; }
+}
+function renderWindAns() {
+  const el = $('#windAns'), w = S.windNow; if (!el || !w) return;
+  const act = (S.ansitze || []).filter(a => a.aktiv), g = ansGroups(act, w.dir);
+  const li = k => g[k].map(x => '<div class="it"><div class="n"><b>' + esc(x.a.name) + '</b><small>' + esc(x.a.typ + ' · Blick ' + ansBlick(x.a)) + '</small></div></div>').join('');
+  el.innerHTML = '<h2>Passende Ansitze</h2><p class="mut" style="margin:0 0 6px">Wind aus ' + windName(w.dir) + ' (' + Math.round(w.dir) + '°), ' + Math.round(w.v) + ' km/h, Stand ' + esc(w.t) + ' Uhr' + (w.v < 5 ? ' · Schwachwind, die Thermik kann die Richtung drehen' : '') + '</p>' +
+    '<div class="lst">' + (li('passt') || '<p class="mut">Kein Ansitz mit passender Blickrichtung.</p>') + '</div>' +
+    (g.bedingt.length ? '<details style="margin-top:8px"><summary>Bedingt, Seitenwind (' + g.bedingt.length + ')</summary><div class="lst">' + li('bedingt') + '</div></details>' : '') +
+    '<p class="mut" style="margin:8px 0 0;font-size:12px">Passt = Wind kommt von vorn (bis 45° zur Blickrichtung), bedingt = von der Seite (bis 90°). Bei Wind von hinten trägt er den Geruch ins Wild. ' + g.unbekannt.length + ' Einrichtungen haben keine Blickrichtung und werden nicht vorgeschlagen.</p>';
+}
+function askAnsitz(id) {
+  const ex = id ? (S.ansitze || []).filter(x => x.id === id)[0] : null, opt = S.ansOpt || { typen: ['Kanzel', 'Kanzel (geschlossen)', 'Kanzel (offen)', 'Leiter', 'Drückjagdbock'], richtungen: Object.keys(ANS_DEG) };
+  openModal('<h2>' + (ex ? 'Ansitzeinrichtung bearbeiten' : 'Neue Ansitzeinrichtung') + '</h2>' +
+    '<label>Name</label><input id="aiName" maxlength="60" autocomplete="off" value="' + esc(ex ? ex.name : '') + '">' +
+    '<label>Typ</label><select id="aiTyp">' + opt.typen.map(t => '<option' + (ex && ex.typ === t ? ' selected' : '') + '>' + esc(t) + '</option>').join('') + '</select>' +
+    '<label>Blickrichtung (mehrere möglich)</label><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px">' +
+    opt.richtungen.map(d => '<label style="display:flex;align-items:center;margin:0;font-weight:400"><input type="checkbox" class="aiDir" value="' + esc(d) + '"' + (ex && ex.blick.indexOf(d) >= 0 ? ' checked' : '') + '>' + esc(d) + '</label>').join('') + '</div>' +
+    '<label style="display:flex;align-items:center;margin-top:12px"><input type="checkbox" id="aiDach"' + (ex && ex.dach ? ' checked' : '') + '>Dach vorhanden</label>' +
+    '<label>Zustand (optional)</label><input id="aiZu" maxlength="100" value="' + esc(ex ? ex.zustand : '') + '">' +
+    '<label>Bemerkung (optional)</label><textarea id="aiBem" rows="2" maxlength="300">' + esc(ex ? ex.bemerkung : '') + '</textarea>' +
+    '<label style="display:flex;align-items:center;margin-top:10px"><input type="checkbox" id="aiAkt"' + (!ex || ex.aktiv ? ' checked' : '') + '>aktiv</label>' +
+    '<p id="mErr" class="mut" style="color:var(--err)"></p><div class="row"><button class="btn sec" id="mCancel">Abbrechen</button><button class="btn" id="mSave">Speichern</button></div>');
+  $('#mCancel').onclick = closeModal;
+  $('#mSave').onclick = async () => {
+    const nm = $('#aiName').value.trim(); if (!nm) { $('#mErr').textContent = 'Bitte einen Namen angeben.'; return; }
+    try {
+      await api('ansitzSave', { id: ex ? ex.id : '', name: nm, typ: $('#aiTyp').value, blick: Array.from(document.querySelectorAll('.aiDir:checked')).map(i => i.value), dach: $('#aiDach').checked, zustand: $('#aiZu').value.trim(), bemerkung: $('#aiBem').value.trim(), aktiv: $('#aiAkt').checked });
+      closeModal(); await loadAnsitzeQuiet(); renderStamm(); toast('Ansitzeinrichtung gespeichert');
+    } catch (e) { $('#mErr').textContent = e.message; }
+  };
 }
 
 /* ---- Abschussplan */
@@ -633,7 +718,7 @@ function renderPlan() {
     html += '<div class="card"><h2>' + esc(w) + ' <span class="mut">' + ws.filter(x => x.plankat).length + ' von ' + wSoll + '</span></h2><div class="lst">' + rows + '</div>' +
       (ohne ? '<p class="mut" style="margin:8px 0 0">' + ohne + ' ' + esc(w) + '-Erlegung' + (ohne === 1 ? '' : 'en') + ' ohne Plankategorie (zählt nicht mit)</p>' : '') + '</div>';
   });
-  $('#pSum').innerHTML = '<div class="tot"><b>' + sumIst + '</b><span>von ' + sumSoll + ' Soll</span></div><div><b>' + Math.max(0, sumSoll - sumIst) + '</b><span>noch offen</span></div>' + (sumOhne ? '<div><b>' + sumOhne + '</b><span>ohne Kategorie</span></div>' : '');
+  $('#pSum').innerHTML = '<div class="tot"><b>' + sumIst + '</b><span>erfüllt</span></div><div><b>' + sumSoll + '</b><span>Soll</span></div><div><b>' + Math.max(0, sumSoll - sumIst) + '</b><span>noch offen</span></div>' + (sumOhne ? '<div><b>' + sumOhne + '</b><span>ohne Kategorie</span></div>' : '');
   $('#pList').innerHTML = html;
 }
 $('#pJahr').onchange = renderPlan;
@@ -1150,6 +1235,8 @@ function renderStamm() {
   $('#kundenList').innerHTML = S.kunden.map(k => '<div class="it ' + (k.aktiv ? '' : 'off') + '"><div class="n">' + esc(k.name) + '<small>' + (k.aktiv ? 'aktiv' : 'inaktiv') + (k.notiz ? ' · ' + esc(k.notiz) : '') + '</small></div><button class="btn sec sm fit" data-act="kundeEdit" data-name="' + esc(k.name) + '">Bearbeiten</button></div>').join('') || '<p class="mut">Noch keine Kunden.</p>';
   $('#lagerList').innerHTML = S.lagerorte.map(l => '<div class="it ' + (l.aktiv ? '' : 'off') + '"><div class="n">' + esc(l.name) + '<small>' + (l.aktiv ? 'aktiv' : 'inaktiv') + '</small></div><button class="btn sec sm fit" data-act="lagerEdit" data-name="' + esc(l.name) + '">Bearbeiten</button></div>').join('') || '<p class="mut">Noch keine Lagerorte.</p>';
   $('#artList').innerHTML = S.artikelList.slice().sort((a, b) => a.code.localeCompare(b.code)).map(a => '<div class="it ' + (a.aktiv ? '' : 'off') + '"><div class="n">' + esc(a.bezeichnung) + '<small>' + a.code + ' · ' + fmtEur(a.preis) + '/kg' + (a.aktiv ? '' : ' · inaktiv') + '</small></div><button class="btn sec sm fit" data-act="artEdit" data-code="' + a.code + '">Bearbeiten</button></div>').join('') || '<p class="mut">Noch keine Artikel.</p>';
+  $('#ansList').innerHTML = (S.ansitze || []).map(a => '<div class="it ' + (a.aktiv ? '' : 'off') + '"><div class="n">' + esc(a.name) + '<small>' + esc(a.typ + (a.blick.length ? ' · Blick ' + ansBlick(a) : ' · keine Blickrichtung') + (a.aktiv ? '' : ' · inaktiv')) + '</small></div><button class="btn sec sm fit" data-act="ansEdit" data-id="' + esc(a.id) + '">Bearbeiten</button></div>').join('') || '<p class="mut">Noch keine Ansitzeinrichtungen.</p>';
+  $('#cnt_ans').textContent = (S.ansitze || []).length;
   $('#cnt_lager').textContent = S.lagerorte.length; $('#cnt_kunden').textContent = S.kunden.length; $('#cnt_art').textContent = S.artikelList.length;
   document.querySelectorAll('details.fold').forEach(d => {
     if (!d.dataset.init) {
@@ -1305,6 +1392,8 @@ document.addEventListener('click', e => {
     else if (a === 'strNew') askErlegung('');
     else if (a === 'strEdit') askErlegung(t.dataset.id);
     else if (a === 'planEdit') askPlan();
+    else if (a === 'ansNew') askAnsitz('');
+    else if (a === 'ansEdit') askAnsitz(t.dataset.id);
     else if (a === 'aufNew') askAufgabe('');
     else if (a === 'aufEdit') askAufgabe(t.dataset.id);
     else if (a === 'aufCheck') aufCheck(t.dataset.id, t.dataset.done === '1');
@@ -1374,6 +1463,8 @@ async function loadWind(loc) {
     const r = await fetch(u); if (!r.ok) throw new Error('HTTP ' + r.status);
     const d = await r.json(), c = d.current, h = d.hourly;
     const rows = h.time.slice(1, 7).map((tm, i) => ({ t: tm.slice(11, 13) + ':00', v: h.wind_speed_10m[i + 1], g: h.wind_gusts_10m[i + 1], d: h.wind_direction_10m[i + 1] }));
+    S.windNow = { dir: c.wind_direction_10m, v: c.wind_speed_10m, t: c.time.slice(11, 16), ts: Date.now() };
+    renderWindAns();
     if (!$('#windBox')) return;
     $('#windBox').innerHTML =
       '<div style="text-align:center">' + windRose(c.wind_direction_10m) +
@@ -1385,7 +1476,7 @@ async function loadWind(loc) {
         '<b>' + x.t + '</b><div><svg viewBox="0 0 24 24" width="26" height="26" style="transform:rotate(' + (x.d + 180) + 'deg)"><path d="M12 3 L18 16 L12 13 L6 16 Z" fill="var(--acc)"/></svg></div>' +
         '<div>' + windName(x.d) + '</div><b>' + Math.round(x.v) + '</b><div style="color:var(--mut)">↑' + Math.round(x.g) + '</div></div>').join('') +
       '</div><small style="color:var(--mut)">km/h, ↑ = Böen · Quelle: Open-Meteo</small>';
-  } catch (e) { box.innerHTML = '<p style="color:var(--err)">Winddaten nicht verfügbar (' + e.message + ').</p>'; }
+  } catch (e) { box.innerHTML = '<p style="color:var(--err)">Winddaten nicht verfügbar (' + e.message + ').</p>'; $('#windAns').innerHTML = ''; }
 }
 function showWind() {
   const base = CONFIG.WIND, loc = windGps || base;

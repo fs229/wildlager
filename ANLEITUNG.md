@@ -99,6 +99,10 @@ Hinweis: Ein öffentliches Repository ist für jeden einsehbar, die Server-URL s
 
 **Revier > Aufgaben**: Aufgabenliste für die Revierarbeit (z. B. Kanzel reparieren, Kirrung auffüllen). Mit **+ Aufgabe** legst du Titel, optional Notiz, Verantwortlichen und Fälligkeitsdatum an. Das Kästchen links hakt eine Aufgabe ab, nochmal antippen öffnet sie wieder. Antippen des Titels öffnet Bearbeiten und Löschen. Oben wechselst du zwischen **Offen** und **Erledigt** und filterst nach Verantwortlich (Alle, Meine, Ohne Zuständigen oder eine Person). Offene Aufgaben sind nach Fälligkeit sortiert, überfällige stehen rot markiert oben. Erledigt zeigt, wer wann abgehakt hat.
 
+**Stammdaten > Ansitzeinrichtungen**: Kanzeln, Leitern und Drückjagdböcke mit Typ, Blickrichtung (mehrere möglich), Dach, Zustand und Bemerkung. Beim ersten Öffnen legt die App das Blatt „Ansitze" selbst an und füllt es mit den 46 Einrichtungen aus deiner Reviereinrichtungen-Liste (Bodenstände, Kirrungen und Salzlecken bewusst weggelassen). Inaktive Einrichtungen bleiben erhalten, tauchen aber nicht mehr in der Auswahl auf.
+
+**Ansitz in der Strecke**: Beim Erfassen gibt es das optionale Feld **Ansitzeinrichtung**. Bei Erlegungen von heute lädt die App den aktuellen Wind am Revier und sortiert die Auswahl: **Passt zum Wind** (Wind kommt von vorn, bis 45° zur Blickrichtung), **Bedingt** (Seitenwind, bis 90°), **Wind ungünstig** (Wind von hinten, trägt den Geruch ins Wild) und **Ohne Blickrichtung**. Bei anderen Datumsangaben gibt es keinen Windvorschlag, dann ist die Liste einfach alphabetisch. Im **Wind**-Tab steht zusätzlich die Liste „Passende Ansitze" für den aktuellen Wind. Einrichtungen ohne Blickrichtung (alle Drückjagdböcke) werden nie vorgeschlagen.
+
 **Revier > Abschussplan**: Soll und Erfüllung je Jagdjahr (1. April bis 31. März). Kategorien Rehwild: Geiß, Schmalreh, Bock, Kitz. Rotwild: Alttier, Schmaltier, Hirsch Klasse 1, 2, 3, Kalb. Mit **Soll bearbeiten** trägst du die Zahlen aus dem Plan ein (leer = kein Soll, grau steht das Vorjahr). Pro Kategorie siehst du „x von Soll", wie viele noch fehlen und einen Balken; Überschreitungen sind rot markiert. In der Strecke wählst du beim Erfassen unter **Zählt ein auf** die Kategorie. Bei Rehwild und Rotwild ist die Auswahl Pflicht, bei anderen Wildarten gibt es sie nicht. Ältere Erlegungen ohne Kategorie zählen im Plan nicht mit, der Plan weist sie als Hinweis aus, und sie lassen sich nur mit Kategorie neu speichern. Das Jagdjahr ergibt sich aus dem Datum der Erlegung.
 
 **Herkunft der Packungen**: Im Tab Scannen gibt es beim **Einbuchen** das Feld **Erlegung (optional)**. Wählst du dort eine Erlegung, bekommen alle folgenden Packungen diese Herkunft, bis du die Auswahl änderst oder auf „keine" stellst. Mit **+ Neu** legst du die Erlegung gleich an. Die Wahl gilt nur für die aktuelle Sitzung und wird beim nächsten Anmelden zurückgesetzt. Im Bestand steht die Herkunft bei jeder Packung, in der Strecke siehst du je Erlegung, wie viele Packungen und wie viel kg eingelagert sind. Der Prozentwert dort ist das eingelagerte Gewicht im Verhältnis zum erfassten Gewicht des Stücks.
@@ -107,7 +111,9 @@ Hinweis: Ein öffentliches Repository ist für jeden einsehbar, die Server-URL s
 
 **Datenfelder je Packung (Blatt „Bestand")**: ID, EAN, Artikelcode, Gewicht (g), Lagerort, Scandatum, Scanuhrzeit, Eingebucht von, Status, Ausbuchdatum, Ausbuchuhrzeit, Ausgebucht von, Kunde (Verkauf), Preis (€), Rechnungsnr.
 
-**Blatt „Strecke"**: ID, Datum, Uhrzeit, Wildart, Geschlecht, Alter in Jahren (ganze Zahl, optional), Erleger, Gewicht (kg), Wildmarke, Erfasst von, Plankategorie. Im Blatt „Bestand" gibt es dazu die Spalte Erlegung mit der ID der Erlegung.
+**Blatt „Strecke"**: ID, Datum, Uhrzeit, Wildart, Geschlecht, Alter in Jahren (ganze Zahl, optional), Erleger, Gewicht (kg), Wildmarke, Erfasst von, Plankategorie, Ansitz. Im Blatt „Bestand" gibt es dazu die Spalte Erlegung mit der ID der Erlegung.
+
+**Blatt „Ansitze"**: ID, Name, Typ, Blickrichtung, Dach, Zustand, Bemerkung, Breite, Länge, Aktiv.
 
 **Blatt „Abschussplan"**: Jagdjahr (Startjahr), Wildart, Kategorie, Soll.
 
@@ -142,7 +148,7 @@ Zurückspielen: die gewünschte Kopie aus dem Ordner öffnen, die Blätter bei B
 
 ---
 
-## Update einer bestehenden Installation (zuletzt: Abschussplan)
+## Update einer bestehenden Installation (zuletzt: Ansitzeinrichtungen)
 
 1. Im Apps-Script-Editor den **kompletten Code ersetzen** durch den neuen `Code.gs`, speichern.
 2. **Bereitstellen > Bereitstellungen verwalten > Bearbeiten (Stift) > Version: Neue Version > Bereitstellen**. Die URL bleibt gleich.
