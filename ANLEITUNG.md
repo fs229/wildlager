@@ -93,7 +93,9 @@ Hinweis: Ein öffentliches Repository ist für jeden einsehbar, die Server-URL s
 - Artikel anlegen oder ändern (Preis, Bezeichnung, aktiv/inaktiv).
 - Alles liegt auch direkt im Google Sheet und kann dort bearbeitet werden. Die Blätter-Überschriften nicht ändern.
 
-**Tab Revier** hat vier Ansichten: **Strecke**, **Aufgaben**, **Abschussplan** und **Wind**. Der Wind liegt nicht mehr oben in der Kopfzeile, sondern hier: Windrichtung und -stärke für das Revier mit Vorhersage der nächsten 6 Stunden, per Knopf auch für den eigenen Standort.
+**Navigation**: Die App hat vier Tabs. **Lager** (Bestand | Scannen, Startansicht ist der Bestand), **Verkauf** (Wünsche | Rechnungen), **Revier** und **Stammdaten**. Die Umschaltung steht jeweils oben im Tab, die App merkt sich je Tab die zuletzt geöffnete Ansicht. Weiter unten in dieser Anleitung ist mit „Tab Scannen", „Bestand", „Wünsche" und „Rechnungen" die jeweilige Ansicht gemeint.
+
+**Tab Revier** hat vier Ansichten: **Strecke**, **Abschussplan**, **Wind** und **Aufgaben**. Der Wind liegt nicht mehr oben in der Kopfzeile, sondern hier: Windrichtung und -stärke für das Revier mit Vorhersage der nächsten 6 Stunden, per Knopf auch für den eigenen Standort.
 
 **Revier > Strecke**: Streckenliste der Erlegungen. Mit **+ Erlegung erfassen** gibst du Datum, Uhrzeit, Wildart, Geschlecht, Alter in Jahren (ganze Zahl, optional), Erleger und optional Gewicht (kg) und Wildmarke ein. Oben filterst du nach Jagdjahr (1. April bis 31. März) und Wildart und siehst Stückzahl, Gewicht und die Zahl je Wildart. Antippen einer Erlegung öffnet sie zum Bearbeiten oder Löschen. Löschen geht nicht, solange Packungen daran hängen.
 
@@ -148,7 +150,7 @@ Zurückspielen: die gewünschte Kopie aus dem Ordner öffnen, die Blätter bei B
 
 ---
 
-## Update einer bestehenden Installation (zuletzt: Ansitzeinrichtungen)
+## Update einer bestehenden Installation (zuletzt: neue Navigation)
 
 1. Im Apps-Script-Editor den **kompletten Code ersetzen** durch den neuen `Code.gs`, speichern.
 2. **Bereitstellen > Bereitstellungen verwalten > Bearbeiten (Stift) > Version: Neue Version > Bereitstellen**. Die URL bleibt gleich.

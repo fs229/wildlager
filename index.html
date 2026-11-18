@@ -105,14 +105,13 @@ details.fold>summary{display:flex;align-items:center;gap:8px;cursor:pointer;list
 <body>
 <header><b class="brand"><img src="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20190%20190%22%20width=%22190%22%20height=%22190%22%3E%3Crect%20width=%22190%22%20height=%22190%22%20rx=%2240%22%20fill=%22%231f3d2b%22/%3E%3Cg%20transform=%22translate(95,95)%22%3E%3Ccircle%20r=%2272%22%20fill=%22none%22%20stroke=%22%23e0a73a%22%20stroke-width=%223%22/%3E%3Cg%20transform=%22translate(0,-6.25)%22%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(-15,-6)%20rotate(7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(15,-6)%20rotate(-7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(-29,40)%20rotate(-12)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(29,40)%20rotate(12)%22%20fill=%22%23f2ead8%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E" width="28" height="28" alt=""> Waidr</b><span><small id="who"></small> <button class="btn sm sec" id="btnTheme" aria-label="Hell/Dunkel umschalten"></button> <button class="btn sm sec hide" id="logout" aria-label="Abmelden" title="Abmelden"><i class="ti ti-logout" aria-hidden="true"></i></button></span></header>
 <nav id="nav" class="hide">
-  <button data-tab="scan" class="on"><i class="ti ti-scan" aria-hidden="true"></i>Scannen</button>
-  <button data-tab="bestand"><i class="ti ti-stack-2" aria-hidden="true"></i>Bestand</button>
+  <button data-grp="lager" class="on"><i class="ti ti-stack-2" aria-hidden="true"></i>Lager</button>
+  <button data-grp="verkauf"><i class="ti ti-file-invoice" aria-hidden="true"></i>Verkauf</button>
   <button data-tab="strecke"><i class="ti ti-target-arrow" aria-hidden="true"></i>Revier</button>
-  <button data-tab="rech"><i class="ti ti-file-invoice" aria-hidden="true"></i>Rechnungen</button>
-  <button data-tab="wunsch"><i class="ti ti-clipboard-list" aria-hidden="true"></i>Wünsche</button>
   <button data-tab="stamm"><i class="ti ti-adjustments" aria-hidden="true"></i>Stammdaten</button>
 </nav>
 <main>
+  <div class="seg hide" id="grpSeg"></div>
   <!-- Anmeldung -->
   <section id="v-login" class="hide">
     <div class="hero"><img src="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20190%20190%22%20width=%22190%22%20height=%22190%22%3E%3Crect%20width=%22190%22%20height=%22190%22%20rx=%2240%22%20fill=%22%231f3d2b%22/%3E%3Cg%20transform=%22translate(95,95)%22%3E%3Ccircle%20r=%2272%22%20fill=%22none%22%20stroke=%22%23e0a73a%22%20stroke-width=%223%22/%3E%3Cg%20transform=%22translate(0,-6.25)%22%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(-15,-6)%20rotate(7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(15,-6)%20rotate(-7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(-29,40)%20rotate(-12)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(29,40)%20rotate(12)%22%20fill=%22%23f2ead8%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E" width="88" height="88" alt="Waidr"><h1>Waidr</h1><p>Wild · Lager · Verkauf</p></div>
@@ -209,7 +208,7 @@ details.fold>summary{display:flex;align-items:center;gap:8px;cursor:pointer;list
 
   <!-- Strecke -->
   <section id="v-strecke" class="hide">
-    <div class="seg" id="rvSeg"><button data-rv="strecke" class="on">Strecke</button><button data-rv="aufg">Aufgaben</button><button data-rv="plan">Abschussplan</button><button data-rv="wind">Wind</button></div>
+    <div class="seg" id="rvSeg"><button data-rv="strecke" class="on">Strecke</button><button data-rv="plan">Abschussplan</button><button data-rv="wind">Wind</button><button data-rv="aufg">Aufgaben</button></div>
     <div id="rvStrecke">
     <div class="card">
       <button class="btn big" data-act="strNew">+ Erlegung erfassen</button>
@@ -438,7 +437,7 @@ function applyInit(r) {
   const def = ls.get('wl_lager_' + S.user);
   const act = S.lagerorte.filter(l => l.aktiv);
   S.lagerort = act.some(l => l.name === def) ? def : (act[0] ? act[0].name : '');
-  renderLager(); renderKunden(); S.wuensche = null; S.strecke = null; S.aufg = null; S.plan = null; S.ansitze = []; S.windNow = null; loadAnsitzeQuiet(); S.rv = 'strecke'; S.ast = 'offen'; S.erl = ''; loadStreckeQuiet(); loadWuenscheQuiet(); setTab(S.tab || 'scan');
+  renderLager(); renderKunden(); S.wuensche = null; S.strecke = null; S.aufg = null; S.plan = null; S.ansitze = []; S.windNow = null; loadAnsitzeQuiet(); S.rv = 'strecke'; S.ast = 'offen'; S.erl = ''; loadStreckeQuiet(); loadWuenscheQuiet(); S.sub = {}; setTab('bestand');
 }
 
 /* -------------------------------------------------------------------- Tabs */
@@ -810,10 +809,16 @@ function setSv(v) {
   if (v === 'stat') loadStat(); else tipHide();
 }
 document.querySelectorAll('#svSeg button').forEach(b => { b.onclick = () => setSv(b.dataset.sv); });
+const TAB_GRP = { bestand: 'lager', scan: 'lager', wunsch: 'verkauf', rech: 'verkauf' };
+const GRP_TABS = { lager: [['bestand', 'Bestand'], ['scan', 'Scannen']], verkauf: [['wunsch', 'Wünsche'], ['rech', 'Rechnungen']] };
 function setTab(t) {
   S.tab = t;
   if (t !== 'scan') stopScan();
-  document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+  const grp = TAB_GRP[t] || '';
+  S.sub = S.sub || {}; if (grp) S.sub[grp] = t;
+  document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.grp ? b.dataset.grp === grp : b.dataset.tab === t));
+  $('#grpSeg').classList.toggle('hide', !grp);
+  if (grp) $('#grpSeg').innerHTML = GRP_TABS[grp].map(x => '<button data-tab="' + x[0] + '"' + (x[0] === t ? ' class="on"' : '') + '>' + x[1] + '</button>').join('');
   show(t);
   if (t === 'bestand') loadBestand();
   if (t === 'strecke') { if (S.rv === 'aufg') loadAufgaben(); else if (S.rv === 'plan') loadPlan(); else if (S.rv === 'wind') showWind(); else loadStrecke(); }
@@ -1371,8 +1376,9 @@ async function rechOpen(nr) {
 
 /* ----------------------------------------------------------------- Ereignisse */
 document.addEventListener('click', e => {
-  const t = e.target.closest('[data-tab],[data-mode],[data-user],[data-act]'); if (!t) return;
-  if (t.dataset.tab) setTab(t.dataset.tab);
+  const t = e.target.closest('[data-tab],[data-grp],[data-mode],[data-user],[data-act]'); if (!t) return;
+  if (t.dataset.grp) setTab((S.sub && S.sub[t.dataset.grp]) || (t.dataset.grp === 'lager' ? 'bestand' : 'wunsch'));
+  else if (t.dataset.tab) setTab(t.dataset.tab);
   else if (t.dataset.mode) setMode(t.dataset.mode);
   else if (t.dataset.user) pickUser(t.dataset.user);
   else {
