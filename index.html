@@ -354,6 +354,41 @@ function parseEan(raw) {
 }
 
 /* ------------------------------------------------------------------- Server */
+/* ---- Zwischenspeicher: Daten sofort aus dem Speicher zeigen, im Hintergrund aktualisieren */
+const RC = { mem: {}, ttl: 30000, gen: 0, startPending: false };
+const RC_READ = { init: 1, nutzer: 1, start: 1, bestand: 1, rechnungen: 1, rechnung: 1, offene: 1, statistik: 1, strecke: 1, ansitze: 1, aufgaben: 1, abschuss: 1, wuensche: 1 };
+const RC_INIT = { artikelSave: 1, lagerortSave: 1, kundeSave: 1 };
+const rcKey = (a, p) => 'waidr_c_' + S.user + '|' + a + '|' + JSON.stringify(p || {});
+function rcGet(k) {
+  let e = RC.mem[k];
+  if (!e) { try { e = JSON.parse(localStorage.getItem(k)); } catch (x) { e = null; } if (e) RC.mem[k] = e; }
+  return e && e.r ? e : null;
+}
+function rcSet(k, r) { const e = { t: Date.now(), d: 0, r: r }; RC.mem[k] = e; try { localStorage.setItem(k, JSON.stringify(e)); } catch (x) {} }
+// Nach eigenen Änderungen: Einträge als veraltet markieren (werden nicht mehr angezeigt, bis frische Daten da sind)
+function rcDirty(initToo) {
+  RC.gen++;
+  let keys = []; try { keys = Object.keys(localStorage).filter(k => k.indexOf('waidr_c_') === 0); } catch (x) {}
+  Object.keys(RC.mem).forEach(k => { if (keys.indexOf(k) < 0) keys.push(k); });
+  keys.forEach(k => {
+    if (!initToo && k.indexOf('|init|') > 0) return;
+    const e = rcGet(k); if (!e) return; e.d = 1; RC.mem[k] = e;
+    try { localStorage.setItem(k, JSON.stringify(e)); } catch (x) {}
+  });
+}
+function rcPurge() { RC.mem = {}; try { Object.keys(localStorage).filter(k => k.indexOf('waidr_c_') === 0).forEach(k => localStorage.removeItem(k)); } catch (x) {} }
+// Liest mit Zwischenspeicher: apply(r) läuft sofort mit gespeicherten Daten und nochmal mit frischen, wenn sie abweichen.
+async function apiSWR(action, payload, apply) {
+  const k = rcKey(action, payload), c = rcGet(k), usable = c && !c.d;
+  if (usable) { apply(c.r); if (Date.now() - c.t < RC.ttl || RC.startPending) return; }
+  const gen = RC.gen;
+  let r;
+  try { r = await api(action, payload); }
+  catch (e) { if (usable && e.net) { toast('Keine Verbindung, zeige gespeicherte Daten'); return; } throw e; }
+  if (gen !== RC.gen) return;
+  rcSet(k, r);
+  if (!usable || JSON.stringify(c.r) !== JSON.stringify(r)) apply(r);
+}
 async function api(action, payload, opt) {
   opt = opt || {};
   const body = JSON.stringify(Object.assign({ action, code: S.code, user: S.user }, payload || {}));
@@ -368,6 +403,7 @@ async function api(action, payload, opt) {
     if (r.auth === false && !opt.noAuthRedirect) { logout(true); }
     throw new Error(r.error || 'Fehler');
   }
+  if (!RC_READ[action]) rcDirty(!!RC_INIT[action]);
   return r;
 }
 
@@ -398,8 +434,28 @@ function start() {
   S.url = CONFIG.API_URL || ls.get('wl_url');
   S.code = ls.get('wl_code'); S.user = ls.get('wl_user');
   if (S.url && S.code && S.user) {
-    api('init', {}, { noAuthRedirect: true }).then(applyInit).catch(() => showLogin());
+    const c = rcGet(rcKey('init', {}));
+    if (c && !c.d) {
+      // gespeicherte Daten sofort zeigen, frische im Hintergrund holen
+      applyInit(c.r);
+      RC.startPending = true;
+      const gen = RC.gen;
+      api('start').then(r => {
+        RC.startPending = false;
+        if (gen !== RC.gen) return;
+        seedStart(r);
+        if (JSON.stringify(c.r) !== JSON.stringify(r.init)) setInitData(r.init);
+        if (S.tab && $('#modal').classList.contains('hide')) setTab(S.tab);
+      }).catch(() => { RC.startPending = false; });
+    } else {
+      api('start', {}, { noAuthRedirect: true }).then(r => { seedStart(r); applyInit(r.init); }).catch(() => showLogin());
+    }
   } else showLogin();
+}
+function seedStart(r) {
+  rcSet(rcKey('init', {}), r.init);
+  rcSet(rcKey('bestand', { history: false }), r.bestand);
+  ['strecke', 'ansitze', 'wuensche', 'aufgaben', 'abschuss', 'rechnungen', 'offene'].forEach(k => rcSet(rcKey(k, null), r[k]));
 }
 function showLogin(msg) {
   $('#nav').classList.add('hide'); $('#logout').classList.add('hide'); $('#who').textContent = '';
@@ -421,14 +477,21 @@ async function codeStep() {
 async function pickUser(name) {
   S.user = name;
   try {
-    const r = await api('init', {}, { noAuthRedirect: true });
+    const r = await api('start', {}, { noAuthRedirect: true });
     ls.set('wl_url', S.url); ls.set('wl_code', S.code); ls.set('wl_user', S.user);
-    applyInit(r);
+    seedStart(r);
+    applyInit(r.init);
   } catch (e) { $('#loginErr').textContent = e.message; }
 }
 function logout(silent) {
-  stopScan(); ls.set('wl_code', ''); ls.set('wl_user', ''); S.code = ''; S.user = '';
+  stopScan(); rcPurge(); ls.set('wl_code', ''); ls.set('wl_user', ''); S.code = ''; S.user = '';
   showLogin(silent ? 'Bitte neu anmelden.' : '');
+}
+function setInitData(r) {
+  S.artikelList = r.artikel; S.artikel = {}; r.artikel.forEach(a => { S.artikel[a.code] = a; });
+  S.lagerorte = r.lagerorte; S.nutzer = r.nutzer; S.settings = r.settings; S.kunden = r.kunden || [];
+  if (S.kunde && S.kunden.every(k => k.name !== S.kunde)) S.kunde = '';
+  renderLager(); renderKunden();
 }
 function applyInit(r) {
   S.artikelList = r.artikel; S.artikel = {}; r.artikel.forEach(a => { S.artikel[a.code] = a; });
@@ -495,8 +558,7 @@ function hbars(list, rows) {
 }
 async function loadStat(jahr) {
   try {
-    const r = await api('statistik', { jahr: jahr || (S.stat && S.stat.jahr) || '' });
-    S.stat = r; renderStat();
+    await apiSWR('statistik', { jahr: jahr || (S.stat && S.stat.jahr) || '' }, r => { S.stat = r; renderStat(); });
   } catch (e) { toast(e.message); }
 }
 function renderStat() {
@@ -524,9 +586,24 @@ $('#yNext').onclick = () => { const i = S.stat.jahre.indexOf(S.stat.jahr); if (i
 const jagdjahr = d => { const m = Number(String(d).slice(3, 5)), y = Number(String(d).slice(6, 10)); return m >= 4 ? y : y - 1; };
 const jjLabel = y => y + '/' + String((y + 1) % 100).padStart(2, '0');
 const strLabel = x => x.datum.slice(0, 6) + ' ' + x.wildart + (x.geschlecht && x.geschlecht !== 'unbekannt' ? ' ' + x.geschlecht : '') + ' · ' + x.erleger;
-async function loadStreckeQuiet() { try { const r = await api('strecke'); S.strecke = r.strecke; S.strOpt = { g: r.geschlechter }; S.plankat = r.plankategorien || {}; renderErl(); } catch (e) {} }
-async function loadAnsitzeQuiet() { try { const r = await api('ansitze'); S.ansitze = r.ansitze; S.ansOpt = { typen: r.typen, richtungen: r.richtungen }; if (S.tab === 'stamm') renderStamm(); } catch (e) {} }
-async function loadStrecke() { await loadStreckeQuiet(); renderStrecke(); }
+async function loadStreckeQuiet() {
+  try {
+    await apiSWR('strecke', null, r => {
+      S.strecke = r.strecke; S.strOpt = { g: r.geschlechter }; S.plankat = r.plankategorien || {}; renderErl();
+      if (S.tab === 'strecke') { if (!S.rv || S.rv === 'strecke') renderStrecke(); else if (S.rv === 'plan' && S.plan) renderPlan(); }
+    });
+  } catch (e) {}
+}
+async function loadAnsitzeQuiet() {
+  try {
+    await apiSWR('ansitze', null, r => {
+      S.ansitze = r.ansitze; S.ansOpt = { typen: r.typen, richtungen: r.richtungen };
+      if (S.tab === 'stamm') renderStamm();
+      if (S.tab === 'strecke' && S.rv === 'wind' && S.windNow) renderWindAns();
+    });
+  } catch (e) {}
+}
+async function loadStrecke() { await loadStreckeQuiet(); if (S.strecke && S.tab === 'strecke' && (!S.rv || S.rv === 'strecke')) renderStrecke(); }
 const todayDe = () => new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
 function renderErl() {
   const all = S.strecke || [], cj = jagdjahr(todayDe());
@@ -684,8 +761,8 @@ function askAnsitz(id) {
 
 /* ---- Abschussplan */
 async function loadPlan() {
-  try { const [p] = await Promise.all([api('abschuss'), loadStreckeQuiet()]); S.plan = p.plan; S.plankat = p.kategorien; } catch (e) { toast(e.message); }
-  renderPlan();
+  try { await Promise.all([apiSWR('abschuss', null, p => { S.plan = p.plan; S.plankat = p.kategorien; if (S.strecke) renderPlan(); }), loadStreckeQuiet()]); } catch (e) { toast(e.message); }
+  if (S.plan && S.strecke) renderPlan();
 }
 const planSoll = (jahr, w, k) => { const x = (S.plan || []).filter(p => p.jahr === jahr && p.wildart === w && p.kategorie === k)[0]; return x ? x.soll : null; };
 function renderPlan() {
@@ -740,7 +817,7 @@ function askPlan() {
 }
 
 /* ---- Aufgaben (Revierarbeit) */
-async function loadAufgaben() { try { const r = await api('aufgaben'); S.aufg = r.aufgaben; } catch (e) { toast(e.message); } renderAufgaben(); }
+async function loadAufgaben() { try { await apiSWR('aufgaben', null, r => { S.aufg = r.aufgaben; renderAufgaben(); }); } catch (e) { toast(e.message); renderAufgaben(); } }
 function setRv(v) {
   S.rv = v;
   document.querySelectorAll('#rvSeg button').forEach(b => b.classList.toggle('on', b.dataset.rv === v));
@@ -1014,8 +1091,7 @@ function retry(tmp) {
 /* ---------------------------------------------------------------- Bestand */
 async function loadBestand() {
   try {
-    const r = await api('bestand', { history: $('#fOut').checked });
-    S.bestand = r.bestand; S.ausgebucht = r.ausgebucht; renderBestand();
+    await apiSWR('bestand', { history: $('#fOut').checked }, r => { S.bestand = r.bestand; S.ausgebucht = r.ausgebucht; renderBestand(); });
   } catch (e) { toast(e.message); }
 }
 function renderBestand() {
@@ -1087,11 +1163,15 @@ function bedarf(code, ws) {
   return { kg, stk, lager, pk: lagerPk(code), avg, unk, approx: stk > 0 && avg != null, fehl: Math.max(0, r3(eq - lager)) };
 }
 const wTxt = (kg, stk) => [kg > 0 ? fmtK(kg) : '', stk > 0 ? stk + ' Stk' : ''].filter(Boolean).join(' + ') || fmtK(0);
-async function loadWuenscheQuiet() { try { S.wuensche = (await api('wuensche')).wuensche; renderHint(); } catch (e) {} }
+async function loadWuenscheQuiet() { try { await apiSWR('wuensche', null, r => { S.wuensche = r.wuensche; renderHint(); }); } catch (e) {} }
 async function loadWunsch() {
   try {
-    const r = await Promise.all([api('wuensche'), api('bestand', { history: true })]);
-    S.wuensche = r[0].wuensche; S.bestand = r[1].bestand; S.ausgebucht = r[1].ausgebucht; renderWunsch();
+    let a = false, b = false;
+    const draw = () => { if (a && b) renderWunsch(); };
+    await Promise.all([
+      apiSWR('wuensche', null, r => { S.wuensche = r.wuensche; a = true; draw(); }),
+      apiSWR('bestand', { history: true }, r => { S.bestand = r.bestand; S.ausgebucht = r.ausgebucht; b = true; draw(); })
+    ]);
   } catch (e) { toast(e.message); }
 }
 function renderWunsch() {
@@ -1329,8 +1409,12 @@ function askLager(name) {
 const parseDe = d => { const m = /^(\d\d)\.(\d\d)\.(\d{4})$/.exec(d || ''); return m ? new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1])) : null; };
 async function loadRech() {
   try {
-    const [a, b] = await Promise.all([api('rechnungen'), api('offene')]);
-    S.rechnungen = a.rechnungen; S.offene = b.offene; renderRech();
+    let a = false, b = false;
+    const draw = () => { if (a && b) renderRech(); };
+    await Promise.all([
+      apiSWR('rechnungen', null, r => { S.rechnungen = r.rechnungen; a = true; draw(); }),
+      apiSWR('offene', null, r => { S.offene = r.offene; b = true; draw(); })
+    ]);
   } catch (e) { toast(e.message); }
 }
 function renderRech() {
@@ -1509,6 +1593,7 @@ $('#btnTheme').onclick = () => applyTheme(document.documentElement.getAttribute(
 applyTheme(document.documentElement.getAttribute('data-theme') || 'light', false);
 document.addEventListener('visibilitychange', () => { if (document.hidden) stopScan(); });
 start();
+if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
 </body>
 </html>

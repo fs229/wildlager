@@ -93,6 +93,8 @@ Hinweis: Ein öffentliches Repository ist für jeden einsehbar, die Server-URL s
 - Artikel anlegen oder ändern (Preis, Bezeichnung, aktiv/inaktiv).
 - Alles liegt auch direkt im Google Sheet und kann dort bearbeitet werden. Die Blätter-Überschriften nicht ändern.
 
+**Schnelleres Laden (Zwischenspeicher)**: Die App merkt sich die zuletzt geladenen Daten auf dem Gerät. Beim Öffnen und beim Tabwechsel erscheinen sie sofort, im Hintergrund holt die App den aktuellen Stand und tauscht ihn bei Änderungen aus. Der Start holt alle Daten in einem einzigen Serveraufruf. Innerhalb von 30 Sekunden fragt die App nicht erneut beim Server nach. Nach eigenen Änderungen (Scannen, Speichern, Abhaken) zeigt sie nie den alten Stand, sondern wartet auf die frischen Daten. Beim Abmelden werden die gespeicherten Daten gelöscht. Für die Anzeige ohne Netz gilt: Listen sind lesbar, Schreiben braucht weiterhin Verbindung. Die Datei `sw.js` gehört neben `index.html` ins GitHub-Repository, sie speichert die Seite selbst, die Icons und die Symbolschrift. Mit „Zum Home-Bildschirm hinzufügen" läuft Waidr dann wie eine App.
+
 **Navigation**: Die App hat vier Tabs. **Lager** (Bestand | Scannen, Startansicht ist der Bestand), **Verkauf** (Wünsche | Rechnungen), **Revier** und **Stammdaten**. Die Umschaltung steht jeweils oben im Tab, die App merkt sich je Tab die zuletzt geöffnete Ansicht. Weiter unten in dieser Anleitung ist mit „Tab Scannen", „Bestand", „Wünsche" und „Rechnungen" die jeweilige Ansicht gemeint.
 
 **Tab Revier** hat vier Ansichten: **Strecke**, **Abschussplan**, **Wind** und **Aufgaben**. Der Wind liegt nicht mehr oben in der Kopfzeile, sondern hier: Windrichtung und -stärke für das Revier mit Vorhersage der nächsten 6 Stunden, per Knopf auch für den eigenen Standort.
@@ -150,7 +152,7 @@ Zurückspielen: die gewünschte Kopie aus dem Ordner öffnen, die Blätter bei B
 
 ---
 
-## Update einer bestehenden Installation (zuletzt: neue Navigation)
+## Update einer bestehenden Installation (zuletzt: Zwischenspeicher und Service Worker)
 
 1. Im Apps-Script-Editor den **kompletten Code ersetzen** durch den neuen `Code.gs`, speichern.
 2. **Bereitstellen > Bereitstellungen verwalten > Bearbeiten (Stift) > Version: Neue Version > Bereitstellen**. Die URL bleibt gleich.
