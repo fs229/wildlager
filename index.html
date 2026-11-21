@@ -105,6 +105,15 @@ button i.bi{font-size:1.2em;line-height:1;vertical-align:-3px;margin-right:6px}
 button.bio i.bi{margin-right:0}
 .seg button.bic{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:13px;padding:8px 2px}
 .seg button.bic i.bi{margin:0;font-size:20px;vertical-align:baseline}
+
+.sti{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;font-size:19px}
+.sti.s0{background:color-mix(in srgb,var(--err) 16%,transparent);color:var(--err)}
+.sti.s1{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.sti.s2{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.stleg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--mut);margin-top:8px}
+.stleg span{display:flex;align-items:center;gap:5px}
+.stleg .sti{width:20px;height:20px;font-size:12px}
+.stp{display:flex;gap:6px;font-size:18px;margin-left:auto}
 </style>
 </head>
 <body>
@@ -267,6 +276,7 @@ button.bio i.bi{margin-right:0}
         </select></div>
       </div>
       <label>Zahlung</label><select id="rStatus"><option value="offen">Offen (nicht eingezahlt)</option><option value="unbezahlt">Nicht bezahlt</option><option value="bezahlt">Bezahlt, noch nicht eingezahlt</option><option value="eingezahlt">Eingezahlt</option><option value="">Alle</option></select>
+      <div class="stleg"><span><span class="sti s0"><i class="ti ti-clock"></i></span>nicht bezahlt</span><span><span class="sti s1"><i class="ti ti-cash"></i></span>bezahlt, nicht eingezahlt</span><span><span class="sti s2"><i class="ti ti-pig-money"></i></span>eingezahlt</span></div>
       <div class="sum" id="rSum" style="margin-top:10px"></div>
     </div>
     <div class="card"><h2>Rechnungen</h2><div class="lst" id="rList"></div></div>
@@ -1500,12 +1510,12 @@ function renderRech() {
   $('#rSum').innerHTML = '<div class="tot"><b>' + fmtEur(te) + '</b><span>Umsatz (' + list.length + ' Rechnungen)</span></div>' +
     '<div><b' + (un.length ? ' style="color:var(--err)"' : '') + '>' + fmtEur(sm(un)) + '</b><span>nicht bezahlt (' + un.length + ')</span></div>' +
     '<div><b' + (bz.length ? ' style="color:var(--warn,#b7791f)"' : '') + '>' + fmtEur(sm(bz)) + '</b><span>noch einzuzahlen (' + bz.length + ')</span></div>';
-  const lab = { offen: ['nicht bezahlt', 'var(--err)'], bezahlt: ['bezahlt, noch nicht eingezahlt', 'var(--warn,#b7791f)'], eingezahlt: ['eingezahlt', 'var(--g2)'] };
+  const lab = { offen: ['nicht bezahlt', 'clock', 's0'], bezahlt: ['bezahlt, noch nicht eingezahlt', 'cash', 's1'], eingezahlt: ['eingezahlt', 'pig-money', 's2'] };
   const ico = { offen: ['cash', 'Als bezahlt markieren'], bezahlt: ['pig-money', 'Als eingezahlt markieren'] };
   $('#rList').innerHTML = list.map(r => { const st = rechStat(r);
-    return '<div class="it" data-act="rechOpen" data-nr="' + esc(r.nr) + '" style="cursor:pointer"><div class="n">' + esc(r.nr) + ' · ' + esc(r.kunde) + '<small>' + esc(r.datum + ' ' + r.uhrzeit) + ' · ' + r.packungen + ' Pack. · ' + fmtKg(r.gewichtG) + '</small>' +
-      '<small style="color:' + lab[st][1] + '">' + lab[st][0] + '</small></div><b>' + fmtEur(r.summe) + '</b>' +
-      (ico[st] ? '<button class="btn sec sm fit" data-act="rechPay" data-nr="' + esc(r.nr) + '" aria-label="' + ico[st][1] + '"><i class="ti ti-' + ico[st][0] + '" aria-hidden="true"></i></button>' : '') + '</div>'; }).join('') || '<p class="mut">Keine Rechnungen.</p>';
+    return '<div class="it" data-act="rechOpen" data-nr="' + esc(r.nr) + '" style="cursor:pointer"><div class="sti ' + lab[st][2] + '" role="img" aria-label="' + lab[st][0] + '" title="' + lab[st][0] + '"><i class="ti ti-' + lab[st][1] + '" aria-hidden="true"></i></div>' +
+      '<div class="n">' + esc(r.nr) + ' · ' + esc(r.kunde) + '<small>' + esc(r.datum + ' ' + r.uhrzeit) + ' · ' + r.packungen + ' Pack. · ' + fmtKg(r.gewichtG) + '</small><small>erstellt von ' + esc(r.nutzer || '–') + '</small></div><b>' + fmtEur(r.summe) + '</b>' +
+      (ico[st] ? '<button class="btn sec sm fit" data-act="rechPay" data-nr="' + esc(r.nr) + '" aria-label="' + ico[st][1] + '" title="' + ico[st][1] + '"><i class="ti ti-' + ico[st][0] + '" aria-hidden="true"></i></button>' : '') + '</div>'; }).join('') || '<p class="mut">Keine Rechnungen.</p>';
 }
 async function rechCreate(kunde) {
   const g = S.offene.filter(x => x.kunde === kunde)[0]; if (!g) return;
@@ -1535,11 +1545,14 @@ async function rechOpen(nr) {
     const arrow = (id, ic, dis, lbl) => '<button class="btn sec" id="' + id + '" aria-label="' + lbl + '" style="width:44px;height:44px;padding:0;' + (dis ? 'opacity:.35' : '') + '"><i class="ti ti-' + ic + '" aria-hidden="true"></i></button>';
     const head = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">' + arrow('mPrev', 'chevron-left', i <= 0, 'Vorherige Rechnung') +
       '<small class="mut">' + (i < 0 ? 'nicht in der Liste' : (i + 1) + ' von ' + v.length) + '</small>' + arrow('mNext', 'chevron-right', i < 0 || i >= v.length - 1, 'Nächste Rechnung') + '</div>';
+    const lab = { offen: ['Nicht bezahlt', 'clock', 's0'], bezahlt: ['Bezahlt, noch nicht eingezahlt', 'cash', 's1'], eingezahlt: ['Eingezahlt', 'pig-money', 's2'] }[st];
+    const stp = '<span class="stp" aria-hidden="true"><i class="ti ti-file-invoice" style="color:var(--ok)"></i><i class="ti ti-cash" style="color:' + (st !== 'offen' ? 'var(--warn)' : 'var(--line)') + '"></i><i class="ti ti-pig-money" style="color:' + (st === 'eingezahlt' ? 'var(--ok)' : 'var(--line)') + '"></i></span>';
+    const stHead = '<div style="display:flex;align-items:center;gap:10px"><div class="sti ' + lab[2] + '"><i class="ti ti-' + lab[1] + '" aria-hidden="true"></i></div><b>' + lab[0] + '</b>' + stp + '</div>';
     const stBox = st === 'offen'
-      ? '<b style="color:var(--err)">Nicht bezahlt</b><button class="btn" id="mStep" style="margin-top:8px;width:100%">Als bezahlt markieren und weiter</button>'
+      ? stHead + '<button class="btn" id="mStep" style="margin-top:8px;width:100%">Als bezahlt markieren und weiter</button>'
       : st === 'bezahlt'
-        ? '<b style="color:var(--warn,#b7791f)">Bezahlt, noch nicht eingezahlt</b><button class="btn" id="mStep" style="margin-top:8px;width:100%">Als eingezahlt markieren und weiter</button><button class="btn sec" id="mBack" style="margin-top:6px;width:100%">Zurück auf nicht bezahlt</button>'
-        : '<b style="color:var(--g2)">Eingezahlt</b><button class="btn sec" id="mBack" style="margin-top:8px;width:100%">Zurück auf bezahlt, nicht eingezahlt</button>';
+        ? stHead + '<button class="btn" id="mStep" style="margin-top:8px;width:100%">Als eingezahlt markieren und weiter</button><button class="btn sec" id="mBack" style="margin-top:6px;width:100%">Zurück auf nicht bezahlt</button>'
+        : stHead + '<button class="btn sec" id="mBack" style="margin-top:8px;width:100%">Zurück auf bezahlt, nicht eingezahlt</button>';
     openModal(head + '<h2>' + esc(re.nr) + '</h2><p class="mut">' + esc(re.kunde + ' · ' + re.datum + ' ' + re.uhrzeit + ' · erstellt von ' + re.nutzer) + '</p>' +
       '<div class="lst">' + pos.map(p => '<div class="it"><div class="n">' + esc(p.bezeichnung) + '<small>' + esc(fmtKg(p.gewichtG)) + ' · ' + esc(p.abDatum + ' ' + p.abUhrzeit) + '</small></div><span>' + fmtEur(p.betrag) + '</span></div>').join('') + '</div>' +
       '<div class="sum" style="margin:10px 0"><div><b>' + re.packungen + '</b><span>Packungen</span></div><div><b>' + fmtKg(re.gewichtG) + '</b><span>Gewicht</span></div><div class="tot"><b>' + fmtEur(re.summe) + '</b><span>Summe</span></div></div>' +
@@ -1736,7 +1749,10 @@ function biDecorate() {
     const inSeg = !!b.closest('.seg'), small = b.classList.contains('sm') && !BI_TEXT[t] && !inSeg;
     const i = document.createElement('i'); i.className = 'ti ti-' + ic + ' bi'; i.setAttribute('aria-hidden', 'true');
     if (small) { b.setAttribute('aria-label', t); b.title = t; b.textContent = ''; b.classList.add('bio'); b.appendChild(i); }
-    else { b.insertBefore(i, b.firstChild); if (inSeg) b.classList.add('bic'); }
+    else {
+      if (/^\+ /.test(t)) { const n = Array.from(b.childNodes).find(x => x.nodeType === 3 && /\S/.test(x.nodeValue)); if (n) n.nodeValue = n.nodeValue.replace(/^\s*\+\s*/, ''); }
+      b.insertBefore(i, b.firstChild); if (inSeg) b.classList.add('bic');
+    }
   });
 }
 let biTimer = 0;
