@@ -149,7 +149,7 @@ select{-webkit-appearance:none;appearance:none;min-height:50px;border-radius:12p
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-<symbol id="wi-all" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.6 4.8C8.2 5.4 6 8.8 6 13c0 3.4 1.5 5.8 4.6 6.4z" fill="currentColor" fill-opacity=".14"/><path d="M13.4 4.8C15.8 5.4 18 8.8 18 13c0 3.4-1.5 5.8-4.6 6.4z" fill="currentColor" fill-opacity=".14"/></symbol>
+<symbol id="wi-all" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(8 8.6) rotate(-12) scale(0.62) translate(-12 -12.1)" stroke-width="1.69"><path d="M10.6 4.8C8.2 5.4 6 8.8 6 13c0 3.4 1.5 5.8 4.6 6.4z" fill="currentColor" fill-opacity=".14"/><path d="M13.4 4.8C15.8 5.4 18 8.8 18 13c0 3.4-1.5 5.8-4.6 6.4z" fill="currentColor" fill-opacity=".14"/></g><g transform="translate(17 10.4) rotate(12) scale(0.5) translate(-12 -12.1)" stroke-width="2.1"><path d="M10.6 4.8C8.2 5.4 6 8.8 6 13c0 3.4 1.5 5.8 4.6 6.4z" fill="currentColor" fill-opacity=".14"/><path d="M13.4 4.8C15.8 5.4 18 8.8 18 13c0 3.4-1.5 5.8-4.6 6.4z" fill="currentColor" fill-opacity=".14"/></g><g transform="translate(12.6 18.6) rotate(0) scale(0.42) translate(-12 -12.1)" stroke-width="2.5"><path d="M10.6 4.8C8.2 5.4 6 8.8 6 13c0 3.4 1.5 5.8 4.6 6.4z" fill="currentColor" fill-opacity=".14"/><path d="M13.4 4.8C15.8 5.4 18 8.8 18 13c0 3.4-1.5 5.8-4.6 6.4z" fill="currentColor" fill-opacity=".14"/></g></symbol>
 <symbol id="wi-rot" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5c0 4.2 1.3 7.5 3 7.5s3-3.3 3-7.5"/><path d="M9 10.5 5.8 9.2"/><path d="M15 10.5l3.2-1.3"/><path d="M9.3 10C7.5 8.5 6.7 6 6.9 3"/><path d="M7.4 7.2 4.5 6.3"/><path d="M6.9 4.6 9.6 3.6"/><path d="M14.7 10c1.8-1.5 2.6-4 2.4-7"/><path d="M16.6 7.2l2.9-.9"/><path d="M17.1 4.6l-2.7-1"/><circle cx="12" cy="18.2" r=".5" fill="currentColor"/></symbol>
 <symbol id="wi-reh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5c0 4 1.3 7.2 3 7.2s3-3.2 3-7.2"/><path d="M9 11C6.7 10.8 4.8 9.6 4 7.6c2.4-.2 4 .7 4.8 3.4"/><path d="M15 11c2.3-.2 4.2-1.4 5-3.4-2.4-.2-4 .7-4.8 3.4"/><path d="M10.1 9.9 9.1 6.6"/><path d="M9.1 6.6 7.5 4.3"/><path d="M9.1 6.6l1.1-2.5"/><path d="M13.9 9.9l1-3.3"/><path d="M14.9 6.6l1.6-2.3"/><path d="M14.9 6.6l-1.1-2.5"/><circle cx="12" cy="17.8" r=".5" fill="currentColor"/></symbol>
 <symbol id="wi-sau" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7.2 9.5C7.2 14.2 9.3 17.6 12 17.6s4.8-3.4 4.8-8.1"/><path d="M7.2 9.5 5.6 5.2 9.4 7"/><path d="M16.8 9.5l1.6-4.3L14.6 7"/><ellipse cx="12" cy="14.6" rx="2.5" ry="1.7"/><path d="M9.7 16.6 6.4 14.6 8.9 15.4Z" fill="currentColor" stroke-width="1.2"/><path d="M14.3 16.6l3.3-2-2.5.8Z" fill="currentColor" stroke-width="1.2"/><circle cx="11" cy="14.6" r=".4" fill="currentColor"/><circle cx="13" cy="14.6" r=".4" fill="currentColor"/><circle cx="9.7" cy="10.5" r=".5" fill="currentColor"/><circle cx="14.3" cy="10.5" r=".5" fill="currentColor"/></symbol>
@@ -1794,7 +1794,7 @@ function biDecorate() {
 
 /* ----------------------------------------------------------------- Auswahlfelder: gestaltet, Schalter/Chips, Kunden-Blatt */
 
-const WI = { Rotwild: 'rot', Rehwild: 'reh', Schwarzwild: 'sau' };
+const WI = { Rotwild: 'rot', Rehwild: 'reh', Schwarzwild: 'sau', Gemischt: 'all' };
 const wi = (w, noMargin) => WI[w] ? '<svg class="wi wi-' + WI[w] + '" aria-hidden="true"><use href="#wi-' + WI[w] + '"/></svg>' : '';
 const SEL_IC = { fLager: 'snowflake', selLager: 'snowflake', rKunde: 'user', wKd: 'user', wKunde: 'user', rsKunde: 'user', wArt: 'package', aVer: 'user-circle', aWer: 'user-circle',
   aiTyp: 'home-2', eAns: 'binoculars', eKat: 'tag', pJahr: 'calendar', sJahr: 'calendar', selErl: 'map-pin', eWild: 'paw', eGe: 'gender-bigender' };
@@ -1806,7 +1806,7 @@ function selSegSync(sel) {
   const cur = selVal.get.call(sel);
   const wild = sel.id === 'fWild' || sel.id === 'sWild';
   const html = Array.from(sel.options).map(o => {
-    const ico = wild ? (o.value === '' ? '<svg class="wi wi-all" aria-hidden="true"><use href="#wi-all"/></svg>' : wi(o.value)) : '';
+    const ico = wild && o.value !== '' ? wi(o.value) : '';
     const cls = (o.value === cur ? 'on' : '') + (ico ? ' wic' : '');
     return '<button type="button" data-v="' + esc(o.value) + '"' + (cls.trim() ? ' class="' + cls.trim() + '"' : '') + (ico ? ' aria-label="' + esc(o.textContent) + '" title="' + esc(o.textContent) + '"' : '') + '>' + (ico || esc(SEL_SHORT[o.textContent] || o.textContent)) + '</button>';
   }).join('');
