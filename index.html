@@ -128,6 +128,7 @@ select{-webkit-appearance:none;appearance:none;min-height:50px;border-radius:12p
 .selw.hasic select{padding-left:42px}
 .selw select{width:100%}
 .chp{display:flex;flex-wrap:wrap;gap:6px}
+.chp.w{flex-wrap:nowrap;gap:4px}
 .chp button{border-radius:999px;padding:8px 14px;font-size:13px;border:1px solid var(--line);background:var(--inp);color:var(--mut);font-weight:600}
 .chp button.on{background:color-mix(in srgb,var(--acc) 16%,transparent);border-color:var(--acc);color:var(--acc)}
 .sseg button{text-transform:none}
@@ -145,6 +146,9 @@ select{-webkit-appearance:none;appearance:none;min-height:50px;border-radius:12p
 .wi-rot{color:var(--err)}.wi-reh{color:var(--warn)}.wi-sau{color:var(--txt)}.wi-all{color:var(--acc)}
 .chp button.wic{display:flex;align-items:center;justify-content:center;min-width:52px;min-height:44px;padding:6px 12px}
 .chp button.wic .wi{width:26px;height:26px;margin:0}
+.chp.w button{padding:0 11px;min-height:36px;min-width:0;font-size:13px}
+.chp.w button.wic{min-width:36px;padding:0 6px}
+.chp.w button.wic .wi{width:22px;height:22px}
 </style>
 </head>
 <body>
@@ -242,7 +246,7 @@ select{-webkit-appearance:none;appearance:none;min-height:50px;border-radius:12p
     <div class="card">
       <div class="row">
         <div><label>Lagerort</label><select id="fLager"></select></div>
-        <div><label>Wildart</label><select id="fWild"></select></div>
+        <div class="fit"><label>Wildart</label><select id="fWild"></select></div>
       </div>
       <label>Suche</label>
       <input id="fText" placeholder="z. B. Lende">
@@ -265,7 +269,7 @@ select{-webkit-appearance:none;appearance:none;min-height:50px;border-radius:12p
       <button class="btn big" data-act="strNew">+ Erlegung erfassen</button>
       <div class="row" style="margin-top:10px">
         <div><label>Jagdjahr (1.4.–31.3.)</label><select id="sJahr"></select></div>
-        <div><label>Wildart</label><select id="sWild"></select></div>
+        <div class="fit"><label>Wildart</label><select id="sWild"></select></div>
       </div>
       <div class="sum" id="sSum" style="margin-top:10px"></div>
       <div id="sChips" style="margin-top:8px"></div>
@@ -1813,7 +1817,7 @@ function selSegSync(sel) {
   if (box.innerHTML !== html) box.innerHTML = html;
 }
 function selSegInit(sel, kind) {
-  const box = document.createElement('div'); box.className = kind === 'chips' ? 'chp' : 'seg sseg'; box.setAttribute('role', 'group');
+  const box = document.createElement('div'); box.className = kind === 'chips' ? 'chp' + (/Wild$/.test(sel.id) ? ' w' : '') : 'seg sseg'; box.setAttribute('role', 'group');
   sel.insertAdjacentElement('afterend', box); sel._seg = box; sel.style.display = 'none';
   Object.defineProperty(sel, 'value', { configurable: true, get() { return selVal.get.call(sel); }, set(v) { selVal.set.call(sel, v); selSegSync(sel); } });
   box.onclick = e => { const b = e.target.closest('button'); if (!b) return; selVal.set.call(sel, b.dataset.v); selSegSync(sel); sel.dispatchEvent(new Event('change', { bubbles: true })); };
