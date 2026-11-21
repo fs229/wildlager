@@ -110,10 +110,36 @@ button.bio i.bi{margin-right:0}
 .sti.s0{background:color-mix(in srgb,var(--err) 16%,transparent);color:var(--err)}
 .sti.s1{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
 .sti.s2{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
-.stleg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--mut);margin-top:8px}
-.stleg span{display:flex;align-items:center;gap:5px}
-.stleg .sti{width:20px;height:20px;font-size:12px}
 .stp{display:flex;gap:6px;font-size:18px;margin-left:auto}
+
+.rchips{display:flex;gap:6px;margin-top:10px}
+.rchips button{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 4px;border-radius:999px;border:1.5px solid var(--line);background:none;color:var(--mut);font-size:13px;font-weight:600}
+.rchips button i{font-size:17px}
+.rchips button b{font-weight:700}
+.rchips button.on.s0{border-color:var(--err);color:var(--err);background:color-mix(in srgb,var(--err) 14%,transparent)}
+.rchips button.on.s1{border-color:var(--warn);color:var(--warn);background:color-mix(in srgb,var(--warn) 16%,transparent)}
+.rchips button.on.s2{border-color:var(--ok);color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+
+:root{--chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23667066' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6l6-6'/%3E%3C/svg%3E")}
+:root[data-theme=dark]{--chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%239aa89e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6l6-6'/%3E%3C/svg%3E")}
+select{-webkit-appearance:none;appearance:none;min-height:50px;border-radius:12px;padding:0 40px 0 14px;background-image:var(--chev);background-repeat:no-repeat;background-position:right 14px center;background-size:18px}
+.selw{position:relative;flex:1;min-width:0}
+.selw>i.ti{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:20px;color:var(--mut);pointer-events:none}
+.selw.hasic select{padding-left:42px}
+.selw select{width:100%}
+.chp{display:flex;flex-wrap:wrap;gap:6px}
+.chp button{border-radius:999px;padding:8px 14px;font-size:13px;border:1px solid var(--line);background:var(--inp);color:var(--mut);font-weight:600}
+.chp button.on{background:color-mix(in srgb,var(--acc) 16%,transparent);border-color:var(--acc);color:var(--acc)}
+.sseg button{text-transform:none}
+.kfld{display:flex;align-items:center;gap:10px;width:100%;min-height:50px;padding:0 14px;border:1px solid var(--line);border-radius:12px;background:var(--inp);color:var(--txt);font-size:16px;text-align:left;flex:1;min-width:0}
+.kfld .v{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kfld .ph{color:var(--mut)}
+.kfld i{font-size:20px;color:var(--mut);flex:none}
+.ksr{display:flex;align-items:center;gap:10px;min-height:48px;padding:0 8px;border-radius:10px;font-size:16px;cursor:pointer;background:none;border:0;width:100%;color:var(--txt);text-align:left}
+.ksr:active{background:var(--btn2)}
+.ksr .av{width:32px;height:32px;border-radius:50%;background:color-mix(in srgb,var(--acc) 16%,transparent);color:var(--acc);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex:none}
+.ksr .ck{margin-left:auto;color:var(--acc);font-size:19px}
+.kgl{font-size:12px;color:var(--mut);margin:10px 0 2px 8px;font-weight:600}
 </style>
 </head>
 <body>
@@ -275,8 +301,7 @@ button.bio i.bi{margin-right:0}
           <option value="">Alle</option><option value="monat">Dieser Monat</option><option value="30">Letzte 30 Tage</option><option value="jahr">Dieses Jahr</option>
         </select></div>
       </div>
-      <label>Zahlung</label><select id="rStatus"><option value="offen">Offen (nicht eingezahlt)</option><option value="unbezahlt">Nicht bezahlt</option><option value="bezahlt">Bezahlt, noch nicht eingezahlt</option><option value="eingezahlt">Eingezahlt</option><option value="">Alle</option></select>
-      <div class="stleg"><span><span class="sti s0"><i class="ti ti-clock"></i></span>nicht bezahlt</span><span><span class="sti s1"><i class="ti ti-cash"></i></span>bezahlt, nicht eingezahlt</span><span><span class="sti s2"><i class="ti ti-pig-money"></i></span>eingezahlt</span></div>
+      <div class="rchips" id="rChips" role="group" aria-label="Zahlungsstatus filtern"></div>
       <div class="sum" id="rSum" style="margin-top:10px"></div>
     </div>
     <div class="card"><h2>Rechnungen</h2><div class="lst" id="rList"></div></div>
@@ -341,7 +366,7 @@ button.bio i.bi{margin-right:0}
 const CONFIG = { API_URL: 'https://script.google.com/macros/s/AKfycbw1PuF_n7MlVTeZ-E3jJimiT_uPmKVnkeNOu-72ufzSXXvyw_Y4qmOlt8BSGz8NZqq8/exec', WIND: { lat: 49.58886, lon: 9.15914, name: 'Revier' } };
 
 const S = {
-  res: [],
+  res: [], rf: { offen: true, bezahlt: true, eingezahlt: false },
   url: '', code: '', user: '', artikel: {}, artikelList: [], lagerorte: [], nutzer: [], settings: { prefix: '28', gram: 1 },
   mode: 'ein', lagerort: '', dauer: true, scanner: null, running: false, paused: false,
   queue: [], sending: false, log: [], seq: 0, lastEan: '', lastSeen: 0, lastEntry: null,
@@ -1482,15 +1507,10 @@ async function loadRech() {
 }
 const rechStat = r => (r.eingezahltAm ? 'eingezahlt' : r.bezahltAm ? 'bezahlt' : 'offen');
 const RECH_NEXT = { offen: 'bezahlt', bezahlt: 'eingezahlt' };
-function rechFiltered() {
-  const kf = $('#rKunde').value, zf = $('#rZeit').value, sf = $('#rStatus').value, now = new Date();
+function rechBase() {
+  const kf = $('#rKunde').value, zf = $('#rZeit').value, now = new Date();
   return S.rechnungen.filter(r => {
     if (kf && r.kunde !== kf) return false;
-    const st = rechStat(r);
-    if (sf === 'offen' && st === 'eingezahlt') return false;
-    if (sf === 'unbezahlt' && st !== 'offen') return false;
-    if (sf === 'bezahlt' && st !== 'bezahlt') return false;
-    if (sf === 'eingezahlt' && st !== 'eingezahlt') return false;
     const d = parseDe(r.datum);
     if (zf && d) {
       if (zf === 'jahr' && d.getFullYear() !== now.getFullYear()) return false;
@@ -1500,9 +1520,13 @@ function rechFiltered() {
     return true;
   });
 }
+function rechFiltered() { return rechBase().filter(r => S.rf[rechStat(r)]); }
 function renderRech() {
   $('#offenCard').classList.toggle('hide', !S.offene.length);
   $('#offenList').innerHTML = S.offene.map(g => '<div class="it"><div class="n">' + esc(g.kunde) + '<small>' + g.packungen + ' Packungen · ' + fmtKg(g.gewichtG) + ' · ' + fmtEur(g.summe) + '</small></div><button class="btn sm fit" data-act="rechCreate" data-kunde="' + esc(g.kunde) + '">Rechnung erstellen</button></div>').join('');
+  const cnt = { offen: 0, bezahlt: 0, eingezahlt: 0 }; rechBase().forEach(r => { cnt[rechStat(r)]++; });
+  const CH = [['offen', 'clock', 's0', 'Offen', 'nicht bezahlt'], ['bezahlt', 'cash', 's1', 'Bezahlt', 'bezahlt, noch nicht eingezahlt'], ['eingezahlt', 'pig-money', 's2', 'Eingezahlt', 'eingezahlt']];
+  $('#rChips').innerHTML = CH.map(c => '<button class="' + c[2] + (S.rf[c[0]] ? ' on' : '') + '" data-act="rchip" data-rs="' + c[0] + '" aria-pressed="' + !!S.rf[c[0]] + '" title="' + c[4] + '"><i class="ti ti-' + c[1] + '" aria-hidden="true"></i>' + c[3] + ' <b>' + cnt[c[0]] + '</b></button>').join('');
   const list = rechFiltered();
   const te = list.reduce((a, r) => a + r.summe, 0);
   const un = list.filter(r => rechStat(r) === 'offen'), bz = list.filter(r => rechStat(r) === 'bezahlt');
@@ -1606,6 +1630,7 @@ document.addEventListener('click', e => {
     else if (a === 'rechCreate') rechCreate(t.dataset.kunde);
     else if (a === 'rechOpen') rechOpen(t.dataset.nr);
     else if (a === 'rechPay') rechPay(t.dataset.nr);
+    else if (a === 'rchip') { const k = t.dataset.rs; if (S.rf[k] && Object.keys(S.rf).filter(x => S.rf[x]).length === 1) return; S.rf[k] = !S.rf[k]; renderRech(); }
     else if (a === 'strNew') askErlegung('');
     else if (a === 'strEdit') askErlegung(t.dataset.id);
     else if (a === 'planEdit') askPlan();
@@ -1653,7 +1678,7 @@ function manual() { const v = $('#inManual').value; $('#inManual').value = ''; i
 $('#btnManual').onclick = manual;
 $('#inManual').addEventListener('keydown', e => { if (e.key === 'Enter') manual(); });
 ['fLager', 'fWild'].forEach(id => $('#' + id).onchange = renderBestand);
-['rKunde', 'rZeit', 'rStatus'].forEach(id => $('#' + id).onchange = renderRech);
+['rKunde', 'rZeit'].forEach(id => $('#' + id).onchange = renderRech);
 $('#fText').oninput = renderBestand;
 $('#fOut').onchange = loadBestand;
 $('#btnReload').onclick = loadBestand;
@@ -1755,8 +1780,71 @@ function biDecorate() {
     }
   });
 }
+
+/* ----------------------------------------------------------------- Auswahlfelder: gestaltet, Schalter/Chips, Kunden-Blatt */
+const SEL_IC = { fLager: 'snowflake', selLager: 'snowflake', rKunde: 'user', wKd: 'user', wKunde: 'user', rsKunde: 'user', wArt: 'package', aVer: 'user-circle', aWer: 'user-circle',
+  aiTyp: 'home-2', eAns: 'binoculars', eKat: 'tag', pJahr: 'calendar', sJahr: 'calendar', selErl: 'map-pin', eWild: 'paw', eGe: 'gender-bigender' };
+const SEL_SEG = { rZeit: 'seg', wEh: 'seg', wSt: 'seg', fWild: 'chips', sWild: 'chips' };
+const SEL_SHORT = { 'Dieser Monat': 'Monat', 'Letzte 30 Tage': '30 Tage', 'Dieses Jahr': 'Jahr' };
+const selVal = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+function selSegSync(sel) {
+  const box = sel._seg; if (!box) return;
+  const cur = selVal.get.call(sel);
+  const html = Array.from(sel.options).map(o => '<button type="button" data-v="' + esc(o.value) + '"' + (o.value === cur ? ' class="on"' : '') + '>' + esc(SEL_SHORT[o.textContent] || o.textContent) + '</button>').join('');
+  if (box.innerHTML !== html) box.innerHTML = html;
+}
+function selSegInit(sel, kind) {
+  const box = document.createElement('div'); box.className = kind === 'chips' ? 'chp' : 'seg sseg'; box.setAttribute('role', 'group');
+  sel.insertAdjacentElement('afterend', box); sel._seg = box; sel.style.display = 'none';
+  Object.defineProperty(sel, 'value', { configurable: true, get() { return selVal.get.call(sel); }, set(v) { selVal.set.call(sel, v); selSegSync(sel); } });
+  box.onclick = e => { const b = e.target.closest('button'); if (!b) return; selVal.set.call(sel, b.dataset.v); selSegSync(sel); sel.dispatchEvent(new Event('change', { bubbles: true })); };
+  sel.addEventListener('change', () => selSegSync(sel));
+}
+function kundeRecent() { try { return JSON.parse(ls.get('wl_krec_' + S.user) || '[]'); } catch (e) { return []; } }
+function kundeSyncBtn() {
+  const sel = $('#selKunde'), b = $('#kBtn'); if (!sel || !b) return;
+  const v = selVal.get.call(sel);
+  b.innerHTML = '<i class="ti ti-user" aria-hidden="true"></i><span class="v' + (v ? '' : ' ph') + '">' + esc(v || 'Kunde wählen') + '</span><i class="ti ti-chevron-down" aria-hidden="true"></i>';
+}
+function kundeSheet() {
+  const sel = $('#selKunde'), names = Array.from(sel.options).map(o => o.value).filter(Boolean), cur = selVal.get.call(sel), rec = kundeRecent().filter(n => names.indexOf(n) >= 0);
+  const draw = () => {
+    const q = $('#kQ').value.trim().toLowerCase(), hit = names.filter(n => n.toLowerCase().indexOf(q) >= 0);
+    const r = q ? [] : rec.filter(n => hit.indexOf(n) >= 0), rest = hit.filter(n => r.indexOf(n) < 0);
+    const row = n => '<button type="button" class="ksr" data-k="' + esc(n) + '"><span class="av">' + esc(n.slice(0, 2).toUpperCase()) + '</span>' + esc(n) + (n === cur ? '<i class="ti ti-check ck" aria-hidden="true"></i>' : '') + '</button>';
+    $('#kList').innerHTML = (r.length ? '<div class="kgl">Zuletzt</div>' + r.map(row).join('') : '') + (rest.length ? '<div class="kgl">' + (r.length ? 'Alle Kunden' : 'Kunden') + '</div>' + rest.map(row).join('') : '') +
+      (hit.length ? '' : '<p class="mut" style="padding:8px">Kein Kunde gefunden.</p>');
+  };
+  openModal('<h2>Kunde wählen</h2><input id="kQ" type="search" placeholder="Kunde suchen" aria-label="Kunde suchen" autocomplete="off"><div id="kList" style="max-height:50vh;overflow:auto;margin-top:6px"></div>' +
+    '<div class="row" style="margin-top:10px"><button class="btn sec" id="mCancel">Schließen</button></div>');
+  $('#mCancel').onclick = closeModal; $('#kQ').oninput = draw; draw();
+  $('#kList').onclick = e => {
+    const b = e.target.closest('[data-k]'); if (!b) return;
+    const n = b.dataset.k; ls.set('wl_krec_' + S.user, JSON.stringify([n].concat(kundeRecent().filter(x => x !== n)).slice(0, 5)));
+    selVal.set.call(sel, n); sel.dispatchEvent(new Event('change', { bubbles: true })); kundeSyncBtn(); closeModal();
+  };
+}
+function selDecorate() {
+  document.querySelectorAll('select').forEach(sel => {
+    if (sel.id === 'selKunde') {
+      if (!sel._k) {
+        sel._k = true; sel.style.display = 'none';
+        const b = document.createElement('button'); b.type = 'button'; b.id = 'kBtn'; b.className = 'kfld'; b.onclick = kundeSheet;
+        sel.insertAdjacentElement('afterend', b);
+        Object.defineProperty(sel, 'value', { configurable: true, get() { return selVal.get.call(sel); }, set(v) { selVal.set.call(sel, v); kundeSyncBtn(); } });
+      }
+      kundeSyncBtn(); return;
+    }
+    if (SEL_SEG[sel.id]) { if (!sel._seg) selSegInit(sel, SEL_SEG[sel.id]); selSegSync(sel); return; }
+    if (sel.closest('.selw')) return;
+    const w = document.createElement('div'), ic = SEL_IC[sel.id]; w.className = 'selw' + (ic ? ' hasic' : '');
+    sel.parentNode.insertBefore(w, sel); w.appendChild(sel);
+    if (ic) { const i = document.createElement('i'); i.className = 'ti ti-' + ic; i.setAttribute('aria-hidden', 'true'); w.insertBefore(i, sel); }
+  });
+}
 let biTimer = 0;
-new MutationObserver(() => { if (!biTimer) biTimer = setTimeout(() => { biTimer = 0; biDecorate(); }, 0); }).observe(document.body, { childList: true, subtree: true, characterData: true });
+new MutationObserver(() => { if (!biTimer) biTimer = setTimeout(() => { biTimer = 0; selDecorate(); biDecorate(); }, 0); }).observe(document.body, { childList: true, subtree: true, characterData: true });
+selDecorate();
 biDecorate();
 start();
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
