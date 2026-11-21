@@ -140,9 +140,20 @@ select{-webkit-appearance:none;appearance:none;min-height:50px;border-radius:12p
 .ksr .av{width:32px;height:32px;border-radius:50%;background:color-mix(in srgb,var(--acc) 16%,transparent);color:var(--acc);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex:none}
 .ksr .ck{margin-left:auto;color:var(--acc);font-size:19px}
 .kgl{font-size:12px;color:var(--mut);margin:10px 0 2px 8px;font-weight:600}
+
+.wi{width:1.25em;height:1.25em;vertical-align:-.28em;margin-right:6px;flex:none}
+.wi-rot{color:var(--err)}.wi-reh{color:var(--warn)}.wi-sau{color:var(--txt)}.wi-all{color:var(--acc)}
+.chp button.wic{display:flex;align-items:center;justify-content:center;min-width:52px;min-height:44px;padding:6px 12px}
+.chp button.wic .wi{width:26px;height:26px;margin:0}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="wi-all" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.6 4.8C8.2 5.4 6 8.8 6 13c0 3.4 1.5 5.8 4.6 6.4z" fill="currentColor" fill-opacity=".14"/><path d="M13.4 4.8C15.8 5.4 18 8.8 18 13c0 3.4-1.5 5.8-4.6 6.4z" fill="currentColor" fill-opacity=".14"/></symbol>
+<symbol id="wi-rot" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5c0 4.2 1.3 7.5 3 7.5s3-3.3 3-7.5"/><path d="M9 10.5 5.8 9.2"/><path d="M15 10.5l3.2-1.3"/><path d="M9.3 10C7.5 8.5 6.7 6 6.9 3"/><path d="M7.4 7.2 4.5 6.3"/><path d="M6.9 4.6 9.6 3.6"/><path d="M14.7 10c1.8-1.5 2.6-4 2.4-7"/><path d="M16.6 7.2l2.9-.9"/><path d="M17.1 4.6l-2.7-1"/><circle cx="12" cy="18.2" r=".5" fill="currentColor"/></symbol>
+<symbol id="wi-reh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5c0 4 1.3 7.2 3 7.2s3-3.2 3-7.2"/><path d="M9 11C6.7 10.8 4.8 9.6 4 7.6c2.4-.2 4 .7 4.8 3.4"/><path d="M15 11c2.3-.2 4.2-1.4 5-3.4-2.4-.2-4 .7-4.8 3.4"/><path d="M10.1 9.9 9.1 6.6"/><path d="M9.1 6.6 7.5 4.3"/><path d="M9.1 6.6l1.1-2.5"/><path d="M13.9 9.9l1-3.3"/><path d="M14.9 6.6l1.6-2.3"/><path d="M14.9 6.6l-1.1-2.5"/><circle cx="12" cy="17.8" r=".5" fill="currentColor"/></symbol>
+<symbol id="wi-sau" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7.2 9.5C7.2 14.2 9.3 17.6 12 17.6s4.8-3.4 4.8-8.1"/><path d="M7.2 9.5 5.6 5.2 9.4 7"/><path d="M16.8 9.5l1.6-4.3L14.6 7"/><ellipse cx="12" cy="14.6" rx="2.5" ry="1.7"/><path d="M9.7 16.6 6.4 14.6 8.9 15.4Z" fill="currentColor" stroke-width="1.2"/><path d="M14.3 16.6l3.3-2-2.5.8Z" fill="currentColor" stroke-width="1.2"/><circle cx="11" cy="14.6" r=".4" fill="currentColor"/><circle cx="13" cy="14.6" r=".4" fill="currentColor"/><circle cx="9.7" cy="10.5" r=".5" fill="currentColor"/><circle cx="14.3" cy="10.5" r=".5" fill="currentColor"/></symbol>
+</defs></svg>
 <header><b class="brand"><img src="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20190%20190%22%20width=%22190%22%20height=%22190%22%3E%3Crect%20width=%22190%22%20height=%22190%22%20rx=%2240%22%20fill=%22%231f3d2b%22/%3E%3Cg%20transform=%22translate(95,95)%22%3E%3Ccircle%20r=%2272%22%20fill=%22none%22%20stroke=%22%23e0a73a%22%20stroke-width=%223%22/%3E%3Cg%20transform=%22translate(0,-6.25)%22%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(-15,-6)%20rotate(7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(15,-6)%20rotate(-7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(-29,40)%20rotate(-12)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(29,40)%20rotate(12)%22%20fill=%22%23f2ead8%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E" width="28" height="28" alt=""> Waidr</b><span><small id="who"></small> <button class="btn sm sec" id="btnTheme" aria-label="Hell/Dunkel umschalten"></button> <button class="btn sm sec hide" id="logout" aria-label="Abmelden" title="Abmelden"><i class="ti ti-logout" aria-hidden="true"></i></button></span></header>
 <nav id="nav" class="hide">
   <button data-grp="lager" class="on"><i class="ti ti-snowflake" aria-hidden="true"></i>Lager</button>
@@ -676,7 +687,7 @@ function renderStrecke() {
   $('#sChips').innerHTML = Object.keys(per).sort((a, b) => per[b] - per[a]).map(w => '<span class="chip">' + esc(w) + ': ' + per[w] + '</span>').join(' ');
   $('#sList').innerHTML = list.map(x => {
     const pk = x.packN ? '<small>' + x.packN + ' Packung' + (x.packN === 1 ? '' : 'en') + ' · ' + fmtKg(x.packG) + ' eingelagert' + (x.packLager ? ' (' + x.packLager + ' auf Lager)' : ' (alle ausgebucht)') + (x.gewichtKg ? ' · ' + Math.round(x.packG / 10 / x.gewichtKg) + ' % des Gewichts' : '') + '</small>' : '';
-    return '<div class="it" data-act="strEdit" data-id="' + esc(x.id) + '" style="cursor:pointer"><div class="n"><b>' + esc(x.datum + ' ' + x.uhrzeit + ' · ' + x.wildart) + '</b><small>' +
+    return '<div class="it" data-act="strEdit" data-id="' + esc(x.id) + '" style="cursor:pointer"><div class="n"><b>' + wi(x.wildart) + esc(x.datum + ' ' + x.uhrzeit + ' · ' + x.wildart) + '</b><small>' +
       esc([x.geschlecht, /^\d+$/.test(x.alter) ? x.alter + ' J.' : x.alter, x.erleger, x.gewichtKg != null ? x.gewichtKg.toLocaleString('de-DE') + ' kg' : '', x.marke ? 'Marke ' + x.marke : '', x.plankat ? 'Plan: ' + x.plankat : '', x.ansitz ? 'Ansitz: ' + ((S.ansitze || []).filter(a => a.id === x.ansitz)[0] || { name: '?' }).name : ''].filter(Boolean).join(' · ')) + '</small>' + pk + '</div></div>';
   }).join('') || '<p class="mut">Keine Erlegungen in dieser Auswahl.</p>';
 }
@@ -838,7 +849,7 @@ function renderPlan() {
       rows += '<div class="it" style="display:block"><div style="display:flex;justify-content:space-between;gap:8px"><b>' + esc(k) + '</b><span' + (soll !== null && ist > soll ? ' style="color:var(--err)"' : '') + '>' + esc(txt) + '</span></div>' + bar + '</div>';
     });
     sumSoll += wSoll; sumIst += ws.filter(x => x.plankat).length;
-    html += '<div class="card"><h2>' + esc(w) + ' <span class="mut">' + ws.filter(x => x.plankat).length + ' von ' + wSoll + '</span></h2><div class="lst">' + rows + '</div>' +
+    html += '<div class="card"><h2>' + wi(w) + esc(w) + ' <span class="mut">' + ws.filter(x => x.plankat).length + ' von ' + wSoll + '</span></h2><div class="lst">' + rows + '</div>' +
       (ohne ? '<p class="mut" style="margin:8px 0 0">' + ohne + ' ' + esc(w) + '-Erlegung' + (ohne === 1 ? '' : 'en') + ' ohne Plankategorie (zählt nicht mit)</p>' : '') + '</div>';
   });
   $('#pSum').innerHTML = '<div class="tot"><b>' + sumIst + '</b><span>erfüllt</span></div><div><b>' + sumSoll + '</b><span>Soll</span></div><div><b>' + Math.max(0, sumSoll - sumIst) + '</b><span>noch offen</span></div>' + (sumOhne ? '<div><b>' + sumOhne + '</b><span>ohne Kategorie</span></div>' : '');
@@ -1176,7 +1187,7 @@ function renderBestand() {
     let d = '';
     if (open) d = '<div class="d">' + rrows + g.items.map(o => '<div><span>' + fmtKg(o.gewichtG) + ' · ' + esc(o.lagerort) + '<br><small class="mut">' + esc(o.datum + ' ' + o.uhrzeit + ' · ' + o.nutzer + (o.herkunft ? ' · ' + o.herkunft : '')) + '</small></span><em class="pr">' + fmtEur(o.gewichtG / 1000 * g.a.preis) + '</em>' +
       '<button class="btn sec sm fit" data-act="resNew" data-ean="' + esc(o.ean) + '" aria-label="Reservieren" title="Reservieren"><i class="ti ti-bookmark" aria-hidden="true"></i></button><button class="btn sec sm fit" data-act="out" data-id="' + esc(o.id) + '">Ausbuchen</button><button class="btn sec sm fit" data-act="del" data-id="' + esc(o.id) + '">Löschen</button></div>').join('') + '</div>';
-    return '<div class="grp"><div class="h" data-act="toggle" data-code="' + code + '"><span class="n">' + esc(g.a.bezeichnung) + '<br>' + chips + rchip + '</span><span class="v">' + g.items.length + ' Stk<br>' + fmtKg(g.g) + '<br>' + fmtEur(g.wert) + '</span></div>' + d + '</div>';
+    return '<div class="grp"><div class="h" data-act="toggle" data-code="' + code + '"><span class="n">' + wi(g.a.wildart) + esc(g.a.bezeichnung) + '<br>' + chips + rchip + '</span><span class="v">' + g.items.length + ' Stk<br>' + fmtKg(g.g) + '<br>' + fmtEur(g.wert) + '</span></div>' + d + '</div>';
   }).join('');
   let out = '';
   if ($('#fOut').checked) {
@@ -1255,7 +1266,7 @@ function renderWunsch() {
       const L = wild[k].sort((a, b) => a.a.bezeichnung.localeCompare(b.a.bezeichnung, 'de'));
       const sk = r3(L.reduce((s, x) => s + x.kg, 0)), ss = L.reduce((s, x) => s + x.stk, 0), sl = r3(L.reduce((s, x) => s + x.lager, 0)), sf = r3(L.reduce((s, x) => s + x.fehl, 0));
       const ap = L.some(x => x.approx || x.unk);
-      return '<div class="card"><h2>' + esc(k) + '</h2><p class="mut" style="margin:0 0 6px">Wunsch ' + wTxt(sk, ss) + ' · Lager ' + fmtK(sl) + ' · Fehlmenge ' + (ap ? '≈ ' : '') + fmtK(sf) + '</p>' +
+      return '<div class="card"><h2>' + wi(k) + esc(k) + '</h2><p class="mut" style="margin:0 0 6px">Wunsch ' + wTxt(sk, ss) + ' · Lager ' + fmtK(sl) + ' · Fehlmenge ' + (ap ? '≈ ' : '') + fmtK(sf) + '</p>' +
         L.map(x => {
           const open = !!S.wOpen[x.code];
           const d = open ? '<div class="d">' + x.ws.map(w => '<div><span>' + esc(w.kunde) + ' · ' + fmtW(w) + '<br><small class="mut">' + esc(w.datum + ' · ' + w.von) + '</small></span><button class="btn sec sm fit" data-act="wEdit" data-id="' + esc(w.id) + '">Bearbeiten</button></div>').join('') + '</div>' : '';
@@ -1782,6 +1793,9 @@ function biDecorate() {
 }
 
 /* ----------------------------------------------------------------- Auswahlfelder: gestaltet, Schalter/Chips, Kunden-Blatt */
+
+const WI = { Rotwild: 'rot', Rehwild: 'reh', Schwarzwild: 'sau' };
+const wi = (w, noMargin) => WI[w] ? '<svg class="wi wi-' + WI[w] + '" aria-hidden="true"><use href="#wi-' + WI[w] + '"/></svg>' : '';
 const SEL_IC = { fLager: 'snowflake', selLager: 'snowflake', rKunde: 'user', wKd: 'user', wKunde: 'user', rsKunde: 'user', wArt: 'package', aVer: 'user-circle', aWer: 'user-circle',
   aiTyp: 'home-2', eAns: 'binoculars', eKat: 'tag', pJahr: 'calendar', sJahr: 'calendar', selErl: 'map-pin', eWild: 'paw', eGe: 'gender-bigender' };
 const SEL_SEG = { rZeit: 'seg', wEh: 'seg', wSt: 'seg', fWild: 'chips', sWild: 'chips' };
@@ -1790,7 +1804,12 @@ const selVal = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'val
 function selSegSync(sel) {
   const box = sel._seg; if (!box) return;
   const cur = selVal.get.call(sel);
-  const html = Array.from(sel.options).map(o => '<button type="button" data-v="' + esc(o.value) + '"' + (o.value === cur ? ' class="on"' : '') + '>' + esc(SEL_SHORT[o.textContent] || o.textContent) + '</button>').join('');
+  const wild = sel.id === 'fWild' || sel.id === 'sWild';
+  const html = Array.from(sel.options).map(o => {
+    const ico = wild ? (o.value === '' ? '<svg class="wi wi-all" aria-hidden="true"><use href="#wi-all"/></svg>' : wi(o.value)) : '';
+    const cls = (o.value === cur ? 'on' : '') + (ico ? ' wic' : '');
+    return '<button type="button" data-v="' + esc(o.value) + '"' + (cls.trim() ? ' class="' + cls.trim() + '"' : '') + (ico ? ' aria-label="' + esc(o.textContent) + '" title="' + esc(o.textContent) + '"' : '') + '>' + (ico || esc(SEL_SHORT[o.textContent] || o.textContent)) + '</button>';
+  }).join('');
   if (box.innerHTML !== html) box.innerHTML = html;
 }
 function selSegInit(sel, kind) {
