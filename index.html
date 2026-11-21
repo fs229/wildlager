@@ -261,6 +261,7 @@ details.fold>summary{display:flex;align-items:center;gap:8px;cursor:pointer;list
           <option value="">Alle</option><option value="monat">Dieser Monat</option><option value="30">Letzte 30 Tage</option><option value="jahr">Dieses Jahr</option>
         </select></div>
       </div>
+      <label>Zahlung</label><select id="rStatus"><option value="offen">Offen (nicht eingezahlt)</option><option value="unbezahlt">Nicht bezahlt</option><option value="bezahlt">Bezahlt, noch nicht eingezahlt</option><option value="eingezahlt">Eingezahlt</option><option value="">Alle</option></select>
       <div class="sum" id="rSum" style="margin-top:10px"></div>
     </div>
     <div class="card"><h2>Rechnungen</h2><div class="lst" id="rList"></div></div>
@@ -440,7 +441,7 @@ function start() {
       applyInit(c.r);
       RC.startPending = true;
       const gen = RC.gen;
-      api('start').then(r => {
+      apiStart().then(r => {
         RC.startPending = false;
         if (gen !== RC.gen) return;
         seedStart(r);
@@ -448,14 +449,19 @@ function start() {
         if (S.tab && $('#modal').classList.contains('hide')) setTab(S.tab);
       }).catch(() => { RC.startPending = false; });
     } else {
-      api('start', {}, { noAuthRedirect: true }).then(r => { seedStart(r); applyInit(r.init); }).catch(() => showLogin());
+      apiStart({ noAuthRedirect: true }).then(r => { seedStart(r); applyInit(r.init); }).catch(() => showLogin());
     }
   } else showLogin();
 }
+// Gebündelter Start; läuft das Backend noch mit älterem Code (ohne 'start'), weiche auf 'init' aus.
+async function apiStart(opt) {
+  try { return await api('start', {}, opt); }
+  catch (e) { if (!/Unbekannte Aktion/.test(e.message)) throw e; return { init: await api('init', {}, opt) }; }
+}
 function seedStart(r) {
   rcSet(rcKey('init', {}), r.init);
-  rcSet(rcKey('bestand', { history: false }), r.bestand);
-  ['strecke', 'ansitze', 'wuensche', 'aufgaben', 'abschuss', 'rechnungen', 'offene'].forEach(k => rcSet(rcKey(k, null), r[k]));
+  if (r.bestand) rcSet(rcKey('bestand', { history: false }), r.bestand);
+  ['strecke', 'ansitze', 'wuensche', 'aufgaben', 'abschuss', 'rechnungen', 'offene'].forEach(k => { if (r[k]) rcSet(rcKey(k, null), r[k]); });
 }
 function showLogin(msg) {
   $('#nav').classList.add('hide'); $('#logout').classList.add('hide'); $('#who').textContent = '';
@@ -477,7 +483,7 @@ async function codeStep() {
 async function pickUser(name) {
   S.user = name;
   try {
-    const r = await api('start', {}, { noAuthRedirect: true });
+    const r = await apiStart({ noAuthRedirect: true });
     ls.set('wl_url', S.url); ls.set('wl_code', S.code); ls.set('wl_user', S.user);
     seedStart(r);
     applyInit(r.init);
@@ -1417,12 +1423,17 @@ async function loadRech() {
     ]);
   } catch (e) { toast(e.message); }
 }
-function renderRech() {
-  $('#offenCard').classList.toggle('hide', !S.offene.length);
-  $('#offenList').innerHTML = S.offene.map(g => '<div class="it"><div class="n">' + esc(g.kunde) + '<small>' + g.packungen + ' Packungen · ' + fmtKg(g.gewichtG) + ' · ' + fmtEur(g.summe) + '</small></div><button class="btn sm fit" data-act="rechCreate" data-kunde="' + esc(g.kunde) + '">Rechnung erstellen</button></div>').join('');
-  const kf = $('#rKunde').value, zf = $('#rZeit').value, now = new Date();
-  const list = S.rechnungen.filter(r => {
+const rechStat = r => (r.eingezahltAm ? 'eingezahlt' : r.bezahltAm ? 'bezahlt' : 'offen');
+const RECH_NEXT = { offen: 'bezahlt', bezahlt: 'eingezahlt' };
+function rechFiltered() {
+  const kf = $('#rKunde').value, zf = $('#rZeit').value, sf = $('#rStatus').value, now = new Date();
+  return S.rechnungen.filter(r => {
     if (kf && r.kunde !== kf) return false;
+    const st = rechStat(r);
+    if (sf === 'offen' && st === 'eingezahlt') return false;
+    if (sf === 'unbezahlt' && st !== 'offen') return false;
+    if (sf === 'bezahlt' && st !== 'bezahlt') return false;
+    if (sf === 'eingezahlt' && st !== 'eingezahlt') return false;
     const d = parseDe(r.datum);
     if (zf && d) {
       if (zf === 'jahr' && d.getFullYear() !== now.getFullYear()) return false;
@@ -1431,27 +1442,79 @@ function renderRech() {
     }
     return true;
   });
-  const tg = list.reduce((s, r) => s + r.gewichtG, 0), te = list.reduce((s, r) => s + r.summe, 0), tp = list.reduce((s, r) => s + r.packungen, 0);
-  $('#rSum').innerHTML = '<div><b>' + list.length + '</b><span>Rechnungen</span></div><div><b>' + fmtKg(tg) + '</b><span>' + tp + ' Packungen</span></div><div class="tot"><b>' + fmtEur(te) + '</b><span>Umsatz</span></div>';
-  $('#rList').innerHTML = list.map(r => '<div class="it" data-act="rechOpen" data-nr="' + esc(r.nr) + '" style="cursor:pointer"><div class="n">' + esc(r.nr) + ' · ' + esc(r.kunde) + '<small>' + esc(r.datum + ' ' + r.uhrzeit) + ' · ' + r.packungen + ' Pack. · ' + fmtKg(r.gewichtG) + '</small></div><b>' + fmtEur(r.summe) + '</b></div>').join('') || '<p class="mut">Keine Rechnungen.</p>';
+}
+function renderRech() {
+  $('#offenCard').classList.toggle('hide', !S.offene.length);
+  $('#offenList').innerHTML = S.offene.map(g => '<div class="it"><div class="n">' + esc(g.kunde) + '<small>' + g.packungen + ' Packungen · ' + fmtKg(g.gewichtG) + ' · ' + fmtEur(g.summe) + '</small></div><button class="btn sm fit" data-act="rechCreate" data-kunde="' + esc(g.kunde) + '">Rechnung erstellen</button></div>').join('');
+  const list = rechFiltered();
+  const te = list.reduce((a, r) => a + r.summe, 0);
+  const un = list.filter(r => rechStat(r) === 'offen'), bz = list.filter(r => rechStat(r) === 'bezahlt');
+  const sm = a => a.reduce((x, r) => x + r.summe, 0);
+  $('#rSum').innerHTML = '<div class="tot"><b>' + fmtEur(te) + '</b><span>Umsatz (' + list.length + ' Rechnungen)</span></div>' +
+    '<div><b' + (un.length ? ' style="color:var(--err)"' : '') + '>' + fmtEur(sm(un)) + '</b><span>nicht bezahlt (' + un.length + ')</span></div>' +
+    '<div><b' + (bz.length ? ' style="color:var(--warn,#b7791f)"' : '') + '>' + fmtEur(sm(bz)) + '</b><span>noch einzuzahlen (' + bz.length + ')</span></div>';
+  const lab = { offen: ['nicht bezahlt', 'var(--err)'], bezahlt: ['bezahlt, noch nicht eingezahlt', 'var(--warn,#b7791f)'], eingezahlt: ['eingezahlt', 'var(--g2)'] };
+  const ico = { offen: ['cash', 'Als bezahlt markieren'], bezahlt: ['building-bank', 'Als eingezahlt markieren'] };
+  $('#rList').innerHTML = list.map(r => { const st = rechStat(r);
+    return '<div class="it" data-act="rechOpen" data-nr="' + esc(r.nr) + '" style="cursor:pointer"><div class="n">' + esc(r.nr) + ' · ' + esc(r.kunde) + '<small>' + esc(r.datum + ' ' + r.uhrzeit) + ' · ' + r.packungen + ' Pack. · ' + fmtKg(r.gewichtG) + '</small>' +
+      '<small style="color:' + lab[st][1] + '">' + lab[st][0] + '</small></div><b>' + fmtEur(r.summe) + '</b>' +
+      (ico[st] ? '<button class="btn sec sm fit" data-act="rechPay" data-nr="' + esc(r.nr) + '" aria-label="' + ico[st][1] + '"><i class="ti ti-' + ico[st][0] + '" aria-hidden="true"></i></button>' : '') + '</div>'; }).join('') || '<p class="mut">Keine Rechnungen.</p>';
 }
 async function rechCreate(kunde) {
   const g = S.offene.filter(x => x.kunde === kunde)[0]; if (!g) return;
   if (!confirm('Rechnung für ' + kunde + ' erstellen?\n' + g.packungen + ' Packungen, ' + fmtKg(g.gewichtG) + ', ' + fmtEur(g.summe))) return;
   try { const r = await api('rechnungErstellen', { ids: g.ids }); toast('Rechnung erstellt: ' + r.rechnung.nr); loadRech(); } catch (e) { toast(e.message); }
 }
+async function rechSetStatus(nr, status) {
+  const r = await api('rechnungStatus', { nr: nr, status: status });
+  const x = S.rechnungen.find(q => q.nr === nr);
+  if (x) { x.bezahltAm = r.bezahltAm; x.bezahltVon = r.bezahltVon; x.eingezahltAm = r.eingezahltAm; x.eingezahltVon = r.eingezahltVon; }
+  renderRech();
+  return r;
+}
+async function rechPay(nr) {
+  const x = S.rechnungen.find(q => q.nr === nr); if (!x) return;
+  const nxt = RECH_NEXT[rechStat(x)]; if (!nxt) return;
+  try { await rechSetStatus(nr, nxt); toast(nxt === 'bezahlt' ? 'Als bezahlt markiert' : 'Als eingezahlt markiert'); } catch (e) { toast(e.message); }
+}
 async function rechOpen(nr) {
   try {
     const r = await api('rechnung', { nr });
     const re = r.rechnung, pos = r.positionen;
+    const v = rechFiltered(), i = v.findIndex(q => q.nr === nr);
+    const x = S.rechnungen.find(q => q.nr === nr); if (x) Object.assign(x, { bezahltAm: re.bezahltAm, bezahltVon: re.bezahltVon, eingezahltAm: re.eingezahltAm, eingezahltVon: re.eingezahltVon });
+    const st = rechStat(re);
     const text = 'Rechnung ' + re.nr + ' · ' + re.datum + '\nKunde: ' + re.kunde + '\n' + pos.map(p => '- ' + p.bezeichnung + ' ' + fmtKg(p.gewichtG) + ' · ' + fmtEur(p.betrag)).join('\n') + '\nSumme: ' + fmtEur(re.summe) + ' (' + re.packungen + ' Packungen, ' + fmtKg(re.gewichtG) + ')';
-    openModal('<h2>' + esc(re.nr) + '</h2><p class="mut">' + esc(re.kunde + ' · ' + re.datum + ' ' + re.uhrzeit + ' · erstellt von ' + re.nutzer) + '</p>' +
+    const arrow = (id, ic, dis, lbl) => '<button class="btn sec" id="' + id + '" aria-label="' + lbl + '" style="width:44px;height:44px;padding:0;' + (dis ? 'opacity:.35' : '') + '"><i class="ti ti-' + ic + '" aria-hidden="true"></i></button>';
+    const head = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">' + arrow('mPrev', 'chevron-left', i <= 0, 'Vorherige Rechnung') +
+      '<small class="mut">' + (i < 0 ? 'nicht in der Liste' : (i + 1) + ' von ' + v.length) + '</small>' + arrow('mNext', 'chevron-right', i < 0 || i >= v.length - 1, 'Nächste Rechnung') + '</div>';
+    const stBox = st === 'offen'
+      ? '<b style="color:var(--err)">Nicht bezahlt</b><button class="btn" id="mStep" style="margin-top:8px;width:100%">Als bezahlt markieren und weiter</button>'
+      : st === 'bezahlt'
+        ? '<b style="color:var(--warn,#b7791f)">Bezahlt, noch nicht eingezahlt</b><button class="btn" id="mStep" style="margin-top:8px;width:100%">Als eingezahlt markieren und weiter</button><button class="btn sec" id="mBack" style="margin-top:6px;width:100%">Zurück auf nicht bezahlt</button>'
+        : '<b style="color:var(--g2)">Eingezahlt</b><button class="btn sec" id="mBack" style="margin-top:8px;width:100%">Zurück auf bezahlt, nicht eingezahlt</button>';
+    openModal(head + '<h2>' + esc(re.nr) + '</h2><p class="mut">' + esc(re.kunde + ' · ' + re.datum + ' ' + re.uhrzeit + ' · erstellt von ' + re.nutzer) + '</p>' +
       '<div class="lst">' + pos.map(p => '<div class="it"><div class="n">' + esc(p.bezeichnung) + '<small>' + esc(fmtKg(p.gewichtG)) + ' · ' + esc(p.abDatum + ' ' + p.abUhrzeit) + '</small></div><span>' + fmtEur(p.betrag) + '</span></div>').join('') + '</div>' +
       '<div class="sum" style="margin:10px 0"><div><b>' + re.packungen + '</b><span>Packungen</span></div><div><b>' + fmtKg(re.gewichtG) + '</b><span>Gewicht</span></div><div class="tot"><b>' + fmtEur(re.summe) + '</b><span>Summe</span></div></div>' +
-      '<div class="row"><button class="btn sec" id="mCopy">Text kopieren</button><button class="btn red" id="mStorno">Stornieren</button><button class="btn sec" id="mCancel">Schließen</button></div>');
+      '<div class="card" style="margin:0 0 10px;padding:10px">' + stBox + '</div>' +
+      '<div class="row"><button class="btn sec" id="mCopy">Text kopieren</button>' + (st === 'offen' ? '<button class="btn red" id="mStorno">Stornieren</button>' : '') + '<button class="btn sec" id="mCancel">Schließen</button></div>');
     $('#mCancel').onclick = closeModal;
+    const go = d => { const n = v[i + d]; if (n) rechOpen(n.nr); };
+    $('#mPrev').onclick = () => go(-1); $('#mNext').onclick = () => go(1);
+    // nach dem Setzen: weiter zur nächsten Rechnung der (neu gefilterten) Liste
+    const step = async (status, msg, advance) => {
+      try {
+        await rechSetStatus(re.nr, status); toast(msg);
+        if (!advance) { rechOpen(re.nr); return; }
+        const nv = rechFiltered(), j = nv.findIndex(q => q.nr === re.nr);
+        const n = j >= 0 ? nv[j + 1] : nv[Math.min(i, nv.length - 1)];
+        if (n) rechOpen(n.nr); else closeModal();
+      } catch (e) { toast(e.message); }
+    };
+    if ($('#mStep')) $('#mStep').onclick = () => step(RECH_NEXT[st], st === 'offen' ? 'Als bezahlt markiert' : 'Als eingezahlt markiert', true);
+    if ($('#mBack')) $('#mBack').onclick = () => step(st === 'eingezahlt' ? 'bezahlt' : 'offen', 'Status zurückgesetzt', false);
     $('#mCopy').onclick = async () => { try { await navigator.clipboard.writeText(text); toast('Kopiert'); } catch (e) { toast('Kopieren nicht möglich'); } };
-    $('#mStorno').onclick = async () => {
+    if ($('#mStorno')) $('#mStorno').onclick = async () => {
       if (!confirm('Rechnung ' + re.nr + ' stornieren? Die Packungen bleiben an ' + re.kunde + ' ausgebucht und erscheinen wieder unter "Noch nicht abgerechnet".')) return;
       try { await api('rechnungStorno', { nr: re.nr }); closeModal(); toast('Storniert'); loadRech(); } catch (e) { toast(e.message); }
     };
@@ -1479,6 +1542,7 @@ document.addEventListener('click', e => {
     else if (a === 'kundeEdit') askKunde(t.dataset.name);
     else if (a === 'rechCreate') rechCreate(t.dataset.kunde);
     else if (a === 'rechOpen') rechOpen(t.dataset.nr);
+    else if (a === 'rechPay') rechPay(t.dataset.nr);
     else if (a === 'strNew') askErlegung('');
     else if (a === 'strEdit') askErlegung(t.dataset.id);
     else if (a === 'planEdit') askPlan();
@@ -1526,7 +1590,7 @@ function manual() { const v = $('#inManual').value; $('#inManual').value = ''; i
 $('#btnManual').onclick = manual;
 $('#inManual').addEventListener('keydown', e => { if (e.key === 'Enter') manual(); });
 ['fLager', 'fWild'].forEach(id => $('#' + id).onchange = renderBestand);
-['rKunde', 'rZeit'].forEach(id => $('#' + id).onchange = renderRech);
+['rKunde', 'rZeit', 'rStatus'].forEach(id => $('#' + id).onchange = renderRech);
 $('#fText').oninput = renderBestand;
 $('#fOut').onchange = loadBestand;
 $('#btnReload').onclick = loadBestand;

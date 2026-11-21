@@ -1,6 +1,6 @@
 /* Waidr Service Worker: App-Hülle (Seite, Icons, Symbolschrift) aus dem Speicher, Daten bleiben beim Server.
    Bei jeder neuen Version von index.html die Zahl in VERSION erhöhen, dann werden alte Speicher gelöscht. */
-const VERSION = 'waidr-v1';
+const VERSION = 'waidr-v2';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 const CDN = ['cdn.jsdelivr.net'];
 

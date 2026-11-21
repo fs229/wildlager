@@ -77,6 +77,10 @@ Hinweis: Ein öffentliches Repository ist für jeden einsehbar, die Server-URL s
 - Filter nach **Kunde** und **Zeitraum** (Monat, 30 Tage, Jahr). Oben stehen Anzahl, Gewicht und Umsatz der Auswahl.
 - **Pro Kunde:** Rechnungen, Gewicht, Umsatz und letzter Kauf, absteigend nach Umsatz.
 - Rechnung antippen: alle Positionen mit Gewicht und Preis. **Text kopieren** legt eine Zusammenfassung zum Einfügen (z. B. WhatsApp) in die Zwischenablage. **Stornieren** löscht die Rechnung. Die Packungen bleiben beim Kunden ausgebucht und erscheinen wieder unter "Noch nicht abgerechnet".
+- **Zahlstatus (nur Bargeld):** *nicht bezahlt* (rot) → *bezahlt, noch nicht eingezahlt* (gelb: Kunde hat bar an dich gezahlt, das Geld hast du noch) → *eingezahlt* (grün: Geld ist in der zentralen Kasse). In der Liste setzt der Knopf rechts (Geldschein bzw. Bank-Symbol) mit einem Tipp den nächsten Schritt.
+- **Detail:** Pfeile oben wechseln zur vorherigen/nächsten Rechnung der aktuellen Liste. Der große Knopf (**Als bezahlt markieren und weiter** bzw. **Als eingezahlt markieren und weiter**) setzt den Status und springt zur nächsten Rechnung. Mit dem unteren Knopf geht es einen Schritt zurück.
+- **Filter Zahlung:** Standard ist *Offen (nicht eingezahlt)*, dazu *Nicht bezahlt*, *Bezahlt, noch nicht eingezahlt*, *Eingezahlt* und *Alle*. Die Kacheln zeigen Umsatz, die Summe der nicht bezahlten Rechnungen und das Bargeld, das noch in die Kasse einzuzahlen ist.
+- Nur nicht bezahlte Rechnungen lassen sich stornieren. Im Blatt „Rechnungen" stehen zusätzlich „Bezahlt am", „Eingezahlt am" und wer es erfasst hat (nur dort sichtbar).
 - Preise einer Rechnung ändern sich nie nachträglich, auch wenn du später den Preis pro kg im Blatt "Artikel" änderst.
 
 **Wünsche** (eigener Tab)
@@ -125,7 +129,7 @@ Hinweis: Ein öffentliches Repository ist für jeden einsehbar, die Server-URL s
 
 **Blatt „Wünsche"**: ID, Datum, Kunde, Artikelcode, Menge, Status (offen, erfüllt, verworfen), Erledigt am, Erfasst von, Einheit (kg oder Stk; leer gilt als kg).
 
-**Blatt „Rechnungen"**: Rechnungsnr, Datum, Uhrzeit, Kunde, Packungen, Gewicht (g), Summe (€), Erstellt von. Die einzelnen Positionen findest du im Blatt „Bestand" über die Spalte Rechnungsnr. Das Blatt **Kunden** (Name, Aktiv, Notiz) kannst du auch direkt im Sheet pflegen.
+**Blatt „Rechnungen"**: Rechnungsnr, Datum, Uhrzeit, Kunde, Packungen, Gewicht (g), Summe (€), Erstellt von, Bezahlt am, Bezahlt erfasst von, Eingezahlt am, Eingezahlt erfasst von. Die einzelnen Positionen findest du im Blatt „Bestand" über die Spalte Rechnungsnr. Das Blatt **Kunden** (Name, Aktiv, Notiz) kannst du auch direkt im Sheet pflegen.
 
 ---
 
