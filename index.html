@@ -100,14 +100,19 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 #tip b{display:block;font-size:14px}
 details.fold>summary{display:flex;align-items:center;gap:8px;cursor:pointer;list-style:none}details.fold>summary::-webkit-details-marker{display:none}details.fold>summary h2{margin:0;flex:1}details.fold>summary::before{content:'';width:8px;height:8px;border-right:2px solid var(--mut);border-bottom:2px solid var(--mut);transform:rotate(-45deg);transition:transform .15s}details.fold[open]>summary::before{transform:rotate(45deg)}details.fold[open]>summary h2{margin-bottom:8px}
 .stat details{margin-top:8px;font-size:12px}.stat table{width:100%;border-collapse:collapse;margin-top:6px}.stat td,.stat th{padding:3px 4px;text-align:right;border-top:1px solid var(--line)}.stat td:first-child,.stat th:first-child{text-align:left}
+
+button i.bi{font-size:1.2em;line-height:1;vertical-align:-3px;margin-right:6px}
+button.bio i.bi{margin-right:0}
+.seg button.bic{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:13px;padding:8px 2px}
+.seg button.bic i.bi{margin:0;font-size:20px;vertical-align:baseline}
 </style>
 </head>
 <body>
 <header><b class="brand"><img src="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20190%20190%22%20width=%22190%22%20height=%22190%22%3E%3Crect%20width=%22190%22%20height=%22190%22%20rx=%2240%22%20fill=%22%231f3d2b%22/%3E%3Cg%20transform=%22translate(95,95)%22%3E%3Ccircle%20r=%2272%22%20fill=%22none%22%20stroke=%22%23e0a73a%22%20stroke-width=%223%22/%3E%3Cg%20transform=%22translate(0,-6.25)%22%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(-15,-6)%20rotate(7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(15,-6)%20rotate(-7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(-29,40)%20rotate(-12)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(29,40)%20rotate(12)%22%20fill=%22%23f2ead8%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E" width="28" height="28" alt=""> Waidr</b><span><small id="who"></small> <button class="btn sm sec" id="btnTheme" aria-label="Hell/Dunkel umschalten"></button> <button class="btn sm sec hide" id="logout" aria-label="Abmelden" title="Abmelden"><i class="ti ti-logout" aria-hidden="true"></i></button></span></header>
 <nav id="nav" class="hide">
-  <button data-grp="lager" class="on"><i class="ti ti-stack-2" aria-hidden="true"></i>Lager</button>
-  <button data-grp="verkauf"><i class="ti ti-file-invoice" aria-hidden="true"></i>Verkauf</button>
-  <button data-tab="strecke"><i class="ti ti-target-arrow" aria-hidden="true"></i>Revier</button>
+  <button data-grp="lager" class="on"><i class="ti ti-snowflake" aria-hidden="true"></i>Lager</button>
+  <button data-grp="verkauf"><i class="ti ti-receipt" aria-hidden="true"></i>Verkauf</button>
+  <button data-tab="strecke"><i class="ti ti-trees" aria-hidden="true"></i>Revier</button>
   <button data-tab="stamm"><i class="ti ti-adjustments" aria-hidden="true"></i>Stammdaten</button>
 </nav>
 <main>
@@ -1496,7 +1501,7 @@ function renderRech() {
     '<div><b' + (un.length ? ' style="color:var(--err)"' : '') + '>' + fmtEur(sm(un)) + '</b><span>nicht bezahlt (' + un.length + ')</span></div>' +
     '<div><b' + (bz.length ? ' style="color:var(--warn,#b7791f)"' : '') + '>' + fmtEur(sm(bz)) + '</b><span>noch einzuzahlen (' + bz.length + ')</span></div>';
   const lab = { offen: ['nicht bezahlt', 'var(--err)'], bezahlt: ['bezahlt, noch nicht eingezahlt', 'var(--warn,#b7791f)'], eingezahlt: ['eingezahlt', 'var(--g2)'] };
-  const ico = { offen: ['cash', 'Als bezahlt markieren'], bezahlt: ['building-bank', 'Als eingezahlt markieren'] };
+  const ico = { offen: ['cash', 'Als bezahlt markieren'], bezahlt: ['pig-money', 'Als eingezahlt markieren'] };
   $('#rList').innerHTML = list.map(r => { const st = rechStat(r);
     return '<div class="it" data-act="rechOpen" data-nr="' + esc(r.nr) + '" style="cursor:pointer"><div class="n">' + esc(r.nr) + ' · ' + esc(r.kunde) + '<small>' + esc(r.datum + ' ' + r.uhrzeit) + ' · ' + r.packungen + ' Pack. · ' + fmtKg(r.gewichtG) + '</small>' +
       '<small style="color:' + lab[st][1] + '">' + lab[st][0] + '</small></div><b>' + fmtEur(r.summe) + '</b>' +
@@ -1701,6 +1706,42 @@ function applyTheme(t, save) {
 $('#btnTheme').onclick = () => applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark', true);
 applyTheme(document.documentElement.getAttribute('data-theme') || 'light', false);
 document.addEventListener('visibilitychange', () => { if (document.hidden) stopScan(); });
+
+/* ----------------------------------------------------------------- Button-Icons (Tabler), ergänzt automatisch nach Beschriftung */
+const BI = {
+  'Bestand': 'list-details', 'Scannen': 'scan', 'Wünsche': 'heart', 'Rechnungen': 'file-invoice', 'Strecke': 'target-arrow', 'Abschussplan': 'clipboard-list',
+  'Wind': 'wind', 'Aufgaben': 'checklist', 'Statistik': 'chart-bar', 'Stammdaten': 'adjustments', 'Kamera starten': 'camera', 'Kamera stoppen': 'camera-off',
+  'Einbuchen': 'package-import', 'Ausbuchen': 'package-export', 'Umlagern': 'arrows-exchange', '+1 nochmal': 'repeat',
+  'Speichern': 'device-floppy', 'Abbrechen': 'x', 'Schließen': 'x', 'Bearbeiten': 'pencil', 'Soll bearbeiten': 'pencil', 'Ändern': 'pencil', 'Löschen': 'trash',
+  'Aktualisieren': 'refresh', 'Erneut': 'refresh', 'Rückgängig': 'arrow-back-up', 'Zurück ins Lager': 'arrow-back-up', 'Summe zurücksetzen': 'restore', 'Weiter': 'arrow-right',
+  'Rechnung erstellen': 'file-plus', 'Text kopieren': 'copy', 'Stornieren': 'ban', 'Trotzdem': 'alert-triangle', 'Aufheben': 'bookmark-off',
+  'Erledigt': 'check', 'Erfüllt': 'check', 'Abhaken': 'check', 'Offen': 'list-check', 'Nach Artikel': 'sort-ascending', 'Nach Kunde': 'sort-ascending'
+};
+const BI_TEXT = { 'Trotzdem': 1, 'Rechnung erstellen': 1, 'Rückgängig': 1, 'Erneut': 1, 'Summe zurücksetzen': 1, 'Text kopieren': 1 };   // bleiben auch in kleinen Knöpfen beschriftet
+function biFor(t) {
+  if (BI[t]) return BI[t];
+  if (t.indexOf('+ Wunsch') === 0) return 'heart-plus';
+  if (t.indexOf('+ Erlegung') === 0) return 'map-pin-plus';
+  if (t.charAt(0) === '+' && t.length > 2) return 'plus';
+  if (t.indexOf('Als bezahlt markieren') === 0) return 'cash';
+  if (t.indexOf('Als eingezahlt markieren') === 0) return 'pig-money';
+  if (t.indexOf('Zurück auf') === 0) return 'arrow-back';
+  if (t.indexOf('Speichern') === 0) return 'device-floppy';
+  return '';
+}
+function biDecorate() {
+  document.querySelectorAll('button').forEach(b => {
+    if (b.querySelector('i.ti') || b.closest('#nav') || b.hasAttribute('data-noicon')) return;
+    const t = b.textContent.replace(/\s+/g, ' ').trim(), ic = t && biFor(t); if (!ic) return;
+    const inSeg = !!b.closest('.seg'), small = b.classList.contains('sm') && !BI_TEXT[t] && !inSeg;
+    const i = document.createElement('i'); i.className = 'ti ti-' + ic + ' bi'; i.setAttribute('aria-hidden', 'true');
+    if (small) { b.setAttribute('aria-label', t); b.title = t; b.textContent = ''; b.classList.add('bio'); b.appendChild(i); }
+    else { b.insertBefore(i, b.firstChild); if (inSeg) b.classList.add('bic'); }
+  });
+}
+let biTimer = 0;
+new MutationObserver(() => { if (!biTimer) biTimer = setTimeout(() => { biTimer = 0; biDecorate(); }, 0); }).observe(document.body, { childList: true, subtree: true, characterData: true });
+biDecorate();
 start();
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
