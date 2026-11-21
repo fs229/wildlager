@@ -57,12 +57,11 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 .log .m{flex:1;min-width:0}
 .log .m small{display:block;color:var(--mut)}
 .pending .i{color:var(--warn)}.ok .i{color:var(--ok)}.err .i{color:var(--err)}.undone{opacity:.5;text-decoration:line-through}
-.sum{display:flex;gap:8px;text-align:center}
-.sum div{flex:1;background:var(--sumbg);border-radius:10px;padding:8px}
-.sum b{display:block;font-size:18px}
-.sum .tot{background:var(--g2);color:#fff}.sum .tot span{color:#d6e6da}.sum .tot b{font-size:24px}
-.sum span{font-size:12px;color:var(--mut)}
-.sum div{display:flex;flex-direction:column;justify-content:center;align-items:center}#pSum b,#aSum b,#sSum b{font-size:24px;line-height:1.2}#pSum span,#aSum span,#sSum span{font-size:13px}
+.sum{display:flex;gap:6px;text-align:center}
+.sum div{flex:1;min-width:0;background:var(--sumbg);border-radius:10px;padding:6px 4px;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.sum b{display:block;font-size:17px;line-height:1.25;font-weight:700;overflow-wrap:anywhere}
+.sum span{font-size:12px;line-height:1.25;color:var(--mut)}
+.sum .tot{background:var(--g2);color:#fff}.sum .tot span{color:#d6e6da}
 .grp{border-bottom:1px solid var(--line);padding:10px 0}
 .grp .h{display:flex;gap:8px;align-items:center;cursor:pointer}
 .grp .h .n{flex:1;font-weight:600}
@@ -390,7 +389,10 @@ const S = {
 };
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const fmtKg = g => (g / 1000).toLocaleString('de-DE', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) + ' kg';
+/* Gewichte: immer auf 2 Nachkommastellen aufrunden (0,432 kg -> 0,44 kg), auch bei Summen */
+const ceil2 = kg => (Math.ceil(Math.round(kg * 1000) / 10 - 1e-9) / 100) || 0;
+const fmt2 = kg => ceil2(kg).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fmtKg = g => fmt2(g / 1000) + ' kg';
 const fmtEur = v => v.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
 const ls = { get: k => { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
 
@@ -569,7 +571,7 @@ function applyInit(r) {
 /* -------------------------------------------------------------------- Tabs */
 /* ---------- Statistik ---------- */
 const MON = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
-const fmtKgS = g => (g / 1000).toLocaleString('de-DE', { maximumFractionDigits: 1 }) + ' kg';
+const fmtKgS = g => fmt2(g / 1000) + ' kg';
 const fmtEur0 = v => v.toLocaleString('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
 function niceMax(v) { if (v <= 0) return 1; const e = Math.pow(10, Math.floor(Math.log10(v))); const f = v / e; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * e; }
 function tipShow(el, ev) {
@@ -687,13 +689,13 @@ function renderStrecke() {
   $('#sWild').value = wilds.indexOf(curW) >= 0 ? curW : '';
   const list = inJ.filter(x => !$('#sWild').value || x.wildart === $('#sWild').value);
   const kg = list.reduce((a, x) => a + (x.gewichtKg || 0), 0), wn = list.filter(x => x.gewichtKg != null).length;
-  $('#sSum').innerHTML = '<div class="tot"><b>' + list.length + '</b><span>Stück</span></div><div><b>' + kg.toLocaleString('de-DE', { maximumFractionDigits: 1 }) + ' kg</b><span>' + wn + ' gewogen</span></div>';
+  $('#sSum').innerHTML = '<div class="tot"><b>' + list.length + '</b><span>Stück</span></div><div><b>' + fmtK(kg) + '</b><span>' + wn + ' gewogen</span></div>';
   const per = {}; list.forEach(x => { per[x.wildart] = (per[x.wildart] || 0) + 1; });
   $('#sChips').innerHTML = Object.keys(per).sort((a, b) => per[b] - per[a]).map(w => '<span class="chip">' + esc(w) + ': ' + per[w] + '</span>').join(' ');
   $('#sList').innerHTML = list.map(x => {
     const pk = x.packN ? '<small>' + x.packN + ' Packung' + (x.packN === 1 ? '' : 'en') + ' · ' + fmtKg(x.packG) + ' eingelagert' + (x.packLager ? ' (' + x.packLager + ' auf Lager)' : ' (alle ausgebucht)') + (x.gewichtKg ? ' · ' + Math.round(x.packG / 10 / x.gewichtKg) + ' % des Gewichts' : '') + '</small>' : '';
     return '<div class="it" data-act="strEdit" data-id="' + esc(x.id) + '" style="cursor:pointer"><div class="n"><b>' + wi(x.wildart) + esc(x.datum + ' ' + x.uhrzeit + ' · ' + x.wildart) + '</b><small>' +
-      esc([x.geschlecht, /^\d+$/.test(x.alter) ? x.alter + ' J.' : x.alter, x.erleger, x.gewichtKg != null ? x.gewichtKg.toLocaleString('de-DE') + ' kg' : '', x.marke ? 'Marke ' + x.marke : '', x.plankat ? 'Plan: ' + x.plankat : '', x.ansitz ? 'Ansitz: ' + ((S.ansitze || []).filter(a => a.id === x.ansitz)[0] || { name: '?' }).name : ''].filter(Boolean).join(' · ')) + '</small>' + pk + '</div></div>';
+      esc([x.geschlecht, /^\d+$/.test(x.alter) ? x.alter + ' J.' : x.alter, x.erleger, x.gewichtKg != null ? fmtK(x.gewichtKg) : '', x.marke ? 'Marke ' + x.marke : '', x.plankat ? 'Plan: ' + x.plankat : '', x.ansitz ? 'Ansitz: ' + ((S.ansitze || []).filter(a => a.id === x.ansitz)[0] || { name: '?' }).name : ''].filter(Boolean).join(' · ')) + '</small>' + pk + '</div></div>';
   }).join('') || '<p class="mut">Keine Erlegungen in dieser Auswahl.</p>';
 }
 $('#sJahr').onchange = renderStrecke; $('#sWild').onchange = renderStrecke;
@@ -1223,7 +1225,7 @@ async function bestandAction(op, id) {
 
 /* ----------------------------------------------------------------- Wünsche */
 const r3 = x => Math.round(x * 1000) / 1000;
-const fmtK = v => v.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 3 }) + ' kg';
+const fmtK = v => fmt2(v) + ' kg';
 const fmtW = w => w.einheit === 'Stk' ? w.menge + ' Stk' : fmtK(w.menge);
 const aName = c => (S.artikel[c] || {}).bezeichnung || ('Artikel ' + c);
 const wOffen = () => (S.wuensche || []).filter(w => w.status === 'offen');
@@ -1242,7 +1244,7 @@ function bedarf(code, ws) {
   const eq = r3(kg + (avg == null ? 0 : stk * avg));
   return { kg, stk, lager, pk: lagerPk(code), avg, unk, approx: stk > 0 && avg != null, fehl: Math.max(0, r3(eq - lager)) };
 }
-const wTxt = (kg, stk) => [kg > 0 ? fmtK(kg) : '', stk > 0 ? stk + ' Stk' : ''].filter(Boolean).join(' + ') || fmtK(0);
+const wTxt = (kg, stk) => ([kg > 0 ? fmtK(kg) : '', stk > 0 ? stk + ' Stk' : ''].filter(Boolean).join(' + ') || fmtK(0)).replace(/ (kg|Stk)/g, '\u00a0$1');
 async function loadWuenscheQuiet() { try { await apiSWR('wuensche', null, r => { S.wuensche = r.wuensche; renderHint(); }); } catch (e) {} }
 async function loadWunsch() {
   try {
@@ -1261,7 +1263,7 @@ function renderWunsch() {
   const rows = Object.keys(byArt).map(code => Object.assign({ code, a: S.artikel[code] || { bezeichnung: 'Artikel ' + code, wildart: '' }, ws: byArt[code] }, bedarf(code, byArt[code])));
   const tk = r3(rows.reduce((s, x) => s + x.kg, 0)), ts = rows.reduce((s, x) => s + x.stk, 0), tf = r3(rows.reduce((s, x) => s + x.fehl, 0));
   const tAppr = rows.some(x => x.approx), tUnk = rows.some(x => x.unk);
-  $('#wSum').innerHTML = '<div><b>' + open.length + '</b><span>offene Wünsche</span></div><div><b>' + wTxt(tk, ts) + '</b><span>gewünscht</span></div><div class="tot"><b>' + (tAppr || tUnk ? '≈ ' : '') + fmtK(tf) + '</b><span>Fehlmenge' + (tUnk ? ' (min.)' : '') + '</span></div>';
+  $('#wSum').innerHTML = '<div><b>' + open.length + '</b><span>offene Wünsche</span></div><div><b>' + wTxt(tk, ts) + '</b><span>gewünscht</span></div><div class="tot"><b>' + (tAppr || tUnk ? '≈ ' : '') + fmtK(tf) + '</b><span>fehlt</span></div>';
   let h = '';
   if (S.wView === 'art') {
     if (!rows.length) h = '<p class="mut">Keine offenen Wünsche.</p>';
@@ -1271,7 +1273,7 @@ function renderWunsch() {
       const L = wild[k].sort((a, b) => a.a.bezeichnung.localeCompare(b.a.bezeichnung, 'de'));
       const sk = r3(L.reduce((s, x) => s + x.kg, 0)), ss = L.reduce((s, x) => s + x.stk, 0), sl = r3(L.reduce((s, x) => s + x.lager, 0)), sf = r3(L.reduce((s, x) => s + x.fehl, 0));
       const ap = L.some(x => x.approx || x.unk);
-      return '<div class="card"><h2>' + wi(k) + esc(k) + '</h2><p class="mut" style="margin:0 0 6px">Wunsch ' + wTxt(sk, ss) + ' · Lager ' + fmtK(sl) + ' · Fehlmenge ' + (ap ? '≈ ' : '') + fmtK(sf) + '</p>' +
+      return '<div class="card"><h2>' + wi(k) + esc(k) + '</h2><p class="mut" style="margin:0 0 6px">Wunsch ' + wTxt(sk, ss) + ' · Lager ' + fmtK(sl) + ' · Fehlt ' + (ap ? '≈ ' : '') + fmtK(sf) + '</p>' +
         L.map(x => {
           const open = !!S.wOpen[x.code];
           const d = open ? '<div class="d">' + x.ws.map(w => '<div><span>' + esc(w.kunde) + ' · ' + fmtW(w) + '<br><small class="mut">' + esc(w.datum + ' · ' + w.von) + '</small></span><button class="btn sec sm fit" data-act="wEdit" data-id="' + esc(w.id) + '">Bearbeiten</button></div>').join('') + '</div>' : '';
