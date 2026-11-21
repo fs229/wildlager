@@ -72,6 +72,12 @@ Hinweis: Ein öffentliches Repository ist für jeden einsehbar, die Server-URL s
 - Artikel antippen: Einzelpackungen mit Datum, Uhrzeit, Nutzer, dazu **Ausbuchen** oder **Löschen**.
 - **Ausgebuchte zeigen**: die letzten 300, mit **Zurück ins Lager**.
 
+**Reservierungen** (im Bestand)
+- Gleiche Packungen (gleicher Artikel, gleiches Gewicht) sind nicht unterscheidbar. Deshalb reservierst du pro Code eine **Anzahl für einen Kunden**: Gruppe im Bestand aufklappen, bei einer Packung das **Lesezeichen-Symbol** antippen, Kunde und Anzahl wählen. Es lassen sich nur freie Stücke reservieren (Bestand minus bereits Reserviertes).
+- In der Gruppe steht oben „reserviert: n", aufgeklappt „Reserviert für Meier: 2 × 1,6 kg" mit **Ändern** (Anzahl, Kunde, **Aufheben**). Reicht der Bestand nicht mehr, steht dort „Nur n auf Lager".
+- **Beim Scannen im Ausbuchen-Modus:** Solange noch freie Packungen da sind, passiert nichts Besonderes. Sind nur noch reservierte übrig, wird **nicht** ausgebucht, stattdessen erscheint „Reserviert für Meier (2)" mit dem Knopf **Trotzdem**. Ist oben im Dropdown der Kunde gewählt, für den reserviert wurde, gilt der Scan als Erfüllung: keine Warnung, seine Reservierung sinkt um 1 und verschwindet bei 0. Dasselbe gilt für **Ausbuchen** per Knopf im Bestand (dort entscheidet der gewählte Kunde).
+- Ein „Trotzdem"-Verkauf lässt die Reservierung bestehen, sie ist dann nur nicht mehr gedeckt, bis Nachschub kommt.
+
 **Rechnungen** (eigener Tab)
 - **Noch nicht abgerechnet:** Verkäufe, die ausgebucht, aber noch ohne Rechnung sind (z. B. vergessen), mit Knopf **Rechnung erstellen**.
 - Filter nach **Kunde** und **Zeitraum** (Monat, 30 Tage, Jahr). Oben stehen Anzahl, Gewicht und Umsatz der Auswahl.
@@ -129,6 +135,8 @@ Hinweis: Ein öffentliches Repository ist für jeden einsehbar, die Server-URL s
 
 **Blatt „Wünsche"**: ID, Datum, Kunde, Artikelcode, Menge, Status (offen, erfüllt, verworfen), Erledigt am, Erfasst von, Einheit (kg oder Stk; leer gilt als kg).
 
+**Blatt „Reservierungen"**: ID, EAN, Artikelcode, Gewicht (g), Kunde, Anzahl, Erstellt am, Erstellt von.
+
 **Blatt „Rechnungen"**: Rechnungsnr, Datum, Uhrzeit, Kunde, Packungen, Gewicht (g), Summe (€), Erstellt von, Bezahlt am, Bezahlt erfasst von, Eingezahlt am, Eingezahlt erfasst von. Die einzelnen Positionen findest du im Blatt „Bestand" über die Spalte Rechnungsnr. Das Blatt **Kunden** (Name, Aktiv, Notiz) kannst du auch direkt im Sheet pflegen.
 
 ---
@@ -161,7 +169,7 @@ Zurückspielen: die gewünschte Kopie aus dem Ordner öffnen, die Blätter bei B
 1. Im Apps-Script-Editor den **kompletten Code ersetzen** durch den neuen `Code.gs`, speichern.
 2. **Bereitstellen > Bereitstellungen verwalten > Bearbeiten (Stift) > Version: Neue Version > Bereitstellen**. Die URL bleibt gleich.
 3. Neue `index.html` und die Logo-Dateien (`apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `icon.svg`, `manifest.webmanifest`) auf GitHub hochladen (ersetzen bzw. neu hinzufügen). Wer die App schon auf dem Homescreen hat, entfernt das alte Symbol und legt es neu an, damit Name und Logo übernommen werden.
-4. App auf dem Handy neu laden. Beim Öffnen legt das Backend automatisch fehlende Blätter an (**Kunden**, **Rechnungen**, **Wünsche**, **Strecke**) sowie die Spalten für Kunde, Preis, Rechnungsnr und Erlegung im Blatt **Bestand**. Vorhandene Daten bleiben unverändert. Alte Ausbuchungen haben keinen Kunden und erscheinen nicht unter "Noch nicht abgerechnet".
+4. App auf dem Handy neu laden. Beim Öffnen legt das Backend automatisch fehlende Blätter an (**Kunden**, **Rechnungen**, **Wünsche**, **Strecke**, **Reservierungen**) sowie die Spalten für Kunde, Preis, Rechnungsnr und Erlegung im Blatt **Bestand**. Vorhandene Daten bleiben unverändert. Alte Ausbuchungen haben keinen Kunden und erscheinen nicht unter "Noch nicht abgerechnet".
 
 ---
 

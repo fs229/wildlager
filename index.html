@@ -326,6 +326,7 @@ details.fold>summary{display:flex;align-items:center;gap:8px;cursor:pointer;list
 const CONFIG = { API_URL: 'https://script.google.com/macros/s/AKfycbw1PuF_n7MlVTeZ-E3jJimiT_uPmKVnkeNOu-72ufzSXXvyw_Y4qmOlt8BSGz8NZqq8/exec', WIND: { lat: 49.58886, lon: 9.15914, name: 'Revier' } };
 
 const S = {
+  res: [],
   url: '', code: '', user: '', artikel: {}, artikelList: [], lagerorte: [], nutzer: [], settings: { prefix: '28', gram: 1 },
   mode: 'ein', lagerort: '', dauer: true, scanner: null, running: false, paused: false,
   queue: [], sending: false, log: [], seq: 0, lastEan: '', lastSeen: 0, lastEntry: null,
@@ -506,7 +507,7 @@ function applyInit(r) {
   const def = ls.get('wl_lager_' + S.user);
   const act = S.lagerorte.filter(l => l.aktiv);
   S.lagerort = act.some(l => l.name === def) ? def : (act[0] ? act[0].name : '');
-  renderLager(); renderKunden(); S.wuensche = null; S.strecke = null; S.aufg = null; S.plan = null; S.ansitze = []; S.windNow = null; loadAnsitzeQuiet(); S.rv = 'strecke'; S.ast = 'offen'; S.erl = ''; loadStreckeQuiet(); loadWuenscheQuiet(); S.sub = {}; setTab('bestand');
+  renderLager(); renderKunden(); S.wuensche = null; S.res = []; S.strecke = null; S.aufg = null; S.plan = null; S.ansitze = []; S.windNow = null; loadAnsitzeQuiet(); S.rv = 'strecke'; S.ast = 'offen'; S.erl = ''; loadStreckeQuiet(); loadWuenscheQuiet(); S.sub = {}; setTab('bestand');
 }
 
 /* -------------------------------------------------------------------- Tabs */
@@ -1041,14 +1042,15 @@ async function flushQueue() {
       while (S.queue.length && S.queue[0].mode === first.mode && S.queue[0].lagerort === first.lagerort && S.queue[0].kunde === first.kunde && S.queue[0].erl === first.erl && batch.length < 25) batch.push(S.queue.shift());
       const action = first.mode === 'ein' ? 'einbuchen' : first.mode === 'aus' ? 'ausbuchen' : 'umlagern';
       let r;
-      try { r = await api(action, { items: batch.map(b => ({ ean: b.ean, ts: b.ts })), lagerort: first.lagerort, kunde: first.kunde, erlegung: first.erl || '' }); }
+      try { r = await api(action, { items: batch.map(b => ({ ean: b.ean, ts: b.ts, trotzdem: !!b.force })), lagerort: first.lagerort, kunde: first.kunde, erlegung: first.erl || '' }); }
       catch (err) {
         batch.forEach(b => { b.state = 'err'; b.error = err.message; b.net = !!err.net; });
         beep(false); flash(false, 'Fehler', err.message); renderLog(); updateCounters(); continue;
       }
       batch.forEach((b, i) => {
         const x = r.results[i];
-        if (x && x.ok) { b.state = 'ok'; b.res = x; b.name = x.bezeichnung || b.name; }
+        if (x && x.ok) { b.state = 'ok'; b.res = x; b.name = x.bezeichnung || b.name; if (x.reserviertErfuellt) toast('Reservierung für ' + b.kunde + ' erfüllt'); }
+        else if (x && x.reserviert) { b.state = 'err'; b.reserviert = true; b.error = x.error + ' Nur mit „Trotzdem“ ausbuchen.'; beep(false); flash(false, b.name, x.error); }
         else { b.state = 'err'; b.error = x ? x.error : 'Keine Antwort'; beep(false); flash(false, b.name, b.error); }
       });
       renderLog(); updateCounters();
@@ -1063,6 +1065,7 @@ function renderLog() {
     const sub = e.state === 'err' ? esc(e.error) : esc(fmtKg(e.gewichtG) + (e.lagerort ? ' · ' + e.lagerort : '') + (e.res && e.res.von ? ' (von ' + e.res.von + ')' : '') + (e.mode === 'aus' ? ' · ' + e.kunde : '') + (e.mode === 'aus' && e.state === 'ok' ? ' · ' + fmtEur(eurOf(e)) : ''));
     let btn = '';
     if (e.state === 'ok' && e.mode !== 'um') btn = '<button class="btn sec sm fit" data-act="undo" data-id="' + e.tmp + '">Rückgängig</button>';
+    if (e.state === 'err' && e.reserviert) btn = '<button class="btn sm fit" data-act="force" data-id="' + e.tmp + '">Trotzdem</button>';
     if (e.state === 'err' && e.net) btn = '<button class="btn sec sm fit" data-act="retry" data-id="' + e.tmp + '">Erneut</button>';
     return '<li class="' + cls + '"><span class="i">' + ic + '</span><span class="m">' + esc(e.name) + '<small>' + sub + '</small></span>' + btn + '</li>';
   }).join('') || '<li class="mut">Noch nichts gescannt.</li>';
@@ -1089,6 +1092,10 @@ async function undo(tmp) {
   try { await api('korrektur', { id: e.res.id, op: e.mode === 'ein' ? 'loeschen' : 'zurueck' }); e.state = 'undone'; renderLog(); updateCounters(); toast('Rückgängig gemacht'); }
   catch (er) { toast(er.message); }
 }
+function force(tmp) {
+  const e = S.log.find(x => x.tmp === tmp); if (!e) return;
+  e.force = true; e.reserviert = false; e.state = 'pending'; e.error = ''; S.queue.push(e); renderLog(); flushQueue();
+}
 function retry(tmp) {
   const e = S.log.find(x => x.tmp === tmp); if (!e) return;
   e.state = 'pending'; e.error = ''; e.net = false; S.queue.push(e); renderLog(); flushQueue();
@@ -1097,7 +1104,7 @@ function retry(tmp) {
 /* ---------------------------------------------------------------- Bestand */
 async function loadBestand() {
   try {
-    await apiSWR('bestand', { history: $('#fOut').checked }, r => { S.bestand = r.bestand; S.ausgebucht = r.ausgebucht; renderBestand(); });
+    await apiSWR('bestand', { history: $('#fOut').checked }, r => { S.bestand = r.bestand; S.ausgebucht = r.ausgebucht; S.res = r.reservierungen || []; renderBestand(); });
   } catch (e) { toast(e.message); }
 }
 function renderBestand() {
@@ -1121,10 +1128,15 @@ function renderBestand() {
   const list = Object.keys(groups).sort((x, y) => groups[x].a.bezeichnung.localeCompare(groups[y].a.bezeichnung, 'de')).map(code => {
     const g = groups[code], open = !!S.open[code];
     const chips = Object.keys(g.lag).map(l => '<span class="chip">' + esc(l) + ': ' + g.lag[l] + '</span>').join('');
+    const gres = S.res.filter(x => x.artikelcode === code), rtot = gres.reduce((a, x) => a + x.anzahl, 0);
+    const rchip = rtot ? '<span class="chip" style="background:var(--bg-warning,#fdf0d5);color:var(--text-warning,#7a5200)"><i class="ti ti-bookmark" aria-hidden="true"></i> reserviert: ' + rtot + '</span>' : '';
+    const lager = e => S.bestand.filter(o => o.ean === e).length;
+    const rrows = gres.map(x => '<div><span>Reserviert für <b>' + esc(x.kunde) + '</b>: ' + x.anzahl + ' × ' + fmtKg(x.gewichtG) + '<br><small class="mut">' + (lager(x.ean) < x.anzahl ? 'Nur ' + lager(x.ean) + ' auf Lager · ' : '') + esc(x.datum + ' · ' + x.nutzer) + '</small></span>' +
+      '<button class="btn sec sm fit" data-act="resEdit" data-id="' + esc(x.id) + '">Ändern</button></div>').join('');
     let d = '';
-    if (open) d = '<div class="d">' + g.items.map(o => '<div><span>' + fmtKg(o.gewichtG) + ' · ' + esc(o.lagerort) + '<br><small class="mut">' + esc(o.datum + ' ' + o.uhrzeit + ' · ' + o.nutzer + (o.herkunft ? ' · ' + o.herkunft : '')) + '</small></span><em class="pr">' + fmtEur(o.gewichtG / 1000 * g.a.preis) + '</em>' +
-      '<button class="btn sec sm fit" data-act="out" data-id="' + esc(o.id) + '">Ausbuchen</button><button class="btn sec sm fit" data-act="del" data-id="' + esc(o.id) + '">Löschen</button></div>').join('') + '</div>';
-    return '<div class="grp"><div class="h" data-act="toggle" data-code="' + code + '"><span class="n">' + esc(g.a.bezeichnung) + '<br>' + chips + '</span><span class="v">' + g.items.length + ' Stk<br>' + fmtKg(g.g) + '<br>' + fmtEur(g.wert) + '</span></div>' + d + '</div>';
+    if (open) d = '<div class="d">' + rrows + g.items.map(o => '<div><span>' + fmtKg(o.gewichtG) + ' · ' + esc(o.lagerort) + '<br><small class="mut">' + esc(o.datum + ' ' + o.uhrzeit + ' · ' + o.nutzer + (o.herkunft ? ' · ' + o.herkunft : '')) + '</small></span><em class="pr">' + fmtEur(o.gewichtG / 1000 * g.a.preis) + '</em>' +
+      '<button class="btn sec sm fit" data-act="resNew" data-ean="' + esc(o.ean) + '" aria-label="Reservieren" title="Reservieren"><i class="ti ti-bookmark" aria-hidden="true"></i></button><button class="btn sec sm fit" data-act="out" data-id="' + esc(o.id) + '">Ausbuchen</button><button class="btn sec sm fit" data-act="del" data-id="' + esc(o.id) + '">Löschen</button></div>').join('') + '</div>';
+    return '<div class="grp"><div class="h" data-act="toggle" data-code="' + code + '"><span class="n">' + esc(g.a.bezeichnung) + '<br>' + chips + rchip + '</span><span class="v">' + g.items.length + ' Stk<br>' + fmtKg(g.g) + '<br>' + fmtEur(g.wert) + '</span></div>' + d + '</div>';
   }).join('');
   let out = '';
   if ($('#fOut').checked) {
@@ -1139,7 +1151,13 @@ function renderBestand() {
 async function bestandAction(op, id) {
   try {
     if (op === 'out') { const k = await askKundeWahl(); if (!k) return; const code = (S.bestand.filter(x => x.id === id)[0] || {}).artikelcode, g = (S.bestand.filter(x => x.id === id)[0] || {}).gewichtG || 0;
-      await api('ausbuchen', { items: [{ id, ts: Date.now() }], kunde: k });
+      let r = await api('ausbuchen', { items: [{ id, ts: Date.now() }], kunde: k });
+      if (r.results[0] && r.results[0].reserviert) {
+        if (!confirm(r.results[0].error + ' Trotzdem ausbuchen?')) return;
+        r = await api('ausbuchen', { items: [{ id, ts: Date.now(), trotzdem: true }], kunde: k });
+      }
+      if (!r.results[0] || !r.results[0].ok) { toast(r.results[0] ? r.results[0].error : 'Fehler'); loadBestand(); return; }
+      if (r.results[0].reserviertErfuellt) toast('Reservierung für ' + k + ' erfüllt');
       if (code) { await loadWuenscheQuiet(); await offerWuensche(k, [{ code, g }]); } }
     if (op === 'del') { if (!confirm('Eintrag endgültig löschen?')) return; await api('korrektur', { id, op: 'loeschen' }); }
     if (op === 'back') await api('korrektur', { id, op: 'zurueck' });
@@ -1383,6 +1401,30 @@ function askKunde(name) {
     };
   });
 }
+function askReservierung(ean, id) {
+  const ex = id ? S.res.find(x => x.id === id) : null;
+  const e = ex ? ex.ean : ean;
+  const pk = S.bestand.filter(o => o.ean === e); if (!pk.length && !ex) { toast('Kein Bestand mit diesem Code'); return; }
+  const code = ex ? ex.artikelcode : pk[0].artikelcode, g = ex ? ex.gewichtG : pk[0].gewichtG;
+  const a = S.artikel[code] || { bezeichnung: 'Artikel ' + code };
+  const others = S.res.filter(x => x.ean === e && (!ex || x.id !== ex.id)).reduce((s, x) => s + x.anzahl, 0);
+  const frei = Math.max(0, pk.length - others);
+  const act = S.kunden.filter(k => k.aktiv || (ex && k.name === ex.kunde));
+  openModal('<h2>Reservieren</h2><p class="mut">' + esc(a.bezeichnung + ' · ' + fmtKg(g)) + '<br>' + pk.length + ' auf Lager, ' + others + ' für andere reserviert, <b>' + frei + ' frei</b></p>' +
+    '<label>Kunde</label><select id="rsKunde"><option value="">– wählen –</option>' + act.map(k => '<option' + (ex && k.name === ex.kunde ? ' selected' : '') + '>' + esc(k.name) + '</option>').join('') + '</select>' +
+    '<label>Anzahl</label><input id="rsAnz" type="number" inputmode="numeric" min="1" max="99" value="' + (ex ? ex.anzahl : 1) + '">' +
+    '<p id="mErr" class="mut" style="color:var(--err)"></p><div class="row"><button class="btn sec" id="mCancel">Abbrechen</button>' + (ex ? '<button class="btn red" id="mDel">Aufheben</button>' : '') + '<button class="btn" id="mSave">Speichern</button></div>');
+  $('#mCancel').onclick = closeModal;
+  if (ex) $('#mDel').onclick = async () => {
+    try { await api('reservierungDelete', { id: ex.id }); closeModal(); toast('Reservierung aufgehoben'); loadBestand(); } catch (er) { $('#mErr').textContent = er.message; }
+  };
+  $('#mSave').onclick = async () => {
+    const k = $('#rsKunde').value, n = parseInt($('#rsAnz').value, 10);
+    if (!k) { $('#mErr').textContent = 'Bitte Kunden wählen.'; return; }
+    if (!(n >= 1)) { $('#mErr').textContent = 'Bitte eine Anzahl von mindestens 1 angeben.'; return; }
+    try { await api('reservierungSave', { id: ex ? ex.id : '', ean: e, kunde: k, anzahl: n }); closeModal(); toast('Reserviert für ' + k); loadBestand(); } catch (er) { $('#mErr').textContent = er.message; }
+  };
+}
 function askKundeWahl() {
   return new Promise(resolve => {
     const act = S.kunden.filter(k => k.aktiv);
@@ -1532,6 +1574,9 @@ document.addEventListener('click', e => {
     const a = t.dataset.act;
     if (a === 'undo') undo(Number(t.dataset.id));
     else if (a === 'retry') retry(Number(t.dataset.id));
+    else if (a === 'force') force(Number(t.dataset.id));
+    else if (a === 'resNew') askReservierung(t.dataset.ean, '');
+    else if (a === 'resEdit') askReservierung('', t.dataset.id);
     else if (a === 'toggle') { S.open[t.dataset.code] = !S.open[t.dataset.code]; renderBestand(); }
     else if (a === 'out' || a === 'del' || a === 'back') bestandAction(a, t.dataset.id);
     else if (a === 'artNew') askArtikel('', false);
