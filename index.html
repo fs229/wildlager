@@ -112,9 +112,11 @@ button.bio i.bi{margin-right:0}
 .stp{display:flex;gap:6px;font-size:18px;margin-left:auto}
 
 .rchips{display:flex;gap:6px;margin-top:10px}
-.rchips button{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 4px;border-radius:999px;border:1.5px solid var(--line);background:none;color:var(--mut);font-size:13px;font-weight:600}
-.rchips button i{font-size:17px}
-.rchips button b{font-weight:700}
+.rchips button{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:7px 4px 8px;border-radius:16px;border:1.5px solid var(--line);background:none;color:var(--mut);font-size:12px;font-weight:600;line-height:1.2}
+.rchips .rc{display:flex;align-items:center;gap:5px;font-size:18px}
+.rchips .rc i{font-size:18px}
+.rchips .rc b{font-weight:700;font-variant-numeric:tabular-nums}
+.rchips .rl{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rchips button.on.s0{border-color:var(--err);color:var(--err);background:color-mix(in srgb,var(--err) 14%,transparent)}
 .rchips button.on.s1{border-color:var(--warn);color:var(--warn);background:color-mix(in srgb,var(--warn) 16%,transparent)}
 .rchips button.on.s2{border-color:var(--ok);color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
@@ -130,7 +132,10 @@ select{-webkit-appearance:none;appearance:none;min-height:42px;border-radius:10p
 .chp.w{flex-wrap:nowrap;gap:4px}
 .chp button{border-radius:999px;padding:8px 14px;font-size:13px;border:1px solid var(--line);background:var(--inp);color:var(--mut);font-weight:600}
 .chp button.on{background:color-mix(in srgb,var(--acc) 16%,transparent);border-color:var(--acc);color:var(--acc)}
-.sseg button{text-transform:none}
+.sseg{min-height:48px;background:var(--sumbg);border:1px solid var(--line);border-radius:14px;padding:3px;gap:3px;overflow:visible;margin-bottom:0}
+.sseg button{background:none;color:var(--mut);border-radius:11px;min-height:40px;padding:0 4px;font-size:13px;font-weight:600;white-space:nowrap;text-transform:none;transition:background .15s,color .15s}
+.sseg button.on{background:var(--g2);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.22)}
+.sseg button:active:not(.on){background:var(--btn2)}
 .kfld{display:flex;align-items:center;gap:10px;width:100%;min-height:50px;padding:0 14px;border:1px solid var(--line);border-radius:12px;background:var(--inp);color:var(--txt);font-size:16px;text-align:left;flex:1;min-width:0}
 .kfld .v{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kfld .ph{color:var(--mut)}
@@ -313,7 +318,7 @@ select{-webkit-appearance:none;appearance:none;min-height:42px;border-radius:10p
       <div class="row">
         <div><label>Kunde</label><select id="rKunde"></select></div>
         <div><label>Zeitraum</label><select id="rZeit">
-          <option value="">Alle</option><option value="monat">Dieser Monat</option><option value="30">Letzte 30 Tage</option><option value="jahr">Dieses Jahr</option>
+          <option value="">Alle</option><option value="30">Letzte 30 Tage</option><option value="jahr">Dieses Jahr</option>
         </select></div>
       </div>
       <div class="rchips" id="rChips" role="group" aria-label="Zahlungsstatus filtern"></div>
@@ -1532,7 +1537,6 @@ function rechBase() {
     const d = parseDe(r.datum);
     if (zf && d) {
       if (zf === 'jahr' && d.getFullYear() !== now.getFullYear()) return false;
-      if (zf === 'monat' && (d.getFullYear() !== now.getFullYear() || d.getMonth() !== now.getMonth())) return false;
       if (zf === '30' && now - d > 30 * 86400000) return false;
     }
     return true;
@@ -1544,7 +1548,7 @@ function renderRech() {
   $('#offenList').innerHTML = S.offene.map(g => '<div class="it"><div class="n">' + esc(g.kunde) + '<small>' + g.packungen + ' Packungen · ' + fmtKg(g.gewichtG) + ' · ' + fmtEur(g.summe) + '</small></div><button class="btn sm fit" data-act="rechCreate" data-kunde="' + esc(g.kunde) + '">Rechnung erstellen</button></div>').join('');
   const cnt = { offen: 0, bezahlt: 0, eingezahlt: 0 }; rechBase().forEach(r => { cnt[rechStat(r)]++; });
   const CH = [['offen', 'clock', 's0', 'Offen', 'nicht bezahlt'], ['bezahlt', 'cash', 's1', 'Bezahlt', 'bezahlt, noch nicht eingezahlt'], ['eingezahlt', 'pig-money', 's2', 'Eingezahlt', 'eingezahlt']];
-  $('#rChips').innerHTML = CH.map(c => '<button class="' + c[2] + (S.rf[c[0]] ? ' on' : '') + '" data-act="rchip" data-rs="' + c[0] + '" aria-pressed="' + !!S.rf[c[0]] + '" title="' + c[4] + '"><i class="ti ti-' + c[1] + '" aria-hidden="true"></i>' + c[3] + ' <b>' + cnt[c[0]] + '</b></button>').join('');
+  $('#rChips').innerHTML = CH.map(c => '<button class="' + c[2] + (S.rf[c[0]] ? ' on' : '') + '" data-act="rchip" data-rs="' + c[0] + '" aria-pressed="' + !!S.rf[c[0]] + '" title="' + c[4] + '"><span class="rc"><i class="ti ti-' + c[1] + '" aria-hidden="true"></i><b>' + cnt[c[0]] + '</b></span><span class="rl">' + c[3] + '</span></button>').join('');
   const list = rechFiltered();
   const te = list.reduce((a, r) => a + r.summe, 0);
   const un = list.filter(r => rechStat(r) === 'offen'), bz = list.filter(r => rechStat(r) === 'bezahlt');
@@ -1806,7 +1810,7 @@ const wi = (w, noMargin) => WI[w] ? '<svg class="wi wi-' + WI[w] + '" aria-hidde
 const SEL_IC = { fLager: 'snowflake', selLager: 'snowflake', rKunde: 'user', wKd: 'user', wKunde: 'user', rsKunde: 'user', wArt: 'package', aVer: 'user-circle', aWer: 'user-circle',
   aiTyp: 'home-2', eAns: 'binoculars', eKat: 'tag', pJahr: 'calendar', sJahr: 'calendar', selErl: 'map-pin', eWild: 'paw', eGe: 'gender-bigender' };
 const SEL_SEG = { rZeit: 'seg', wEh: 'seg', wSt: 'seg', fWild: 'chips', sWild: 'chips' };
-const SEL_SHORT = { 'Dieser Monat': 'Monat', 'Letzte 30 Tage': '30 Tage', 'Dieses Jahr': 'Jahr' };
+const SEL_SHORT = { 'Letzte 30 Tage': '30 Tage', 'Dieses Jahr': 'Jahr' };
 const selVal = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
 function selSegSync(sel) {
   const box = sel._seg; if (!box) return;
