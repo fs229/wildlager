@@ -23,6 +23,7 @@ header b{font-size:18px}
 .brand{display:flex;align-items:center;gap:8px}.brand img{border-radius:7px}
 .hero{text-align:center;padding:18px 0 6px}.hero img{border-radius:22px}.hero h1{margin:10px 0 0;font-size:28px;letter-spacing:.5px}.hero p{margin:2px 0 0;color:var(--mut)}
 header small{opacity:.85}
+#net{display:inline-flex;align-items:center;gap:4px;background:#e0a947;color:#2a1d00;border-radius:999px;padding:2px 9px;font-size:13px;font-weight:700;margin-right:6px;vertical-align:middle}#net i{font-size:15px}
 nav{display:flex;background:var(--g2);position:sticky;top:46px;z-index:4}
 nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px 6px;background:none;border:0;color:#cfe0d3;font-size:11px;font-weight:600;border-bottom:3px solid transparent}
 nav button i{font-size:24px;line-height:1}
@@ -44,8 +45,9 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 .seg{display:flex;border:1px solid var(--g2);border-radius:10px;overflow:hidden;margin-bottom:8px}
 .seg button{flex:1;padding:8px 2px;background:var(--inp);border:0;font-size:15px;font-weight:600;color:var(--acc)}
 .seg button.on{background:var(--g2);color:#fff}
-#reader{width:100%;min-height:120px;background:#111;border-radius:10px;overflow:hidden}
-#reader video{display:block;width:100%;max-height:60vh;object-fit:cover}
+#reader{position:relative;width:100%;min-height:90px;background:#111;border-radius:10px;overflow:hidden}
+#reader video{display:block;width:100%;height:170px;object-fit:cover}
+#reader video+i{position:absolute;left:50%;top:50%;width:72%;height:62%;transform:translate(-50%,-50%);border:2px solid rgba(255,255,255,.75);border-radius:10px;box-shadow:0 0 0 999px rgba(0,0,0,.28);pointer-events:none}
 .banner{border-radius:12px;padding:14px;margin:10px 0;text-align:center;border:2px solid var(--line);background:var(--card);min-height:84px}
 .banner.ok{border-color:var(--ok);background:var(--okbg)}
 .banner.err{border-color:var(--err);background:var(--errbg)}
@@ -65,6 +67,7 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 .grp{border-bottom:1px solid var(--line);padding:10px 0}
 .grp .h{display:flex;gap:8px;align-items:center;cursor:pointer}
 .grp .h .n{flex:1;font-weight:600}
+.grp .h .tg{flex:none;width:40px;height:40px;padding:0;display:flex;align-items:center;justify-content:center;font-size:20px;border-radius:10px}
 .grp .h .v{text-align:right;font-size:14px;color:var(--mut)}
 .grp .d{margin:8px 0 0 8px;font-size:14px}
 .grp .d div{display:flex;gap:6px;align-items:center;padding:5px 0;border-top:1px dashed var(--line)}
@@ -163,7 +166,7 @@ select{-webkit-appearance:none;appearance:none;min-height:42px;border-radius:10p
 <symbol id="wi-wasch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.2 8.2C4.6 4.6 7.4 3.8 9.8 5.8Q12 5.4 14.2 5.8C16.6 3.8 19.4 4.6 17.8 8.2Q20.4 11 19.6 14.2L21.2 15.6 18.6 16.2Q16.2 19.6 12 19.6T5.4 16.2L2.8 15.6 4.4 14.2Q3.6 11 6.2 8.2Z"/><path d="M5.6 10.4Q9 9 11 11H13Q15 9 18.4 10.4Q17.8 13.4 14.8 12.8Q13.4 12.4 12 12.4Q10.6 12.4 9.2 12.8Q6.2 13.4 5.6 10.4Z" fill="currentColor" stroke-width="1"/><circle cx="8.9" cy="11.2" r=".75" fill="#fff" stroke="none"/><circle cx="15.1" cy="11.2" r=".75" fill="#fff" stroke="none"/><ellipse cx="12" cy="15.6" rx="1.2" ry=".9" fill="currentColor" stroke="none"/></symbol>
 <symbol id="wi-sau" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7.2 9.5C7.2 14.2 9.3 17.6 12 17.6s4.8-3.4 4.8-8.1"/><path d="M7.2 9.5 5.6 5.2 9.4 7"/><path d="M16.8 9.5l1.6-4.3L14.6 7"/><ellipse cx="12" cy="14.6" rx="2.5" ry="1.7"/><path d="M9.7 16.6 6.4 14.6 8.9 15.4Z" fill="currentColor" stroke-width="1.2"/><path d="M14.3 16.6l3.3-2-2.5.8Z" fill="currentColor" stroke-width="1.2"/><circle cx="11" cy="14.6" r=".4" fill="currentColor"/><circle cx="13" cy="14.6" r=".4" fill="currentColor"/><circle cx="9.7" cy="10.5" r=".5" fill="currentColor"/><circle cx="14.3" cy="10.5" r=".5" fill="currentColor"/></symbol>
 </defs></svg>
-<header><b class="brand"><img src="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20190%20190%22%20width=%22190%22%20height=%22190%22%3E%3Crect%20width=%22190%22%20height=%22190%22%20rx=%2240%22%20fill=%22%231f3d2b%22/%3E%3Cg%20transform=%22translate(95,95)%22%3E%3Ccircle%20r=%2272%22%20fill=%22none%22%20stroke=%22%23e0a73a%22%20stroke-width=%223%22/%3E%3Cg%20transform=%22translate(0,-6.25)%22%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(-15,-6)%20rotate(7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(15,-6)%20rotate(-7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(-29,40)%20rotate(-12)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(29,40)%20rotate(12)%22%20fill=%22%23f2ead8%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E" width="28" height="28" alt=""> Waidr</b><span><small id="who"></small> <button class="btn sm sec" id="btnTheme" aria-label="Hell/Dunkel umschalten"></button> <button class="btn sm sec hide" id="logout" aria-label="Abmelden" title="Abmelden"><i class="ti ti-logout" aria-hidden="true"></i></button></span></header>
+<header><b class="brand"><img src="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20190%20190%22%20width=%22190%22%20height=%22190%22%3E%3Crect%20width=%22190%22%20height=%22190%22%20rx=%2240%22%20fill=%22%231f3d2b%22/%3E%3Cg%20transform=%22translate(95,95)%22%3E%3Ccircle%20r=%2272%22%20fill=%22none%22%20stroke=%22%23e0a73a%22%20stroke-width=%223%22/%3E%3Cg%20transform=%22translate(0,-6.25)%22%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(-15,-6)%20rotate(7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(15,-6)%20rotate(-7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(-29,40)%20rotate(-12)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(29,40)%20rotate(12)%22%20fill=%22%23f2ead8%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E" width="28" height="28" alt=""> Waidr</b><span><span id="net" class="hide"></span><small id="who"></small> <button class="btn sm sec" id="btnTheme" aria-label="Hell/Dunkel umschalten"></button> <button class="btn sm sec hide" id="logout" aria-label="Abmelden" title="Abmelden"><i class="ti ti-logout" aria-hidden="true"></i></button></span></header>
 <nav id="nav" class="hide">
   <button data-grp="lager" class="on"><i class="ti ti-snowflake" aria-hidden="true"></i>Lager</button>
   <button data-grp="verkauf"><i class="ti ti-receipt" aria-hidden="true"></i>Verkauf</button>
@@ -454,15 +457,24 @@ async function apiSWR(action, payload, apply) {
   rcSet(k, r);
   if (!usable || JSON.stringify(c.r) !== JSON.stringify(r)) apply(r);
 }
+const netErr = m => { const er = new Error(m); er.net = true; return er; };
+const wait = ms => new Promise(r => setTimeout(r, ms));
 async function api(action, payload, opt) {
   opt = opt || {};
   const body = JSON.stringify(Object.assign({ action, code: S.code, user: S.user }, payload || {}));
+  const read = !!RC_READ[action], ms = opt.timeout || (read ? 25000 : 60000), tries = read ? 3 : 1;
   let r;
-  try {
-    const resp = await fetch(S.url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body, redirect: 'follow' });
-    r = await resp.json();
-  } catch (e) {
-    const er = new Error('Keine Verbindung zum Server'); er.net = true; throw er;
+  for (let i = 0; ; i++) {
+    if (navigator.onLine === false) throw netErr('Offline');
+    const ac = new AbortController(), tm = setTimeout(() => ac.abort(), ms);
+    try {
+      const resp = await fetch(S.url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body, redirect: 'follow', signal: ac.signal });
+      r = await resp.json(); clearTimeout(tm); break;
+    } catch (e) {
+      clearTimeout(tm);
+      if (i + 1 < tries) { await wait(1000 * (i + 1) * (i + 1)); continue; }
+      throw netErr(e && e.name === 'AbortError' ? 'Zeitüberschreitung, Verbindung zu langsam' : 'Keine Verbindung zum Server');
+    }
   }
   if (!r.ok) {
     if (r.auth === false && !opt.noAuthRedirect) { logout(true); }
@@ -554,7 +566,7 @@ async function pickUser(name) {
   } catch (e) { $('#loginErr').textContent = e.message; }
 }
 function logout(silent) {
-  stopScan(); rcPurge(); ls.set('wl_code', ''); ls.set('wl_user', ''); S.code = ''; S.user = '';
+  stopScan(); S.queue = []; S.inflight = []; S.qRestored = ''; rcPurge(); ls.set('wl_code', ''); ls.set('wl_user', ''); S.code = ''; S.user = '';
   showLogin(silent ? 'Bitte neu anmelden.' : '');
 }
 function setInitData(r) {
@@ -570,7 +582,7 @@ function applyInit(r) {
   const def = ls.get('wl_lager_' + S.user);
   const act = S.lagerorte.filter(l => l.aktiv);
   S.lagerort = act.some(l => l.name === def) ? def : (act[0] ? act[0].name : '');
-  renderLager(); renderKunden(); S.wuensche = null; S.res = []; S.strecke = null; S.aufg = null; S.plan = null; S.ansitze = []; S.windNow = null; loadAnsitzeQuiet(); S.rv = 'wind'; S.ast = 'offen'; S.erl = ''; loadStreckeQuiet(); loadWuenscheQuiet(); S.sub = {}; setTab('bestand');
+  renderLager(); renderKunden(); S.wuensche = null; S.res = []; S.strecke = null; S.aufg = null; S.plan = null; S.ansitze = []; S.windNow = null; loadAnsitzeQuiet(); S.rv = 'wind'; S.ast = 'offen'; S.erl = ''; loadStreckeQuiet(); loadWuenscheQuiet(); S.sub = {}; setTab('bestand'); qRestore();
 }
 
 /* -------------------------------------------------------------------- Tabs */
@@ -1026,7 +1038,7 @@ async function startScan() {
     } catch (e) {}
     scanVideo = document.createElement('video');
     scanVideo.setAttribute('playsinline', ''); scanVideo.muted = true; scanVideo.srcObject = scanStream;
-    $('#reader').innerHTML = ''; $('#reader').appendChild(scanVideo);
+    $('#reader').innerHTML = ''; $('#reader').appendChild(scanVideo); { const g = document.createElement('i'); g.setAttribute('aria-hidden', 'true'); $('#reader').appendChild(g); }
     await scanVideo.play();
     S.running = true; scanErr = 0; $('#btnCam').textContent = 'Kamera stoppen';
     flash(true, 'Suche Code …', 'Etikett ruhig und scharf ins Bild halten');
@@ -1073,8 +1085,10 @@ function handleCode(raw) {
   if (S.paused) return;
   const now = Date.now(), ean = normEan(raw);
   const same = ean === S.lastEan && now - S.lastSeen < 1000;   // gleicher Code noch im Bild
+  // 1 Sekunde Pause nach jedem erkannten Code: in dieser Zeit wird nichts übernommen (gegen Doppelscans)
+  if (now < (S.pauseUntil || 0)) { if (ean === S.lastEan) S.lastSeen = now; return; }
   S.lastEan = ean; S.lastSeen = now;
-  if (!same) submitScan(ean);
+  if (!same) { S.pauseUntil = now + 1000; submitScan(ean); }
 }
 async function submitScan(raw) {
   const p = parseEan(raw);
@@ -1093,39 +1107,82 @@ async function submitScan(raw) {
   if (S.log.length > 200) S.log.length = 200;
   flash(true, e.name, fmtKg(p.gewichtG) + (e.lagerort ? ' → ' + e.lagerort : ' → ' + e.kunde));
   beep(true); $('#btnAgain').classList.remove('hide');
-  S.queue.push(e); renderLog(); flushQueue();
+  S.queue.push(e); qSave(); renderLog(); flushQueue();
   if (!S.dauer) stopScan();
+}
+/* Warteschlange: wird gespeichert (überlebt Neuladen), bei Netzfehler automatisch mit Wartezeit erneut gesendet */
+S.inflight = [];
+let flushTimer = 0, flushDelay = 0;
+function qSave() {
+  if (S.user) {
+    const a = (S.inflight || []).concat(S.queue).map(e => ({ tmp: e.tmp, mode: e.mode, ean: e.ean, lagerort: e.lagerort, kunde: e.kunde, erl: e.erl, ts: e.ts, force: !!e.force, name: e.name, gewichtG: e.gewichtG }));
+    ls.set('waidr_q_' + S.user, a.length ? JSON.stringify(a) : '');
+  }
+  netBadge();
+}
+function qRestore() {
+  if (S.qRestored === S.user) return;
+  S.qRestored = S.user;
+  let a = []; try { a = JSON.parse(ls.get('waidr_q_' + S.user) || '[]'); } catch (e) {}
+  let n = 0;
+  a.forEach(x => {
+    if (S.log.some(e => e.ts === x.ts && e.ean === x.ean)) return;
+    const e = Object.assign({}, x, { tmp: ++S.seq, state: 'pending', wait: true });
+    S.log.push(e); S.queue.push(e); n++;
+  });
+  if (n) { S.log.sort((p, q) => q.ts - p.ts); renderLog(); updateCounters(); toast(n + ' ungesendete Scan' + (n === 1 ? '' : 's') + ' wiederhergestellt'); flushQueue(); }
+  netBadge();
+}
+function netBadge() {
+  const el = $('#net'); if (!el) return;
+  const n = S.queue.length + (S.inflight || []).length, off = navigator.onLine === false;
+  if (!off && !n) { el.classList.add('hide'); return; }
+  el.innerHTML = '<i class="ti ti-' + (off ? 'cloud-off' : 'refresh') + '" aria-hidden="true"></i>' + (n ? n : 'Offline');
+  el.title = (off ? 'Offline' : 'Verbindung schwach') + (n ? ' · ' + n + ' Scan' + (n === 1 ? '' : 's') + ' warten auf Versand' : '');
+  el.classList.remove('hide');
 }
 async function flushQueue() {
   if (S.sending) return;
+  clearTimeout(flushTimer);
   S.sending = true;
   try {
     while (S.queue.length) {
       const first = S.queue[0], batch = [];
       while (S.queue.length && S.queue[0].mode === first.mode && S.queue[0].lagerort === first.lagerort && S.queue[0].kunde === first.kunde && S.queue[0].erl === first.erl && batch.length < 25) batch.push(S.queue.shift());
+      S.inflight = batch; qSave();
       const action = first.mode === 'ein' ? 'einbuchen' : first.mode === 'aus' ? 'ausbuchen' : 'umlagern';
       let r;
       try { r = await api(action, { items: batch.map(b => ({ ean: b.ean, ts: b.ts, trotzdem: !!b.force })), lagerort: first.lagerort, kunde: first.kunde, erlegung: first.erl || '' }); }
       catch (err) {
-        batch.forEach(b => { b.state = 'err'; b.error = err.message; b.net = !!err.net; });
-        beep(false); flash(false, 'Fehler', err.message); renderLog(); updateCounters(); continue;
+        S.inflight = [];
+        if (err.net) {   // keine Verbindung: Einträge behalten und später automatisch erneut senden
+          batch.forEach(b => { b.state = 'pending'; b.wait = true; });
+          S.queue.unshift.apply(S.queue, batch); qSave(); renderLog(); updateCounters();
+          flushDelay = Math.min(30000, (flushDelay || 2000) * 2);
+          flushTimer = setTimeout(flushQueue, flushDelay);
+          break;
+        }
+        batch.forEach(b => { b.state = 'err'; b.error = err.message; b.net = false; });
+        qSave(); beep(false); flash(false, 'Fehler', err.message); renderLog(); updateCounters(); continue;
       }
+      flushDelay = 0; S.inflight = [];
       batch.forEach((b, i) => {
+        b.wait = false;
         const x = r.results[i];
         if (x && x.ok) { b.state = 'ok'; b.res = x; b.name = x.bezeichnung || b.name; if (x.reserviertErfuellt) toast('Reservierung für ' + b.kunde + ' erfüllt'); }
         else if (x && x.reserviert) { b.state = 'err'; b.reserviert = true; b.error = x.error + ' Nur mit „Trotzdem“ ausbuchen.'; beep(false); flash(false, b.name, x.error); }
         else { b.state = 'err'; b.error = x ? x.error : 'Keine Antwort'; beep(false); flash(false, b.name, b.error); }
       });
-      renderLog(); updateCounters();
+      qSave(); renderLog(); updateCounters();
     }
-  } finally { S.sending = false; }
+  } finally { S.sending = false; netBadge(); }
 }
 function renderLog() {
   const items = S.log.filter(e => e.mode === S.mode).slice(0, 40);
   $('#log').innerHTML = items.map(e => {
     const ic = e.state === 'ok' ? '✓' : e.state === 'err' ? '✗' : e.state === 'undone' ? '↩' : '…';
     const cls = e.state === 'undone' ? 'ok undone' : e.state;
-    const sub = e.state === 'err' ? esc(e.error) : esc(fmtKg(e.gewichtG) + (e.lagerort ? ' · ' + e.lagerort : '') + (e.res && e.res.von ? ' (von ' + e.res.von + ')' : '') + (e.mode === 'aus' ? ' · ' + e.kunde : '') + (e.mode === 'aus' && e.state === 'ok' ? ' · ' + fmtEur(eurOf(e)) : ''));
+    const sub = e.state === 'err' ? esc(e.error) : esc((e.state === 'pending' && e.wait ? 'wartet auf Verbindung · ' : '') + fmtKg(e.gewichtG) + (e.lagerort ? ' · ' + e.lagerort : '') + (e.res && e.res.von ? ' (von ' + e.res.von + ')' : '') + (e.mode === 'aus' ? ' · ' + e.kunde : '') + (e.mode === 'aus' && e.state === 'ok' ? ' · ' + fmtEur(eurOf(e)) : ''));
     let btn = '';
     if (e.state === 'ok' && e.mode !== 'um') btn = '<button class="btn sec sm fit" data-act="undo" data-id="' + e.tmp + '">Rückgängig</button>';
     if (e.state === 'err' && e.reserviert) btn = '<button class="btn sm fit" data-act="force" data-id="' + e.tmp + '">Trotzdem</button>';
@@ -1157,11 +1214,11 @@ async function undo(tmp) {
 }
 function force(tmp) {
   const e = S.log.find(x => x.tmp === tmp); if (!e) return;
-  e.force = true; e.reserviert = false; e.state = 'pending'; e.error = ''; S.queue.push(e); renderLog(); flushQueue();
+  e.force = true; e.reserviert = false; e.state = 'pending'; e.error = ''; S.queue.push(e); qSave(); renderLog(); flushQueue();
 }
 function retry(tmp) {
   const e = S.log.find(x => x.tmp === tmp); if (!e) return;
-  e.state = 'pending'; e.error = ''; e.net = false; S.queue.push(e); renderLog(); flushQueue();
+  e.state = 'pending'; e.error = ''; e.net = false; S.queue.push(e); qSave(); renderLog(); flushQueue();
 }
 
 /* ---------------------------------------------------------------- Bestand */
@@ -1197,9 +1254,10 @@ function renderBestand() {
     const rrows = gres.map(x => '<div><span>Reserviert für <b>' + esc(x.kunde) + '</b>: ' + x.anzahl + ' × ' + fmtKg(x.gewichtG) + '<br><small class="mut">' + (lager(x.ean) < x.anzahl ? 'Nur ' + lager(x.ean) + ' auf Lager · ' : '') + esc(x.datum + ' · ' + x.nutzer) + '</small></span>' +
       '<button class="btn sec sm fit" data-act="resEdit" data-id="' + esc(x.id) + '">Ändern</button></div>').join('');
     let d = '';
-    if (open) d = '<div class="d">' + rrows + g.items.map(o => '<div><span>' + fmtKg(o.gewichtG) + ' · ' + esc(o.lagerort) + '<br><small class="mut">' + esc(o.datum + ' ' + o.uhrzeit + ' · ' + o.nutzer + (o.herkunft ? ' · ' + o.herkunft : '')) + '</small></span><em class="pr">' + fmtEur(o.gewichtG / 1000 * g.a.preis) + '</em>' +
+    if (open) try { d = '<div class="d">' + rrows + g.items.map(o => '<div><span>' + fmtKg(o.gewichtG) + ' · ' + esc(o.lagerort) + '<br><small class="mut">' + esc(o.datum + ' ' + o.uhrzeit + ' · ' + o.nutzer + (o.herkunft ? ' · ' + o.herkunft : '')) + '</small></span><em class="pr">' + fmtEur(o.gewichtG / 1000 * g.a.preis) + '</em>' +
       '<button class="btn sec sm fit" data-act="resNew" data-ean="' + esc(o.ean) + '" aria-label="Reservieren" title="Reservieren"><i class="ti ti-bookmark" aria-hidden="true"></i></button><button class="btn sec sm fit" data-act="out" data-id="' + esc(o.id) + '">Ausbuchen</button><button class="btn sec sm fit" data-act="del" data-id="' + esc(o.id) + '">Löschen</button></div>').join('') + '</div>';
-    return '<div class="grp"><div class="h" data-act="toggle" data-code="' + code + '"><span class="n">' + wi(g.a.wildart) + esc(g.a.bezeichnung) + '<br>' + chips + rchip + '</span><span class="v">' + g.items.length + ' Stk<br>' + fmtKg(g.g) + '<br>' + fmtEur(g.wert) + '</span></div>' + d + '</div>';
+    } catch (err) { console.error(err); d = '<div class="d"><p class="mut" style="color:var(--err)">Details nicht darstellbar: ' + esc(err && err.message) + ' (Artikel ' + esc(code) + ')</p></div>'; }
+    return '<div class="grp"><div class="h" data-act="toggle" data-code="' + code + '"><span class="n">' + wi(g.a.wildart) + esc(g.a.bezeichnung) + '<br>' + chips + rchip + '</span><span class="v">' + g.items.length + ' Stk<br>' + fmtKg(g.g) + '<br>' + fmtEur(g.wert) + '</span><button type="button" class="btn sec tg" data-act="toggle" data-code="' + code + '" aria-expanded="' + open + '" aria-label="' + (open ? 'Details schließen' : 'Details öffnen') + '"><i class="ti ti-chevron-' + (open ? 'up' : 'down') + '" aria-hidden="true"></i></button></div>' + d + '</div>';
   }).join('');
   let out = '';
   if ($('#fOut').checked) {
@@ -1603,7 +1661,8 @@ async function rechOpen(nr) {
       '<div class="lst">' + pos.map(p => '<div class="it"><div class="n">' + esc(p.bezeichnung) + '<small>' + esc(fmtKg(p.gewichtG)) + ' · ' + esc(p.abDatum + ' ' + p.abUhrzeit) + '</small></div><span>' + fmtEur(p.betrag) + '</span></div>').join('') + '</div>' +
       '<div class="sum" style="margin:10px 0"><div><b>' + re.packungen + '</b><span>Packungen</span></div><div><b>' + fmtKg(re.gewichtG) + '</b><span>Gewicht</span></div><div class="tot"><b>' + fmtEur(re.summe) + '</b><span>Summe</span></div></div>' +
       '<div class="card" style="margin:0 0 10px;padding:10px">' + stBox + '</div>' +
-      '<div class="row"><button class="btn sec" id="mCopy">Text kopieren</button>' + (st === 'offen' ? '<button class="btn red" id="mStorno">Stornieren</button>' : '') + '<button class="btn sec" id="mCancel">Schließen</button></div>');
+      '<div class="row"><button class="btn sec" id="mCopy">Text kopieren</button><button class="btn sec" id="mCancel">Schließen</button></div>' +
+      (st === 'offen' ? '<button class="btn red" id="mStornoLager" style="margin-top:8px;width:100%">Stornieren und zurück ins Lager</button><button class="btn sec" id="mStorno" style="margin-top:8px;width:100%">Nur Rechnung stornieren</button>' : ''));
     $('#mCancel').onclick = closeModal;
     const go = d => { const n = v[i + d]; if (n) rechOpen(n.nr); };
     $('#mPrev').onclick = () => go(-1); $('#mNext').onclick = () => go(1);
@@ -1620,6 +1679,10 @@ async function rechOpen(nr) {
     if ($('#mStep')) $('#mStep').onclick = () => step(RECH_NEXT[st], st === 'offen' ? 'Als bezahlt markiert' : 'Als eingezahlt markiert', true);
     if ($('#mBack')) $('#mBack').onclick = () => step(st === 'eingezahlt' ? 'bezahlt' : 'offen', 'Status zurückgesetzt', false);
     $('#mCopy').onclick = async () => { try { await navigator.clipboard.writeText(text); toast('Kopiert'); } catch (e) { toast('Kopieren nicht möglich'); } };
+    if ($('#mStornoLager')) $('#mStornoLager').onclick = async () => {
+      if (!confirm('Rechnung ' + re.nr + ' stornieren und alle ' + re.packungen + ' Packungen zurück ins Lager legen?\nDie Rechnung wird gelöscht. Eine erfüllte Reservierung wird nicht wiederhergestellt.')) return;
+      try { const r = await api('rechnungStorno', { nr: re.nr, zurueck: true }); closeModal(); toast('Storniert, ' + (r.zurueck || 0) + ' Packungen wieder im Lager'); loadRech(); } catch (e) { toast(e.message); }
+    };
     if ($('#mStorno')) $('#mStorno').onclick = async () => {
       if (!confirm('Rechnung ' + re.nr + ' stornieren? Die Packungen bleiben an ' + re.kunde + ' ausgebucht und erscheinen wieder unter "Noch nicht abgerechnet".')) return;
       try { await api('rechnungStorno', { nr: re.nr }); closeModal(); toast('Storniert'); loadRech(); } catch (e) { toast(e.message); }
@@ -1690,9 +1753,13 @@ $('#btnRechnung').onclick = async () => {
   try {
     for (const k of Object.keys(groups)) { const r = await api('rechnungErstellen', { ids: groups[k].map(e => e.res.id) }); made.push(r.rechnung); }
   } catch (er) { toast(er.message); return; }
-  S.sumSeq = S.seq; S.kunde = ''; renderKunden(); updateCounters();
-  flash(true, 'Rechnung ' + made.map(m => m.nr).join(', '), made.map(m => m.kunde + ' · ' + fmtEur(m.summe)).join(' | '));
-  toast('Rechnung erstellt: ' + made.map(m => m.nr).join(', '));
+  S.sumSeq = S.seq; S.kunde = ''; renderKunden();
+  // abgerechnete Ausbuchungen aus der Sitzungsliste nehmen und Ansicht für den nächsten Kunden zurücksetzen
+  S.log = S.log.filter(e => !(e.mode === 'aus' && e.tmp <= S.sumSeq && e.state !== 'pending'));
+  S.lastEntry = null; $('#btnAgain').classList.add('hide');
+  $('#banner').className = 'banner'; $('#banner').innerHTML = '<div class="t">Bereit</div><div class="s">Nächsten Kunden wählen und scannen</div>';
+  renderLog(); updateCounters();
+  toast('Rechnung erstellt: ' + made.map(m => m.nr + ' · ' + m.kunde + ' · ' + fmtEur(m.summe)).join(' | '));
 };
 $('#btnSumReset').onclick = () => { S.sumSeq = S.seq; updateCounters(); toast('Summe zurückgesetzt'); };
 $('#btnAgain').onclick = () => { if (S.lastEntry) submitScan(S.lastEntry.ean); };
@@ -1765,7 +1832,9 @@ function applyTheme(t, save) {
 }
 $('#btnTheme').onclick = () => applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark', true);
 applyTheme(document.documentElement.getAttribute('data-theme') || 'light', false);
-document.addEventListener('visibilitychange', () => { if (document.hidden) stopScan(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) stopScan(); else if (S.queue.length) flushQueue(); });
+window.addEventListener('online', () => { netBadge(); flushDelay = 0; flushQueue(); });
+window.addEventListener('offline', netBadge);
 
 /* ----------------------------------------------------------------- Button-Icons (Tabler), ergänzt automatisch nach Beschriftung */
 const BI = {
@@ -1774,7 +1843,7 @@ const BI = {
   'Einbuchen': 'package-import', 'Ausbuchen': 'package-export', 'Umlagern': 'arrows-exchange', '+1 nochmal': 'repeat',
   'Speichern': 'device-floppy', 'Abbrechen': 'x', 'Schließen': 'x', 'Bearbeiten': 'pencil', 'Soll bearbeiten': 'pencil', 'Ändern': 'pencil', 'Löschen': 'trash',
   'Aktualisieren': 'refresh', 'Erneut': 'refresh', 'Rückgängig': 'arrow-back-up', 'Zurück ins Lager': 'arrow-back-up', 'Summe zurücksetzen': 'restore', 'Weiter': 'arrow-right',
-  'Rechnung erstellen': 'file-plus', 'Text kopieren': 'copy', 'Stornieren': 'ban', 'Trotzdem': 'alert-triangle', 'Aufheben': 'bookmark-off',
+  'Rechnung erstellen': 'file-plus', 'Text kopieren': 'copy', 'Stornieren': 'ban', 'Stornieren und zurück ins Lager': 'arrow-back-up', 'Nur Rechnung stornieren': 'ban', 'Trotzdem': 'alert-triangle', 'Aufheben': 'bookmark-off',
   'Erledigt': 'check', 'Erfüllt': 'check', 'Abhaken': 'check', 'Offen': 'list-check', 'Nach Artikel': 'sort-ascending', 'Nach Kunde': 'sort-ascending'
 };
 const BI_TEXT = { 'Trotzdem': 1, 'Rechnung erstellen': 1, 'Rückgängig': 1, 'Erneut': 1, 'Summe zurücksetzen': 1, 'Text kopieren': 1 };   // bleiben auch in kleinen Knöpfen beschriftet
