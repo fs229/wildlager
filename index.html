@@ -82,6 +82,7 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 .mod>div{background:var(--card);width:100%;max-width:560px;border-radius:16px 16px 0 0;padding:16px;max-height:92vh;overflow:auto}
 .mod h2{font-size:19px}
 .toast{position:fixed;left:12px;right:12px;bottom:16px;background:#222;color:#fff;border-radius:10px;padding:12px;z-index:30;text-align:center}
+.toast .tact{margin-left:12px;background:none;border:1px solid #fff;color:#fff;border-radius:8px;padding:4px 12px;font:inherit;font-weight:600;cursor:pointer}
 .wl .h{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
 .st{display:inline-block;border-radius:20px;padding:1px 8px;font-size:12px;font-weight:600;background:var(--btn2)}
 .st.e{background:var(--okbg);color:var(--ok)}.st.v{background:var(--errbg);color:var(--err)}
@@ -486,7 +487,15 @@ async function api(action, payload, opt) {
 
 /* ---------------------------------------------------------------- UI-Helfer */
 let toastT;
-function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.remove('hide'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.add('hide'), 3500); }
+function toast(msg, act) {
+  const t = $('#toast'); t.textContent = msg;
+  if (act) { const b = document.createElement('button'); b.type = 'button'; b.className = 'tact'; b.textContent = act.label; b.onclick = () => { t.classList.add('hide'); act.fn(); }; t.appendChild(b); }
+  t.classList.remove('hide'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.add('hide'), act ? 4000 : 3500);
+}
+// Rechnungen rückgängig: Rechnung löschen, Packungen bleiben ausgebucht und stehen wieder unter "Noch nicht abgerechnet"
+async function rechUndo(nrs) {
+  try { for (const nr of nrs) await api('rechnungStorno', { nr: nr }); toast('Rechnung rückgängig, Packungen wieder unter „Noch nicht abgerechnet“'); if (!$('#v-rech').classList.contains('hide')) loadRech(); } catch (e) { toast(e.message); }
+}
 function show(id) { ['login', 'scan', 'bestand', 'strecke', 'rech', 'wunsch', 'stamm'].forEach(v => $('#v-' + v).classList.toggle('hide', v !== id)); }
 function openModal(html) { $('#modalBody').innerHTML = html; $('#modal').classList.remove('hide'); }
 function closeModal() { $('#modal').classList.add('hide'); $('#modalBody').innerHTML = ''; }
@@ -1603,7 +1612,7 @@ function rechBase() {
 function rechFiltered() { return rechBase().filter(r => S.rf[rechStat(r)]); }
 function renderRech() {
   $('#offenCard').classList.toggle('hide', !S.offene.length);
-  $('#offenList').innerHTML = S.offene.map(g => '<div class="it"><div class="n">' + esc(g.kunde) + '<small>' + g.packungen + ' Packungen · ' + fmtKg(g.gewichtG) + ' · ' + fmtEur(g.summe) + '</small></div><button class="btn sm fit" data-act="rechCreate" data-kunde="' + esc(g.kunde) + '">Rechnung erstellen</button></div>').join('');
+  $('#offenList').innerHTML = S.offene.map(g => '<div class="it"><div class="n">' + esc(g.kunde) + '<small>' + g.packungen + ' Packungen · ' + fmtKg(g.gewichtG) + ' · ' + fmtEur(g.summe) + '</small></div><button class="btn sec sm fit" data-act="offBack" data-kunde="' + esc(g.kunde) + '" aria-label="Alle zurück ins Lager" title="Alle zurück ins Lager"><i class="ti ti-arrow-back-up" aria-hidden="true"></i></button><button class="btn sm fit" data-act="rechCreate" data-kunde="' + esc(g.kunde) + '">Rechnung erstellen</button></div>').join('');
   const cnt = { offen: 0, bezahlt: 0, eingezahlt: 0 }; rechBase().forEach(r => { cnt[rechStat(r)]++; });
   const CH = [['offen', 'clock', 's0', 'Offen', 'nicht bezahlt'], ['bezahlt', 'cash', 's1', 'Bezahlt', 'bezahlt, noch nicht eingezahlt'], ['eingezahlt', 'pig-money', 's2', 'Eingezahlt', 'eingezahlt']];
   $('#rChips').innerHTML = CH.map(c => '<button class="' + c[2] + (S.rf[c[0]] ? ' on' : '') + '" data-act="rchip" data-rs="' + c[0] + '" aria-pressed="' + !!S.rf[c[0]] + '" title="' + c[4] + '"><span class="rc"><i class="ti ti-' + c[1] + '" aria-hidden="true"></i><b>' + cnt[c[0]] + '</b></span><span class="rl">' + c[3] + '</span></button>').join('');
@@ -1623,8 +1632,12 @@ function renderRech() {
 }
 async function rechCreate(kunde) {
   const g = S.offene.filter(x => x.kunde === kunde)[0]; if (!g) return;
-  if (!confirm('Rechnung für ' + kunde + ' erstellen?\n' + g.packungen + ' Packungen, ' + fmtKg(g.gewichtG) + ', ' + fmtEur(g.summe))) return;
-  try { const r = await api('rechnungErstellen', { ids: g.ids }); toast('Rechnung erstellt: ' + r.rechnung.nr); loadRech(); } catch (e) { toast(e.message); }
+  try { const r = await api('rechnungErstellen', { ids: g.ids }); toast('Rechnung ' + r.rechnung.nr + ' · ' + fmtEur(r.rechnung.summe), { label: 'Rückgängig', fn: () => rechUndo([r.rechnung.nr]) }); loadRech(); } catch (e) { toast(e.message); }
+}
+async function offBack(kunde) {
+  const g = S.offene.filter(x => x.kunde === kunde)[0]; if (!g) return;
+  if (!confirm('Alle ' + g.packungen + ' Packungen (' + fmtKg(g.gewichtG) + ') von ' + kunde + ' zurück ins Lager legen?\nEine erfüllte Reservierung wird nicht wiederhergestellt.')) return;
+  try { const r = await api('offeneZurueck', { kunde: kunde }); toast(r.zurueck + ' Packungen wieder im Lager'); loadRech(); } catch (e) { toast(e.message); }
 }
 async function rechSetStatus(nr, status) {
   const r = await api('rechnungStatus', { nr: nr, status: status });
@@ -1704,7 +1717,10 @@ document.addEventListener('click', e => {
     else if (a === 'force') force(Number(t.dataset.id));
     else if (a === 'resNew') askReservierung(t.dataset.ean, '');
     else if (a === 'resEdit') askReservierung('', t.dataset.id);
-    else if (a === 'toggle') { S.open[t.dataset.code] = !S.open[t.dataset.code]; renderBestand(); }
+    else if (a === 'toggle') {
+      const c = t.dataset.code; S.open[c] = !S.open[c];
+      try { renderBestand(); } catch (err) { console.error(err); S.open[c] = false; toast('Details nicht darstellbar: ' + (err && err.message) + ' (Artikel ' + c + ')'); try { renderBestand(); } catch (e2) { console.error(e2); } }
+    }
     else if (a === 'out' || a === 'del' || a === 'back') bestandAction(a, t.dataset.id);
     else if (a === 'artNew') askArtikel('', false);
     else if (a === 'artEdit') askArtikel(t.dataset.code, false);
@@ -1713,6 +1729,7 @@ document.addEventListener('click', e => {
     else if (a === 'kundeNew') askKunde('').then(n => { if (n && S.tab === 'scan') { S.kunde = n; renderKunden(); } });
     else if (a === 'kundeEdit') askKunde(t.dataset.name);
     else if (a === 'rechCreate') rechCreate(t.dataset.kunde);
+    else if (a === 'offBack') offBack(t.dataset.kunde);
     else if (a === 'rechOpen') rechOpen(t.dataset.nr);
     else if (a === 'rechPay') rechPay(t.dataset.nr);
     else if (a === 'rchip') { const k = t.dataset.rs; if (S.rf[k] && Object.keys(S.rf).filter(x => S.rf[x]).length === 1) return; S.rf[k] = !S.rf[k]; renderRech(); }
@@ -1748,7 +1765,6 @@ $('#btnRechnung').onclick = async () => {
   if (!ok.length) { toast(live.length ? 'Schon abgerechnet (Eigenbedarf/Drückjagd).' : 'Nichts zum Abrechnen.'); return; }
   const groups = {}; ok.forEach(e => { (groups[e.kunde] = groups[e.kunde] || []).push(e); });
   const txt = Object.keys(groups).map(k => k + ': ' + groups[k].length + ' Packungen, ' + fmtKg(groups[k].reduce((s, e) => s + e.gewichtG, 0)) + ', ' + fmtEur(groups[k].reduce((s, e) => s + eurOf(e), 0))).join('\n');
-  if (!confirm('Rechnung erstellen?\n' + txt)) return;
   const made = [];
   try {
     for (const k of Object.keys(groups)) { const r = await api('rechnungErstellen', { ids: groups[k].map(e => e.res.id) }); made.push(r.rechnung); }
@@ -1759,7 +1775,7 @@ $('#btnRechnung').onclick = async () => {
   S.lastEntry = null; $('#btnAgain').classList.add('hide');
   $('#banner').className = 'banner'; $('#banner').innerHTML = '<div class="t">Bereit</div><div class="s">Nächsten Kunden wählen und scannen</div>';
   renderLog(); updateCounters();
-  toast('Rechnung erstellt: ' + made.map(m => m.nr + ' · ' + m.kunde + ' · ' + fmtEur(m.summe)).join(' | '));
+  toast('Rechnung ' + made.map(m => m.nr + ' · ' + m.kunde + ' · ' + fmtEur(m.summe)).join(' | '), { label: 'Rückgängig', fn: () => rechUndo(made.map(m => m.nr)) });
 };
 $('#btnSumReset').onclick = () => { S.sumSeq = S.seq; updateCounters(); toast('Summe zurückgesetzt'); };
 $('#btnAgain').onclick = () => { if (S.lastEntry) submitScan(S.lastEntry.ean); };
@@ -1843,7 +1859,7 @@ const BI = {
   'Einbuchen': 'package-import', 'Ausbuchen': 'package-export', 'Umlagern': 'arrows-exchange', '+1 nochmal': 'repeat',
   'Speichern': 'device-floppy', 'Abbrechen': 'x', 'Schließen': 'x', 'Bearbeiten': 'pencil', 'Soll bearbeiten': 'pencil', 'Ändern': 'pencil', 'Löschen': 'trash',
   'Aktualisieren': 'refresh', 'Erneut': 'refresh', 'Rückgängig': 'arrow-back-up', 'Zurück ins Lager': 'arrow-back-up', 'Summe zurücksetzen': 'restore', 'Weiter': 'arrow-right',
-  'Rechnung erstellen': 'file-plus', 'Text kopieren': 'copy', 'Stornieren': 'ban', 'Stornieren und zurück ins Lager': 'arrow-back-up', 'Nur Rechnung stornieren': 'ban', 'Trotzdem': 'alert-triangle', 'Aufheben': 'bookmark-off',
+  'Rechnung erstellen': 'file-plus', 'Text kopieren': 'copy', 'Stornieren': 'ban', 'Stornieren und zurück ins Lager': 'arrow-back-up', 'Alle zurück ins Lager': 'arrow-back-up', 'Nur Rechnung stornieren': 'ban', 'Trotzdem': 'alert-triangle', 'Aufheben': 'bookmark-off',
   'Erledigt': 'check', 'Erfüllt': 'check', 'Abhaken': 'check', 'Offen': 'list-check', 'Nach Artikel': 'sort-ascending', 'Nach Kunde': 'sort-ascending'
 };
 const BI_TEXT = { 'Trotzdem': 1, 'Rechnung erstellen': 1, 'Rückgängig': 1, 'Erneut': 1, 'Summe zurücksetzen': 1, 'Text kopieren': 1 };   // bleiben auch in kleinen Knöpfen beschriftet

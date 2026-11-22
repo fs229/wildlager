@@ -60,33 +60,35 @@ Hinweis: Ein öffentliches Repository ist für jeden einsehbar, die Server-URL s
 - Oben **Einbuchen / Ausbuchen / Umlagern** wählen.
 - **Lagerort (Standard)** wählen. Er wird pro Handy gemerkt und bei jedem Einbuchen automatisch verwendet. Beim Umlagern ist es der Ziel-Lagerort.
 - **Dauerscan** an: Die Kamera bleibt an, du hältst ein Etikett nach dem anderen davor. Jeder Treffer gibt einen Piepton und zeigt Artikel und Gewicht an. Die Daten werden im Hintergrund gespeichert, du musst nicht warten.
-- Zwei Packungen mit exakt gleichem Etikett hintereinander: Kamera kurz vom ersten Etikett wegnehmen, dann das zweite zeigen. Oder bei gleichem Code **+1 nochmal** tippen.
+- Nach jedem erkannten Etikett pausiert die Kamera **1 Sekunde** (Piepton), damit kein Etikett doppelt zählt. Zwei Packungen mit exakt gleichem Etikett hintereinander: Kamera kurz vom ersten Etikett wegnehmen, dann das zweite zeigen. Oder bei gleichem Code **+1 nochmal** tippen. Das Kamerafenster ist bewusst klein und passt auf das Etikett.
 - **Ausbuchen:** Zuerst oben den **Kunden** wählen (Antippen öffnet eine Liste mit Suche, die zuletzt benutzten stehen oben; oder **+ Neu**), dann scannen. Ohne Kunden wird nicht ausgebucht. Der Preis jeder Packung (Gewicht × Preis pro kg, auf Cent gerundet) wird dabei festgehalten und oben als **Summe** mitgezählt.
-- **Rechnung erstellen:** Wenn der Verkauf fertig ist, **Rechnung erstellen** antippen. Es entsteht eine Rechnung mit Nummer (`R-2026-0001`), die Summe wird auf 0 gesetzt und der Kunde ist wieder leer, damit der nächste Verkauf nicht versehentlich beim falschen Kunden landet.
-- Falsch gescannt? In der Liste **Rückgängig**. Das geht nur, solange noch keine Rechnung erstellt ist.
+- **Rechnung erstellen:** Wenn der Verkauf fertig ist, **Rechnung erstellen** antippen. Es kommt keine Rückfrage, die Rechnung entsteht sofort (`R-2026-0001`). Unten erscheint kurz die Meldung mit Knopf **Rückgängig** (ca. 4 Sekunden): Er löscht die Rechnung wieder, die Packungen stehen dann unter „Noch nicht abgerechnet“. Danach ist die Ansicht zurückgesetzt: Summe 0, Kunde leer, Liste und Meldung geleert, damit du direkt mit dem nächsten Kunden starten kannst und nichts versehentlich beim falschen Kunden landet.
+- **Eigenbedarf und Drückjagd:** Buchst du an einen dieser beiden Kunden aus, kostet die Packung 0,00 € und es entsteht **sofort** eine fertige Rechnung über 0,00 €, schon als *bezahlt* und *eingezahlt* markiert. Alle Packungen eines Scan-Vorgangs landen auf einer gemeinsamen Rechnung. Du musst nicht auf **Rechnung erstellen** tippen, der Knopf ignoriert diese Packungen. Die Kundennamen müssen genau so in den Stammdaten stehen. Weitere Kunden dieser Art trägt man im Code in `FREI_KUNDEN` ein.
+- Falsch gescannt? In der Liste **Rückgängig**. Das geht nur, solange noch keine Rechnung erstellt ist. Ausnahme Eigenbedarf/Drückjagd: Dort nimmt **Rückgängig** die Packung aus der automatischen Rechnung und legt sie zurück ins Lager. Die Rechnung verschwindet, wenn keine Packung mehr darauf ist.
+- **Schlechter Empfang:** Jeder Scan wird zuerst auf dem Gerät gemerkt und dann gesendet. Ohne Verbindung steht er in der Liste mit „wartet auf Verbindung“, oben in der Kopfzeile zeigt ein Symbol die Zahl der wartenden Scans. Sobald wieder Netz da ist, wird automatisch nachgesendet, auch nach einem App-Neustart. Der Server erkennt wiederholte Sendungen desselben Scans und bucht nie doppelt. Mit **Rechnung erstellen** wartest du, bis alle Scans gespeichert sind. Neue Daten laden und Rechnungen erstellen brauchen weiterhin Verbindung.
 - Artikelcode unbekannt: Die App öffnet das Formular „Neuer Artikel". Wildart, Fleischart und Preis eintragen, dann wird die Packung eingebucht.
 - Geht die Kamera nicht (oder hast du einen Bluetooth-Handscanner): Code im Feld **manuell** eingeben und OK.
 
 **Bestand**
 - Filter nach Lagerort, Wildart, Suche. Oben stehen Packungen, Gesamtgewicht und Wert (Gewicht × Preis pro kg).
-- Artikel antippen: Einzelpackungen mit Datum, Uhrzeit, Nutzer, dazu **Ausbuchen** oder **Löschen**.
-- **Ausgebuchte zeigen**: die letzten 300, mit **Zurück ins Lager**.
+- Artikel antippen **oder** den Pfeil-Knopf rechts (Pfeil nach unten = aufklappen, nach oben = zuklappen) öffnet die Einzelpackungen mit Datum, Uhrzeit, Nutzer, dazu **Ausbuchen** oder **Löschen**. Die ganze Gruppenzeile ist antippbar. Lässt sich eine Gruppe nicht öffnen, erscheint jetzt unten eine Meldung „Details nicht darstellbar“ mit Artikelcode, bitte genau diese Meldung melden.
+- **Ausgebuchte zeigen**: die letzten 300, mit **Zurück ins Lager**. Das ist der Weg, wenn ausgebuchte Packungen unter „Noch nicht abgerechnet“ stehen und gar nicht verkauft wurden.
 
 **Reservierungen** (im Bestand)
 - Gleiche Packungen (gleicher Artikel, gleiches Gewicht) sind nicht unterscheidbar. Deshalb reservierst du pro Code eine **Anzahl für einen Kunden**: Gruppe im Bestand aufklappen, bei einer Packung das **Lesezeichen-Symbol** antippen, Kunde und Anzahl wählen. Es lassen sich nur freie Stücke reservieren (Bestand minus bereits Reserviertes).
-- In der Gruppe steht oben „reserviert: n", aufgeklappt „Reserviert für Meier: 2 × 1,6 kg" mit **Ändern** (Anzahl, Kunde, **Aufheben**). Reicht der Bestand nicht mehr, steht dort „Nur n auf Lager".
+- In der Gruppe steht oben „reserviert: n", aufgeklappt „Reserviert für Meier: 2 × 1,6 kg" mit **Ändern** (Anzahl, Kunde, **Aufheben**). Reicht der Bestand nicht mehr, steht dort „Nur n auf Lager" (z. B. „Nur 0 auf Lager", wenn die reservierte Packung fehlt oder schon ausgebucht ist). Das ist nur ein Hinweis, die Reservierung bleibt gültig.
 - **Beim Scannen im Ausbuchen-Modus:** Solange noch freie Packungen da sind, passiert nichts Besonderes. Sind nur noch reservierte übrig, wird **nicht** ausgebucht, stattdessen erscheint „Reserviert für Meier (2)" mit dem Knopf **Trotzdem**. Ist oben im Dropdown der Kunde gewählt, für den reserviert wurde, gilt der Scan als Erfüllung: keine Warnung, seine Reservierung sinkt um 1 und verschwindet bei 0. Dasselbe gilt für **Ausbuchen** per Knopf im Bestand (dort entscheidet der gewählte Kunde).
 - Ein „Trotzdem"-Verkauf lässt die Reservierung bestehen, sie ist dann nur nicht mehr gedeckt, bis Nachschub kommt.
 
 **Rechnungen** (eigener Tab)
-- **Noch nicht abgerechnet:** Verkäufe, die ausgebucht, aber noch ohne Rechnung sind (z. B. vergessen), mit Knopf **Rechnung erstellen**.
-- Filter nach **Kunde** und **Zeitraum** (Monat, 30 Tage, Jahr). Oben stehen Anzahl, Gewicht und Umsatz der Auswahl.
+- **Noch nicht abgerechnet:** Verkäufe, die ausgebucht, aber noch ohne Rechnung sind (z. B. vergessen), mit Knopf **Rechnung erstellen**. Rechnung erstellen geht ohne Rückfrage, mit Knopf **Rückgängig** in der Meldung. Der Pfeil-Knopf links daneben (**Alle zurück ins Lager**) bucht sämtliche Packungen dieses Kunden mit einer Rückfrage zurück in den Bestand, wenn es Fehlbuchungen waren. Einzelne Packungen gehen weiter im Bestand über **Ausgebuchte zeigen > Zurück ins Lager**.
+- Filter nach **Kunde** und **Zeitraum** (Alle, Letzte 30 Tage, Dieses Jahr), nebeneinander. Oben stehen Anzahl, Gewicht und Umsatz der Auswahl.
 - **Pro Kunde:** Rechnungen, Gewicht, Umsatz und letzter Kauf, absteigend nach Umsatz.
-- Rechnung antippen: alle Positionen mit Gewicht und Preis. **Text kopieren** legt eine Zusammenfassung zum Einfügen (z. B. WhatsApp) in die Zwischenablage. **Stornieren** löscht die Rechnung. Die Packungen bleiben beim Kunden ausgebucht und erscheinen wieder unter "Noch nicht abgerechnet".
+- Rechnung antippen: alle Positionen mit Gewicht und Preis. **Text kopieren** legt eine Zusammenfassung zum Einfügen (z. B. WhatsApp) in die Zwischenablage. Bei nicht bezahlten Rechnungen gibt es zwei Wege: **Stornieren und zurück ins Lager** löscht die Rechnung und legt alle Packungen wieder in den Bestand (Kunde und Preis werden geleert, mit Rückfrage), **Nur Rechnung stornieren** löscht nur die Rechnung, die Packungen bleiben beim Kunden ausgebucht und erscheinen wieder unter "Noch nicht abgerechnet". Eine durch das Ausbuchen erfüllte Reservierung und ein abgehakter Wunsch werden dabei nicht wiederhergestellt.
 - **Zahlstatus (nur Bargeld):** *nicht bezahlt* (rot) → *bezahlt, noch nicht eingezahlt* (gelb: Kunde hat bar an dich gezahlt, das Geld hast du noch) → *eingezahlt* (grün: Geld ist in der zentralen Kasse). In der Liste setzt der Knopf rechts (Geldschein bzw. Sparschwein) mit einem Tipp den nächsten Schritt.
 - **Detail:** Pfeile oben wechseln zur vorherigen/nächsten Rechnung der aktuellen Liste. Der große Knopf (**Als bezahlt markieren und weiter** bzw. **Als eingezahlt markieren und weiter**) setzt den Status und springt zur nächsten Rechnung. Mit dem unteren Knopf geht es einen Schritt zurück.
 - **Filter Zahlung:** Drei Chips mit Icon und Anzahl: **Offen** (rote Uhr, nicht bezahlt), **Bezahlt** (gelber Geldschein, noch nicht eingezahlt) und **Eingezahlt** (grünes Sparschwein). Tippen schaltet sie ein oder aus, mindestens einer bleibt aktiv. Standard: Offen und Bezahlt an, Eingezahlt aus. Die Kacheln zeigen Umsatz, die Summe der nicht bezahlten Rechnungen und das Bargeld, das noch in die Kasse einzuzahlen ist.
-- Nur nicht bezahlte Rechnungen lassen sich stornieren. Im Blatt „Rechnungen" stehen zusätzlich „Bezahlt am", „Eingezahlt am" und wer es erfasst hat (nur dort sichtbar).
+- Nur nicht bezahlte Rechnungen lassen sich stornieren, bezahlte zuerst auf „nicht bezahlt“ zurücksetzen. Automatische Rechnungen für Eigenbedarf und Drückjagd (0,00 €) sind schon bezahlt und eingezahlt. Im Blatt „Rechnungen" stehen zusätzlich „Bezahlt am", „Eingezahlt am" und wer es erfasst hat (nur dort sichtbar).
 - Preise einer Rechnung ändern sich nie nachträglich, auch wenn du später den Preis pro kg im Blatt "Artikel" änderst.
 
 **Wünsche** (eigener Tab)
@@ -103,7 +105,7 @@ Hinweis: Ein öffentliches Repository ist für jeden einsehbar, die Server-URL s
 - Artikel anlegen oder ändern (Preis, Bezeichnung, aktiv/inaktiv).
 - Alles liegt auch direkt im Google Sheet und kann dort bearbeitet werden. Die Blätter-Überschriften nicht ändern.
 
-**Schnelleres Laden (Zwischenspeicher)**: Die App merkt sich die zuletzt geladenen Daten auf dem Gerät. Beim Öffnen und beim Tabwechsel erscheinen sie sofort, im Hintergrund holt die App den aktuellen Stand und tauscht ihn bei Änderungen aus. Der Start holt alle Daten in einem einzigen Serveraufruf. Innerhalb von 30 Sekunden fragt die App nicht erneut beim Server nach. Nach eigenen Änderungen (Scannen, Speichern, Abhaken) zeigt sie nie den alten Stand, sondern wartet auf die frischen Daten. Beim Abmelden werden die gespeicherten Daten gelöscht. Für die Anzeige ohne Netz gilt: Listen sind lesbar, Schreiben braucht weiterhin Verbindung. Die Datei `sw.js` gehört neben `index.html` ins GitHub-Repository, sie speichert die Seite selbst, die Icons und die Symbolschrift. Mit „Zum Home-Bildschirm hinzufügen" läuft Waidr dann wie eine App.
+**Schnelleres Laden (Zwischenspeicher)**: Die App merkt sich die zuletzt geladenen Daten auf dem Gerät. Beim Öffnen und beim Tabwechsel erscheinen sie sofort, im Hintergrund holt die App den aktuellen Stand und tauscht ihn bei Änderungen aus. Der Start holt alle Daten in einem einzigen Serveraufruf. Innerhalb von 30 Sekunden fragt die App nicht erneut beim Server nach. Nach eigenen Änderungen (Scannen, Speichern, Abhaken) zeigt sie nie den alten Stand, sondern wartet auf die frischen Daten. Beim Abmelden werden die gespeicherten Daten gelöscht. Für die Anzeige ohne Netz gilt: Listen sind lesbar, Scans werden gemerkt und später gesendet (siehe Schlechter Empfang), alles andere braucht Verbindung. Bei Zeitüberschreitung versucht die App Abrufe mehrfach, ohne zu blockieren. Die Datei `sw.js` (Version `waidr-v3`) gehört neben `index.html` ins GitHub-Repository, sie speichert die Seite selbst, die Icons und die Symbolschrift. Beim Start der Seite lädt sie zuerst aus dem Gerätespeicher und prüft im Hintergrund auf Neues, nach einem Update ist daher oft ein zweites Neuladen nötig. Mit „Zum Home-Bildschirm hinzufügen" läuft Waidr dann wie eine App.
 
 **Navigation**: Die App hat vier Tabs. **Lager** (Bestand | Scannen, Startansicht ist der Bestand), **Verkauf** (Wünsche | Rechnungen), **Revier** und **Stammdaten**. Die Umschaltung steht jeweils oben im Tab, die App merkt sich je Tab die zuletzt geöffnete Ansicht. Weiter unten in dieser Anleitung ist mit „Tab Scannen", „Bestand", „Wünsche" und „Rechnungen" die jeweilige Ansicht gemeint.
 
@@ -164,12 +166,13 @@ Zurückspielen: die gewünschte Kopie aus dem Ordner öffnen, die Blätter bei B
 
 ---
 
-## Update einer bestehenden Installation (zuletzt: Zwischenspeicher und Service Worker)
+## Update einer bestehenden Installation (zuletzt: Schlechter Empfang, doppelte Scans, 0-€-Rechnungen, Storno mit Rückbuchung)
 
 1. Im Apps-Script-Editor den **kompletten Code ersetzen** durch den neuen `Code.gs`, speichern.
 2. **Bereitstellen > Bereitstellungen verwalten > Bearbeiten (Stift) > Version: Neue Version > Bereitstellen**. Die URL bleibt gleich.
-3. Neue `index.html` und die Logo-Dateien (`apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `icon.svg`, `manifest.webmanifest`) auf GitHub hochladen (ersetzen bzw. neu hinzufügen). Wer die App schon auf dem Homescreen hat, entfernt das alte Symbol und legt es neu an, damit Name und Logo übernommen werden.
-4. App auf dem Handy neu laden. Beim Öffnen legt das Backend automatisch fehlende Blätter an (**Kunden**, **Rechnungen**, **Wünsche**, **Strecke**, **Reservierungen**) sowie die Spalten für Kunde, Preis, Rechnungsnr und Erlegung im Blatt **Bestand**. Vorhandene Daten bleiben unverändert. Alte Ausbuchungen haben keinen Kunden und erscheinen nicht unter "Noch nicht abgerechnet".
+3. Neue `index.html`, die neue `sw.js` (`waidr-v3`) und die Logo-Dateien (`apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `icon.svg`, `manifest.webmanifest`) auf GitHub hochladen (ersetzen bzw. neu hinzufügen). Wer die App schon auf dem Homescreen hat, entfernt das alte Symbol und legt es neu an, damit Name und Logo übernommen werden.
+4. Prüfen: Die Server-URL (`.../exec`) im Browser öffnen, sie zeigt den Stand (zuletzt `2026-11-22-3`). Zeigt sie den alten, wurde keine **neue Version** bereitgestellt.
+5. App auf dem Handy neu laden, bei Bedarf zweimal. Beim Öffnen legt das Backend automatisch fehlende Blätter an (**Kunden**, **Rechnungen**, **Wünsche**, **Strecke**, **Reservierungen**) sowie die Spalten für Kunde, Preis, Rechnungsnr und Erlegung im Blatt **Bestand**. Vorhandene Daten bleiben unverändert. Alte Ausbuchungen haben keinen Kunden und erscheinen nicht unter "Noch nicht abgerechnet".
 
 ---
 
@@ -180,7 +183,9 @@ Zurückspielen: die gewünschte Kopie aus dem Ordner öffnen, die Blätter bei B
 | „Zugangscode falsch" | Code im Blatt Einstellungen prüfen. |
 | Nach Änderung von `Code.gs` ändert sich nichts | Apps Script: **Bereitstellen > Bereitstellungen verwalten > Bearbeiten (Stift) > Version: Neue Version > Bereitstellen**. Die URL bleibt gleich. |
 | Kamera startet nicht | Kamera-Erlaubnis im Browser prüfen. Die Seite muss über `https://` geöffnet sein. Auf dem iPhone Safari verwenden. |
-| „Keine Verbindung zum Server" | Internet prüfen, dann **Erneut** in der Liste. Es gibt keinen Offline-Betrieb. |
+| „Keine Verbindung zum Server" | Scans gehen nicht verloren: Sie stehen in der Liste als „wartet auf Verbindung" und werden automatisch nachgesendet. Internet prüfen, notfalls **Erneut**. |
+| Packungen tauchen unter „Noch nicht abgerechnet" auf, obwohl nicht verkauft | Pfeil-Knopf **Alle zurück ins Lager** beim Kunden, einzelne Packungen im Bestand über **Ausgebuchte zeigen > Zurück ins Lager**. |
+| Scan wurde doppelt gezählt | Sollte nicht mehr vorkommen (1 s Pause plus Doppelschutz am Server). Zwei echte Packungen mit gleichem Code zählen bewusst einzeln. |
 | Etikett wird schlecht erkannt | Mehr Licht, 15–25 cm Abstand, Etikett glatt halten. Notfalls Code manuell eingeben. |
 | Gleiche Packungen (gleicher Artikel, gleiches Gewicht) | Haben denselben Code. Beim Ausbuchen wird die **älteste** zuerst ausgebucht (FIFO). |
 
