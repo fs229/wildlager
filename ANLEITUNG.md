@@ -109,7 +109,14 @@ Hinweis: Ein öffentliches Repository ist für jeden einsehbar, die Server-URL s
 
 **Navigation**: Die App hat fünf Tabs: **Bestand** (Startansicht), **Scannen**, **Verkauf** (Rechnungen | Wünsche, Startansicht sind die Rechnungen), **Revier** und **Stammdaten**. Die Umschaltung steht jeweils oben im Tab, die App merkt sich je Tab die zuletzt geöffnete Ansicht. Weiter unten in dieser Anleitung ist mit „Tab Scannen“, „Bestand“, „Wünsche“ und „Rechnungen“ die jeweilige Ansicht gemeint.
 
-**Tab Revier** hat vier Ansichten: **Strecke**, **Abschussplan**, **Wind** und **Aufgaben**. Der Wind liegt nicht mehr oben in der Kopfzeile, sondern hier: Windrichtung und -stärke für das Revier mit Vorhersage der nächsten 6 Stunden, per Knopf auch für den eigenen Standort.
+**Tab Revier** hat fünf Ansichten: **Wind**, **Strecke**, **Abschussplan**, **Aufgaben** und **Ansitz** (Belegung). Der Wind liegt nicht mehr oben in der Kopfzeile, sondern hier: Windrichtung und -stärke für das Revier mit Vorhersage der nächsten 6 Stunden, per Knopf auch für den eigenen Standort.
+
+**Revier > Ansitz (Belegung)**: Hier tragt ihr ein, wer wann auf welchem Ansitz sitzt, damit niemand doppelt hinfährt. Oben stellst du mit **‹ ›** oder dem Datumsfeld den Tag ein (nur heute und später). Die Kacheln zeigen, wie viele Ansitze morgens und abends noch frei sind und wie viele Belegungen du hast. Mit dem Suchfeld findest du einen Ansitz schnell.
+- Jede Zeile hat zwei Knöpfe, **Morgen** und **Abend**. **frei** (weißer Rand) antippen öffnet die Belegung: **Schicht** wählen (Morgen, Abend oder **Ganztägig**) und mit **Belegen** speichern. Dein eigener Eintrag ist grün, die Einträge anderer grau mit ihrem Namen. Ganztägig zeigt auf beiden Knöpfen **ganztägig** und den Namen.
+- **Doppelbelegung ist gesperrt.** Ein belegter Ansitz lässt sich in dieser Schicht nicht nochmal vergeben, Ganztägig geht nur, wenn der Ansitz an dem Tag ganz frei ist. Gesperrte Schichten sind im Fenster ausgegraut.
+- **Jagdgast:** Im Fenster **Für einen Jagdgast** ankreuzen und den Namen eintragen. Der Ansitz steht dann auf den Namen des Gasts, eingetragen von dir.
+- **Freigeben:** Auf einen belegten Knopf tippen und **Freigeben**. Das darf jeder, auch bei Einträgen anderer. Unter **Meine Belegungen** stehen alle deine kommenden Belegungen, Antippen öffnet sie.
+- Nur aktive Ansitze erscheinen (Stammdaten > Ansitzeinrichtungen). Vergangene Belegungen bleiben im Blatt „Ansitzbelegung", werden in der App aber nicht mehr gezeigt.
 
 **Revier > Strecke**: Streckenliste der Erlegungen. Mit **+ Erlegung erfassen** gibst du Datum, Uhrzeit, Wildart, Geschlecht, Alter in Jahren (ganze Zahl, optional), Erleger und optional Gewicht (kg) und Wildmarke ein. Oben filterst du nach Jagdjahr (1. April bis 31. März) und Wildart und siehst Stückzahl, Gewicht und die Zahl je Wildart. Antippen einer Erlegung öffnet sie zum Bearbeiten oder Löschen. Löschen geht nicht, solange Packungen daran hängen.
 
@@ -130,6 +137,8 @@ Hinweis: Ein öffentliches Repository ist für jeden einsehbar, die Server-URL s
 **Blatt „Strecke"**: ID, Datum, Uhrzeit, Wildart, Geschlecht, Alter in Jahren (ganze Zahl, optional), Erleger, Gewicht (kg), Wildmarke, Erfasst von, Plankategorie, Ansitz. Im Blatt „Bestand" gibt es dazu die Spalte Erlegung mit der ID der Erlegung.
 
 **Blatt „Ansitze"**: ID, Name, Typ, Blickrichtung, Dach, Zustand, Bemerkung, Breite, Länge, Aktiv.
+
+**Blatt „Ansitzbelegung"**: ID, Datum, Ansitz-ID, Schicht (Morgen, Abend, Ganztägig), Nutzer, Jagdgast, Erstellt am. Das Blatt legt das Backend beim ersten Aufruf nach dem Update selbst an.
 
 **Blatt „Abschussplan"**: Jagdjahr (Startjahr), Wildart, Kategorie, Soll.
 
@@ -166,13 +175,13 @@ Zurückspielen: die gewünschte Kopie aus dem Ordner öffnen, die Blätter bei B
 
 ---
 
-## Update einer bestehenden Installation (zuletzt: Schlechter Empfang, doppelte Scans, 0-€-Rechnungen, Storno mit Rückbuchung)
+## Update einer bestehenden Installation (zuletzt: Ansitzbelegung, Schlechter Empfang, doppelte Scans, 0-€-Rechnungen, Storno mit Rückbuchung)
 
 1. Im Apps-Script-Editor den **kompletten Code ersetzen** durch den neuen `Code.gs`, speichern.
 2. **Bereitstellen > Bereitstellungen verwalten > Bearbeiten (Stift) > Version: Neue Version > Bereitstellen**. Die URL bleibt gleich.
 3. Neue `index.html`, die neue `sw.js` (`waidr-v3`) und die Logo-Dateien (`apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `icon.svg`, `manifest.webmanifest`) auf GitHub hochladen (ersetzen bzw. neu hinzufügen). Wer die App schon auf dem Homescreen hat, entfernt das alte Symbol und legt es neu an, damit Name und Logo übernommen werden.
-4. Prüfen: Die Server-URL (`.../exec`) im Browser öffnen, sie zeigt den Stand (zuletzt `2026-11-22-3`). Zeigt sie den alten, wurde keine **neue Version** bereitgestellt.
-5. App auf dem Handy neu laden, bei Bedarf zweimal. Beim Öffnen legt das Backend automatisch fehlende Blätter an (**Kunden**, **Rechnungen**, **Wünsche**, **Strecke**, **Reservierungen**) sowie die Spalten für Kunde, Preis, Rechnungsnr und Erlegung im Blatt **Bestand**. Vorhandene Daten bleiben unverändert. Alte Ausbuchungen haben keinen Kunden und erscheinen nicht unter "Noch nicht abgerechnet".
+4. Prüfen: Die Server-URL (`.../exec`) im Browser öffnen, sie zeigt den Stand (zuletzt `2026-11-22-4`). Zeigt sie den alten, wurde keine **neue Version** bereitgestellt.
+5. App auf dem Handy neu laden, bei Bedarf zweimal. Beim Öffnen legt das Backend automatisch fehlende Blätter an (**Kunden**, **Rechnungen**, **Wünsche**, **Strecke**, **Reservierungen**, **Ansitzbelegung**) sowie die Spalten für Kunde, Preis, Rechnungsnr und Erlegung im Blatt **Bestand**. Vorhandene Daten bleiben unverändert. Alte Ausbuchungen haben keinen Kunden und erscheinen nicht unter "Noch nicht abgerechnet".
 
 ---
 
