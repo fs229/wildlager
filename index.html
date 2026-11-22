@@ -83,6 +83,13 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 .mod>div{background:var(--card);width:100%;max-width:560px;border-radius:16px 16px 0 0;padding:16px;max-height:92vh;overflow:auto}
 .mod h2{font-size:19px}
 .toast{position:fixed;left:12px;right:12px;bottom:16px;background:#222;color:#fff;border-radius:10px;padding:12px;z-index:30;text-align:center}
+.brow{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line)}.brow:first-child{border-top:0}
+.brow .n{flex:1;min-width:0}.brow .n b{display:block;overflow-wrap:anywhere}.brow .n small{display:block;color:var(--mut);font-size:12px}
+.bs{flex:none;width:80px;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 4px;border-radius:10px;border:1.5px solid var(--acc);background:var(--card);color:var(--acc);font:inherit;font-size:13px;font-weight:600;line-height:1.25;cursor:pointer}
+.bs small{font-size:11px;font-weight:500;opacity:.85}.bs span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bs.mine{background:var(--g2);border-color:var(--g2);color:#fff}.bs.oth{background:var(--sumbg);border-color:var(--line);color:var(--txt)}
+#rvSeg i{display:none}#rvSeg button{padding-left:4px;padding-right:4px;font-size:13px}
+.bdate{display:flex;gap:8px;align-items:center;margin-bottom:10px}.bdate input{flex:1;min-width:0}.bdate .btn{flex:none;padding:9px 14px}
 .toast .tact{margin-left:12px;background:none;border:1px solid #fff;color:#fff;border-radius:8px;padding:4px 12px;font:inherit;font-weight:600;cursor:pointer}
 .wl .h{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
 .st{display:inline-block;border-radius:20px;padding:1px 8px;font-size:12px;font-weight:600;background:var(--btn2)}
@@ -274,7 +281,7 @@ select{-webkit-appearance:none;appearance:none;min-height:42px;border-radius:10p
 
   <!-- Strecke -->
   <section id="v-strecke" class="hide">
-    <div class="seg" id="rvSeg"><button data-rv="wind" class="on">Wind</button><button data-rv="strecke">Strecke</button><button data-rv="plan">Abschussplan</button><button data-rv="aufg">Aufgaben</button></div>
+    <div class="seg" id="rvSeg"><button data-rv="wind" class="on">Wind</button><button data-rv="strecke">Strecke</button><button data-rv="plan">Abschussplan</button><button data-rv="aufg">Aufgaben</button><button data-rv="bel">Ansitz</button></div>
     <div id="rvStrecke" class="hide">
     <div class="card">
       <button class="btn big" data-act="strNew">+ Erlegung erfassen</button>
@@ -302,6 +309,15 @@ select{-webkit-appearance:none;appearance:none;min-height:42px;border-radius:10p
         <div style="display:flex;gap:8px;margin-top:12px"><button class="btn sec" id="wGps" style="flex:1"></button><button class="btn sec" id="wRel" style="flex:1">Aktualisieren</button></div>
       </div>
       <div class="card" id="windAns"></div>
+    </div>
+    <div id="rvBel" class="hide">
+      <div class="card">
+        <div class="bdate"><button class="btn sec" id="bPrev" aria-label="Vortag">‹</button><input id="bDate" type="date" aria-label="Datum"><button class="btn sec" id="bNext" aria-label="Nächster Tag">›</button></div>
+        <div class="sum" id="bSum"></div>
+        <input id="bQ" type="search" placeholder="Ansitz suchen" aria-label="Ansitz suchen" autocomplete="off" style="margin-top:10px">
+      </div>
+      <div class="card hide" id="bMineCard"><h2>Meine Belegungen</h2><div class="lst" id="bMine"></div></div>
+      <div class="card"><div id="bList"></div></div>
     </div>
     <div id="rvAufg" class="hide">
       <div class="card">
@@ -427,7 +443,7 @@ function parseEan(raw) {
 /* ------------------------------------------------------------------- Server */
 /* ---- Zwischenspeicher: Daten sofort aus dem Speicher zeigen, im Hintergrund aktualisieren */
 const RC = { mem: {}, ttl: 30000, gen: 0, startPending: false };
-const RC_READ = { init: 1, nutzer: 1, start: 1, bestand: 1, rechnungen: 1, rechnung: 1, offene: 1, statistik: 1, strecke: 1, ansitze: 1, aufgaben: 1, abschuss: 1, wuensche: 1 };
+const RC_READ = { belegungen: 1, init: 1, nutzer: 1, start: 1, bestand: 1, rechnungen: 1, rechnung: 1, offene: 1, statistik: 1, strecke: 1, ansitze: 1, aufgaben: 1, abschuss: 1, wuensche: 1 };
 const RC_INIT = { artikelSave: 1, lagerortSave: 1, kundeSave: 1 };
 const rcKey = (a, p) => 'waidr_c_' + S.user + '|' + a + '|' + JSON.stringify(p || {});
 function rcGet(k) {
@@ -909,13 +925,74 @@ function askPlan() {
   };
 }
 
+/* ---- Ansitzbelegung */
+const BSCH = ['Morgen', 'Abend', 'Ganztägig'];
+const isoToDe = d => d ? d.slice(8, 10) + '.' + d.slice(5, 7) + '.' + d.slice(0, 4) : '';
+const deToIso = d => d ? d.slice(6, 10) + '-' + d.slice(3, 5) + '-' + d.slice(0, 2) : '';
+const isoToday = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+const isoAdd = (iso, n) => { const d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() + n); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+const dayLabel = iso => new Date(iso + 'T12:00:00').toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' });
+async function loadBel() { if (!S.bDate) S.bDate = isoToday(); try { await apiSWR('belegungen', null, r => { S.bel = r.belegungen; renderBel(); }); } catch (e) { toast(e.message); renderBel(); } }
+function belWho(r) { return r.gast ? r.gast : r.nutzer; }
+function belCover(aid, de, sch) { return (S.bel || []).filter(x => x.ansitz === aid && x.datum === de && (x.schicht === sch || x.schicht === 'Ganztägig'))[0]; }
+function renderBel() {
+  if (!S.bDate || S.bDate < isoToday()) S.bDate = isoToday();
+  $('#bDate').value = S.bDate; $('#bDate').min = isoToday(); $('#bPrev').disabled = S.bDate <= isoToday();
+  const de = isoToDe(S.bDate), q = $('#bQ').value.trim().toLowerCase(), me = S.user;
+  const act = (S.ansitze || []).filter(a => a.aktiv);
+  const free = sch => act.filter(a => !belCover(a.id, de, sch)).length;
+  const mine = (S.bel || []).filter(x => x.nutzer === me);
+  $('#bSum').innerHTML = '<div><b>' + free('Morgen') + '</b><span>Morgen frei</span></div><div><b>' + free('Abend') + '</b><span>Abend frei</span></div><div><b>' + mine.length + '</b><span>meine Belegungen</span></div>';
+  const chip = (a, sch) => {
+    const r = belCover(a.id, de, sch), cls = !r ? '' : r.nutzer === me ? ' mine' : ' oth';
+    return '<button type="button" class="bs' + cls + '" data-act="belTap" data-a="' + esc(a.id) + '" data-s="' + sch + '"><small>' + (r && r.schicht === 'Ganztägig' ? 'ganztägig' : sch) + '</small><span>' + (r ? esc(belWho(r)) : 'frei') + '</span></button>';
+  };
+  const list = act.filter(a => !q || (a.name + ' ' + a.typ).toLowerCase().indexOf(q) >= 0);
+  $('#bList').innerHTML = list.map(a => '<div class="brow"><div class="n"><b>' + esc(a.name) + '</b><small>' + esc(a.typ + (a.blick && a.blick.length ? ' · Blick ' + a.blick.join(', ') : '')) + '</small></div>' + chip(a, 'Morgen') + chip(a, 'Abend') + '</div>').join('') || '<p class="mut">Kein Ansitz gefunden.</p>';
+  $('#bMineCard').classList.toggle('hide', !mine.length);
+  $('#bMine').innerHTML = mine.slice().sort((x, y) => deToIso(x.datum).localeCompare(deToIso(y.datum)) || BSCH.indexOf(x.schicht) - BSCH.indexOf(y.schicht)).map(x => {
+    const a = (S.ansitze || []).filter(t => t.id === x.ansitz)[0];
+    return '<div class="it" data-act="belMine" data-a="' + esc(x.ansitz) + '" data-s="' + esc(x.schicht) + '" data-d="' + esc(x.datum) + '" style="cursor:pointer"><div class="n">' + esc(a ? a.name : 'Ansitz') + '<small>' + dayLabel(deToIso(x.datum)) + ' · ' + x.schicht + (x.gast ? ' · Gast ' + esc(x.gast) : '') + '</small></div></div>';
+  }).join('');
+}
+function belTap(aid, sch, de) {
+  de = de || isoToDe(S.bDate);
+  const a = (S.ansitze || []).filter(t => t.id === aid)[0]; if (!a) return;
+  const hit = belCover(aid, de, sch), head = '<h2>' + esc(a.name) + '</h2><p class="mut">' + dayLabel(deToIso(de)) + ' · ' + sch + '</p>';
+  if (hit) {
+    openModal(head + '<p><b>' + esc(hit.gast ? 'Jagdgast ' + hit.gast : hit.nutzer) + '</b>' + (hit.gast ? '<br><span class="mut">eingetragen von ' + esc(hit.nutzer) + '</span>' : '') + '<br><span class="mut">' + hit.schicht + '</span></p>' +
+      '<p id="mErr" class="mut" style="color:var(--err)"></p><div class="row"><button class="btn sec" id="mCancel">Schließen</button><button class="btn red" id="mDel">Freigeben</button></div>');
+    $('#mCancel').onclick = closeModal;
+    $('#mDel').onclick = async () => { try { await api('belegungDelete', { id: hit.id }); closeModal(); await loadBel(); toast('Ansitz wieder frei'); } catch (e) { $('#mErr').textContent = e.message; } };
+    return;
+  }
+  const taken = x => (S.bel || []).some(r => r.ansitz === aid && r.datum === de && (x === 'Ganztägig' || r.schicht === x || r.schicht === 'Ganztägig'));
+  let cur = sch;
+  openModal(head + '<label>Schicht</label><div class="seg" id="bSeg">' + BSCH.map(x => '<button type="button" data-bs="' + x + '"' + (taken(x) ? ' disabled style="opacity:.4"' : '') + (x === cur ? ' class="on"' : '') + '>' + x + '</button>').join('') + '</div>' +
+    '<label style="display:flex;align-items:center;margin-top:12px;color:var(--txt);font-size:15px"><input type="checkbox" id="bGastChk"> Für einen Jagdgast</label>' +
+    '<input id="bGast" class="hide" maxlength="40" placeholder="Name des Gasts" autocomplete="off" style="margin-top:6px">' +
+    '<p id="mErr" class="mut" style="color:var(--err)"></p><div class="row"><button class="btn sec" id="mCancel">Abbrechen</button><button class="btn" id="mSave">Belegen</button></div>');
+  document.querySelectorAll('#bSeg button').forEach(b => { b.onclick = () => { if (b.disabled) return; cur = b.dataset.bs; document.querySelectorAll('#bSeg button').forEach(o => o.classList.toggle('on', o === b)); }; });
+  $('#bGastChk').onchange = e => { $('#bGast').classList.toggle('hide', !e.target.checked); if (e.target.checked) $('#bGast').focus(); };
+  $('#mCancel').onclick = closeModal;
+  $('#mSave').onclick = async () => {
+    const gast = $('#bGastChk').checked ? $('#bGast').value.trim() : '';
+    if ($('#bGastChk').checked && !gast) { $('#mErr').textContent = 'Bitte den Namen des Gasts eintragen.'; return; }
+    try { await api('belegungSave', { ansitz: aid, datum: de, schicht: cur, gast: gast }); closeModal(); await loadBel(); toast(a.name + ' belegt'); } catch (e) { $('#mErr').textContent = e.message; await loadBel(); }
+  };
+}
+$('#bDate').onchange = e => { S.bDate = e.target.value || isoToday(); renderBel(); };
+$('#bPrev').onclick = () => { S.bDate = isoAdd(S.bDate || isoToday(), -1); renderBel(); };
+$('#bNext').onclick = () => { S.bDate = isoAdd(S.bDate || isoToday(), 1); renderBel(); };
+$('#bQ').oninput = renderBel;
+
 /* ---- Aufgaben (Revierarbeit) */
 async function loadAufgaben() { try { await apiSWR('aufgaben', null, r => { S.aufg = r.aufgaben; renderAufgaben(); }); } catch (e) { toast(e.message); renderAufgaben(); } }
 function setRv(v) {
   S.rv = v;
   document.querySelectorAll('#rvSeg button').forEach(b => b.classList.toggle('on', b.dataset.rv === v));
-  $('#rvStrecke').classList.toggle('hide', v !== 'strecke'); $('#rvAufg').classList.toggle('hide', v !== 'aufg'); $('#rvPlan').classList.toggle('hide', v !== 'plan'); $('#rvWind').classList.toggle('hide', v !== 'wind');
-  if (v === 'aufg') loadAufgaben(); else if (v === 'plan') loadPlan(); else if (v === 'wind') showWind(); else renderStrecke();
+  $('#rvStrecke').classList.toggle('hide', v !== 'strecke'); $('#rvAufg').classList.toggle('hide', v !== 'aufg'); $('#rvPlan').classList.toggle('hide', v !== 'plan'); $('#rvWind').classList.toggle('hide', v !== 'wind'); $('#rvBel').classList.toggle('hide', v !== 'bel');
+  if (v === 'aufg') loadAufgaben(); else if (v === 'plan') loadPlan(); else if (v === 'wind') showWind(); else if (v === 'bel') loadBel(); else renderStrecke();
 }
 document.querySelectorAll('#rvSeg button').forEach(b => { b.onclick = () => setRv(b.dataset.rv); });
 document.querySelectorAll('#aStSeg button').forEach(b => { b.onclick = () => { S.ast = b.dataset.ast; renderAufgaben(); }; });
@@ -991,7 +1068,7 @@ function setTab(t) {
   if (grp) $('#grpSeg').innerHTML = GRP_TABS[grp].map(x => '<button data-tab="' + x[0] + '"' + (x[0] === t ? ' class="on"' : '') + '>' + x[1] + '</button>').join('');
   show(t);
   if (t === 'bestand') loadBestand();
-  if (t === 'strecke') { if (S.rv === 'aufg') loadAufgaben(); else if (S.rv === 'plan') loadPlan(); else if (S.rv === 'wind') showWind(); else loadStrecke(); }
+  if (t === 'strecke') { if (S.rv === 'aufg') loadAufgaben(); else if (S.rv === 'plan') loadPlan(); else if (S.rv === 'wind') showWind(); else if (S.rv === 'bel') loadBel(); else loadStrecke(); }
   if (t === 'rech') loadRech();
   if (t === 'wunsch') loadWunsch();
   if (t === 'stamm') { setSv(S.sv || 'daten'); renderStamm(); }
@@ -1732,6 +1809,8 @@ document.addEventListener('click', e => {
     else if (a === 'kundeEdit') askKunde(t.dataset.name);
     else if (a === 'rechCreate') rechCreate(t.dataset.kunde);
     else if (a === 'offBack') offBack(t.dataset.kunde);
+    else if (a === 'belTap') belTap(t.dataset.a, t.dataset.s);
+    else if (a === 'belMine') belTap(t.dataset.a, t.dataset.s, t.dataset.d);
     else if (a === 'rechOpen') rechOpen(t.dataset.nr);
     else if (a === 'rechPay') rechPay(t.dataset.nr);
     else if (a === 'rchip') { const k = t.dataset.rs; if (S.rf[k] && Object.keys(S.rf).filter(x => S.rf[x]).length === 1) return; S.rf[k] = !S.rf[k]; renderRech(); }
