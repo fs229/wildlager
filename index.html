@@ -1471,7 +1471,8 @@ function askWunsch(id, pre) {
   const aOpts = wilds.map(w => '<optgroup label="' + esc(w) + '">' + as.filter(a => (a.wildart || 'Sonstige') === w).sort((a, b) => a.bezeichnung.localeCompare(b.bezeichnung, 'de'))
     .map(a => '<option value="' + a.code + '"' + (a.code === aSel ? ' selected' : '') + '>' + esc(a.bezeichnung) + '</option>').join('') + '</optgroup>').join('');
   openModal('<h2>' + (ex ? 'Wunsch bearbeiten' : 'Neuer Wunsch') + '</h2>' +
-    '<label>Kunde</label><select id="wKd"><option value="">– wählen –</option>' + ks.map(k => '<option' + (k.name === kSel ? ' selected' : '') + '>' + esc(k.name) + '</option>').join('') + '</select>' +
+    '<label>Kunde</label><div class="row"><select id="wKd"><option value="">– wählen –</option>' + ks.map(k => '<option' + (k.name === kSel ? ' selected' : '') + '>' + esc(k.name) + '</option>').join('') + '</select><button type="button" class="btn sec fit" id="wKdNew"><i class="ti ti-user-plus" aria-hidden="true"></i>Neu</button></div>' +
+    '<div class="row hide" id="wKdBox" style="margin-top:6px"><input id="wKdName" placeholder="Name des neuen Kunden" autocomplete="off" maxlength="80"><button type="button" class="btn fit" id="wKdOk"><i class="ti ti-check" aria-hidden="true"></i>Anlegen</button></div>' +
     '<label>Artikel</label><select id="wArt"><option value="">– wählen –</option>' + aOpts + '</select>' +
     '<label>Menge</label><div style="display:flex;gap:8px"><input id="wMenge" inputmode="decimal" style="flex:1" value="' + (ex ? String(ex.menge).replace('.', ',') : '') + '">' +
     '<select id="wEh" style="width:110px"><option value="kg"' + (eh0 === 'kg' ? ' selected' : '') + '>kg</option><option value="Stk"' + (eh0 === 'Stk' ? ' selected' : '') + '>Stück</option></select></div>' +
@@ -1482,6 +1483,20 @@ function askWunsch(id, pre) {
   const ph = () => { $('#wMenge').placeholder = $('#wEh').value === 'Stk' ? 'z. B. 3' : 'z. B. 2,5'; $('#wMenge').inputMode = $('#wEh').value === 'Stk' ? 'numeric' : 'decimal'; };
   ph(); $('#wEh').onchange = ph;
   $('#mCancel').onclick = closeModal;
+  $('#wKdNew').onclick = () => { $('#wKdBox').classList.toggle('hide'); if (!$('#wKdBox').classList.contains('hide')) $('#wKdName').focus(); };
+  const kdAnlegen = async () => {
+    const nm = $('#wKdName').value.trim(); if (!nm) { $('#mErr').textContent = 'Bitte einen Namen eingeben.'; return; }
+    const dup = S.kunden.filter(k => k.name.toLowerCase() === nm.toLowerCase())[0];
+    try {
+      let name = nm;
+      if (dup) name = dup.name; else { const r = await api('kundeSave', { name: nm, oldName: '', notiz: '', aktiv: true }); S.kunden = r.kunden; renderKunden(); renderStamm(); }
+      const sel = $('#wKd'); if (!Array.from(sel.options).some(o => o.value === name)) sel.add(new Option(name, name));
+      sel.value = name; $('#wKdName').value = ''; $('#wKdBox').classList.add('hide'); $('#mErr').textContent = '';
+      toast(dup ? 'Kunde existiert schon – ausgewählt' : 'Kunde angelegt');
+    } catch (e) { $('#mErr').textContent = e.message; }
+  };
+  $('#wKdOk').onclick = kdAnlegen;
+  $('#wKdName').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); kdAnlegen(); } };
   const save = async more => {
     const kunde = $('#wKd').value, artikelcode = $('#wArt').value, einheit = $('#wEh').value, menge = $('#wMenge').value.trim().replace(',', '.');
     if (!kunde || !artikelcode) { $('#mErr').textContent = 'Bitte Kunde und Artikel wählen.'; return; }
