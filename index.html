@@ -89,7 +89,7 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 .bs small{font-size:11px;font-weight:500;opacity:.85}.bs span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bs.mine{background:var(--g2);border-color:var(--g2);color:#fff}.bs.oth{background:var(--sumbg);border-color:var(--line);color:var(--txt)}
 #rvSeg i{display:none}#rvSeg button{padding-left:4px;padding-right:4px;font-size:13px}
-#bTyp{flex-wrap:nowrap;gap:6px}#bTyp button{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 6px;min-height:40px;white-space:nowrap}#bTyp button i{font-size:19px;line-height:1}
+#bTyp,#sTyp{flex-wrap:nowrap;gap:6px}#bTyp button,#sTyp button{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 6px;min-height:40px;white-space:nowrap}#bTyp button i,#sTyp button i{font-size:19px;line-height:1}
 .bdate{display:flex;gap:8px;align-items:center;margin-bottom:10px}.bdate input{flex:1;min-width:0}.bdate .btn{flex:none;padding:9px 14px}
 .toast .tact{margin-left:12px;background:none;border:1px solid #fff;color:#fff;border-radius:8px;padding:4px 12px;font:inherit;font-weight:600;cursor:pointer}
 .wl .h{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
@@ -175,8 +175,9 @@ select{-webkit-appearance:none;appearance:none;min-height:42px;border-radius:10p
 <symbol id="wi-reh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5c0 4 1.3 7.2 3 7.2s3-3.2 3-7.2"/><path d="M9 11C6.7 10.8 4.8 9.6 4 7.6c2.4-.2 4 .7 4.8 3.4"/><path d="M15 11c2.3-.2 4.2-1.4 5-3.4-2.4-.2-4 .7-4.8 3.4"/><path d="M10.1 9.9 9.1 6.6"/><path d="M9.1 6.6 7.5 4.3"/><path d="M9.1 6.6l1.1-2.5"/><path d="M13.9 9.9l1-3.3"/><path d="M14.9 6.6l1.6-2.3"/><path d="M14.9 6.6l-1.1-2.5"/><circle cx="12" cy="17.8" r=".5" fill="currentColor"/></symbol>
 <symbol id="wi-wasch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.2 8.2C4.6 4.6 7.4 3.8 9.8 5.8Q12 5.4 14.2 5.8C16.6 3.8 19.4 4.6 17.8 8.2Q20.4 11 19.6 14.2L21.2 15.6 18.6 16.2Q16.2 19.6 12 19.6T5.4 16.2L2.8 15.6 4.4 14.2Q3.6 11 6.2 8.2Z"/><path d="M5.6 10.4Q9 9 11 11H13Q15 9 18.4 10.4Q17.8 13.4 14.8 12.8Q13.4 12.4 12 12.4Q10.6 12.4 9.2 12.8Q6.2 13.4 5.6 10.4Z" fill="currentColor" stroke-width="1"/><circle cx="8.9" cy="11.2" r=".75" fill="#fff" stroke="none"/><circle cx="15.1" cy="11.2" r=".75" fill="#fff" stroke="none"/><ellipse cx="12" cy="15.6" rx="1.2" ry=".9" fill="currentColor" stroke="none"/></symbol>
 <symbol id="wi-sau" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7.2 9.5C7.2 14.2 9.3 17.6 12 17.6s4.8-3.4 4.8-8.1"/><path d="M7.2 9.5 5.6 5.2 9.4 7"/><path d="M16.8 9.5l1.6-4.3L14.6 7"/><ellipse cx="12" cy="14.6" rx="2.5" ry="1.7"/><path d="M9.7 16.6 6.4 14.6 8.9 15.4Z" fill="currentColor" stroke-width="1.2"/><path d="M14.3 16.6l3.3-2-2.5.8Z" fill="currentColor" stroke-width="1.2"/><circle cx="11" cy="14.6" r=".4" fill="currentColor"/><circle cx="13" cy="14.6" r=".4" fill="currentColor"/><circle cx="9.7" cy="10.5" r=".5" fill="currentColor"/><circle cx="14.3" cy="10.5" r=".5" fill="currentColor"/></symbol>
+<symbol id="wi-hochsitz" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 9 12 4l7.5 5"/><path d="M6.5 9v5.5h11V9"/><path d="M9.5 12h5"/><path d="M7.5 14.5 6 21"/><path d="M16.5 14.5 18 21"/><path d="M6.8 18h10.4"/><path d="M12 14.5V21"/></symbol>
 </defs></svg>
-<header><b class="brand"><img src="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20190%20190%22%20width=%22190%22%20height=%22190%22%3E%3Crect%20width=%22190%22%20height=%22190%22%20rx=%2240%22%20fill=%22%231f3d2b%22/%3E%3Cg%20transform=%22translate(95,95)%22%3E%3Ccircle%20r=%2272%22%20fill=%22none%22%20stroke=%22%23e0a73a%22%20stroke-width=%223%22/%3E%3Cg%20transform=%22translate(0,-6.25)%22%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(-15,-6)%20rotate(7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(15,-6)%20rotate(-7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(-29,40)%20rotate(-12)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(29,40)%20rotate(12)%22%20fill=%22%23f2ead8%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E" width="28" height="28" alt=""> Waidr</b><span><span id="net" class="hide"></span><small id="who"></small> <button class="btn sm sec" id="btnTheme" aria-label="Hell/Dunkel umschalten"></button> <button class="btn sm sec hide" id="logout" aria-label="Abmelden" title="Abmelden"><i class="ti ti-logout" aria-hidden="true"></i></button></span></header>
+<header><b class="brand"><img src="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20190%20190%22%20width=%22190%22%20height=%22190%22%3E%3Crect%20width=%22190%22%20height=%22190%22%20rx=%2240%22%20fill=%22%231f3d2b%22/%3E%3Cg%20transform=%22translate(95,95)%22%3E%3Ccircle%20r=%2272%22%20fill=%22none%22%20stroke=%22%23e0a73a%22%20stroke-width=%223%22/%3E%3Cg%20transform=%22translate(0,-6.25)%22%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(-15,-6)%20rotate(7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-32%20C13,-16%2015,10%209,27%20Q0,34%20-9,27%20C-15,10%20-13,-16%200,-32%20Z%22%20transform=%22translate(15,-6)%20rotate(-7)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(-29,40)%20rotate(-12)%22%20fill=%22%23f2ead8%22/%3E%3Cpath%20d=%22M0,-9%20C6,-4%207,4%204,9%20Q0,12%20-4,9%20C-7,4%20-6,-4%200,-9%20Z%22%20transform=%22translate(29,40)%20rotate(12)%22%20fill=%22%23f2ead8%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E" width="28" height="28" alt=""> Waidr</b><span><span id="net" class="hide"></span><small id="who"></small> <button class="btn sm sec hide" id="btnSitz" aria-label="Ich sitze jetzt auf" title="Ich sitze jetzt auf"><svg class="wi" style="margin:0" aria-hidden="true"><use href="#wi-hochsitz"/></svg></button> <button class="btn sm sec" id="btnTheme" aria-label="Hell/Dunkel umschalten"></button> <button class="btn sm sec hide" id="logout" aria-label="Abmelden" title="Abmelden"><i class="ti ti-logout" aria-hidden="true"></i></button></span></header>
 <nav id="nav" class="hide">
   <button data-tab="bestand" class="on"><i class="ti ti-snowflake" aria-hidden="true"></i>Bestand</button>
   <button data-tab="scan"><i class="ti ti-scan" aria-hidden="true"></i>Scannen</button>
@@ -569,7 +570,7 @@ function seedStart(r) {
   ['strecke', 'ansitze', 'wuensche', 'aufgaben', 'abschuss', 'rechnungen', 'offene'].forEach(k => { if (r[k]) rcSet(rcKey(k, null), r[k]); });
 }
 function showLogin(msg) {
-  $('#nav').classList.add('hide'); $('#logout').classList.add('hide'); $('#who').textContent = '';
+  $('#nav').classList.add('hide'); $('#logout').classList.add('hide'); $('#btnSitz').classList.add('hide'); $('#who').textContent = '';
   $('#urlBox').classList.toggle('hide', !!CONFIG.API_URL);
   $('#inUrl').value = S.url || ''; $('#userBox').classList.add('hide'); $('#loginErr').textContent = msg || '';
   show('login');
@@ -607,7 +608,7 @@ function setInitData(r) {
 function applyInit(r) {
   S.artikelList = r.artikel; S.artikel = {}; r.artikel.forEach(a => { S.artikel[a.code] = a; });
   S.lagerorte = r.lagerorte; S.nutzer = r.nutzer; S.settings = r.settings; S.kunden = r.kunden || []; S.kunde = '';
-  $('#who').textContent = S.user; $('#logout').classList.remove('hide'); $('#nav').classList.remove('hide');
+  $('#who').textContent = S.user; $('#logout').classList.remove('hide'); $('#btnSitz').classList.remove('hide'); $('#nav').classList.remove('hide');
   const def = ls.get('wl_lager_' + S.user);
   const act = S.lagerorte.filter(l => l.aktiv);
   S.lagerort = act.some(l => l.name === def) ? def : (act[0] ? act[0].name : '');
@@ -934,7 +935,7 @@ const deToIso = d => d ? d.slice(6, 10) + '-' + d.slice(3, 5) + '-' + d.slice(0,
 const isoToday = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
 const isoAdd = (iso, n) => { const d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() + n); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
 const dayLabel = iso => new Date(iso + 'T12:00:00').toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' });
-document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('#bTyp button'); if (!b) return; S.bTyp[b.dataset.bt] = !S.bTyp[b.dataset.bt]; renderBel(); });
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('#bTyp button'); if (b) { S.bTyp[b.dataset.bt] = !S.bTyp[b.dataset.bt]; renderBel(); return; } const c = e.target.closest && e.target.closest('#sTyp button'); if (c) { S.sTyp[c.dataset.bt] = !S.sTyp[c.dataset.bt]; sitzRender(); } });
 async function loadBel() { if (!S.bDate) S.bDate = isoToday(); try { await apiSWR('belegungen', null, r => { S.bel = r.belegungen; renderBel(); }); } catch (e) { toast(e.message); renderBel(); } }
 function belWho(r) { return r.gast ? r.gast : r.nutzer; }
 function belCover(aid, de, sch) { return (S.bel || []).filter(x => x.ansitz === aid && x.datum === de && (x.schicht === sch || x.schicht === 'Ganztägig'))[0]; }
@@ -988,6 +989,42 @@ function belTap(aid, sch, de) {
     try { await api('belegungSave', { ansitz: aid, datum: de, schicht: cur, gast: gast }); closeModal(); await loadBel(); toast(a.name + ' belegt'); } catch (e) { $('#mErr').textContent = e.message; await loadBel(); }
   };
 }
+S.sTyp = S.sTyp || { kanzel: true };
+async function sitzAuf() {
+  openModal('<h2>Ich sitze auf …</h2><p class="mut">Lade Ansitze …</p>');
+  try {
+    if (!(S.ansitze || []).length) await loadAnsitzeQuiet();
+    const r = await api('belegungen'); S.bel = r.belegungen;
+  } catch (e) { closeModal(); toast(e.message); return; }
+  sitzRender();
+}
+function sitzRender() {
+  const de = isoToDe(isoToday()), me = S.user;
+  const on = Object.keys(S.sTyp).filter(k => S.sTyp[k]);
+  const act = (S.ansitze || []).filter(a => a.aktiv && (!on.length || on.indexOf(belGrp(a)) >= 0));
+  const own = (S.bel || []).filter(x => x.datum === de && x.nutzer === me && !x.gast && (x.schicht === 'Abend' || x.schicht === 'Ganztägig'))[0];
+  const rows = act.map(a => {
+    const r = belCover(a.id, de, 'Abend'), mine = r && own && r.id === own.id;
+    const lbl = !r ? '<small>Abend</small><span>frei</span>' : '<small>' + (r.schicht === 'Ganztägig' ? 'ganztägig' : 'Abend') + '</small><span>' + esc(belWho(r)) + '</span>';
+    return '<div class="brow"><div class="n"><b>' + esc(a.name) + '</b><small>' + esc(a.typ) + '</small></div><button type="button" class="bs' + (mine ? ' mine' : r ? ' oth' : '') + '" data-sa="' + esc(a.id) + '"' + (r ? ' disabled' : '') + '>' + lbl + '</button></div>';
+  }).join('') || '<p class="mut">Kein Ansitz gefunden.</p>';
+  openModal('<h2>Ich sitze heute Abend auf …</h2>' +
+    (own ? '<p class="mut" style="margin:0 0 6px">Aktuell eingetragen: <b>' + esc((((S.ansitze || []).filter(t => t.id === own.ansitz)[0]) || {}).name || 'Ansitz') + '</b>. Ein anderer Sitz bucht dich um.</p>' : '') +
+    '<div class="chp" id="sTyp"><button type="button" data-bt="kanzel" class="' + (S.sTyp.kanzel ? 'on' : '') + '"><i class="ti ti-home-2" aria-hidden="true"></i>Kanzel</button><button type="button" data-bt="leiter" class="' + (S.sTyp.leiter ? 'on' : '') + '"><i class="ti ti-ladder" aria-hidden="true"></i>Leiter</button><button type="button" data-bt="bock" class="' + (S.sTyp.bock ? 'on' : '') + '"><i class="ti ti-crosshair" aria-hidden="true"></i>DJ-Bock</button></div>' +
+    '<div style="margin-top:8px">' + rows + '</div><p id="mErr" class="mut" style="color:var(--err)"></p><button class="btn sec big" id="mCancel">Schließen</button>');
+  $('#mCancel').onclick = closeModal;
+  document.querySelectorAll('#modalBody [data-sa]').forEach(b => { b.onclick = async () => {
+    if (b.disabled) return; const aid = b.dataset.sa, a = (S.ansitze || []).filter(t => t.id === aid)[0];
+    document.querySelectorAll('#modalBody [data-sa]').forEach(x => x.disabled = true);
+    try {
+      await api('belegungSave', { ansitz: aid, datum: de, schicht: 'Abend', gast: '' });
+      if (own && own.ansitz !== aid) { try { await api('belegungDelete', { id: own.id }); } catch (e) { } }
+      closeModal(); toast('Du sitzt heute Abend auf ' + (a ? a.name : 'dem Ansitz'));
+      if (S.tab === 'strecke' && S.rv === 'bel') loadBel();
+    } catch (e) { $('#mErr').textContent = e.message; try { const r = await api('belegungen'); S.bel = r.belegungen; } catch (x) { } sitzRender(); $('#mErr').textContent = e.message; }
+  }; });
+}
+$('#btnSitz').onclick = sitzAuf;
 $('#bDate').onchange = e => { S.bDate = e.target.value || isoToday(); renderBel(); };
 $('#bPrev').onclick = () => { S.bDate = isoAdd(S.bDate || isoToday(), -1); renderBel(); };
 $('#bNext').onclick = () => { S.bDate = isoAdd(S.bDate || isoToday(), 1); renderBel(); };
