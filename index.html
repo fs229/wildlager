@@ -1006,16 +1006,21 @@ function sitzRender() {
   const rows = act.map(a => {
     const r = belCover(a.id, de, 'Abend'), mine = r && own && r.id === own.id;
     const lbl = !r ? '<small>Abend</small><span>frei</span>' : '<small>' + (r.schicht === 'Ganztägig' ? 'ganztägig' : 'Abend') + '</small><span>' + esc(belWho(r)) + '</span>';
-    return '<div class="brow"><div class="n"><b>' + esc(a.name) + '</b><small>' + esc(a.typ) + '</small></div><button type="button" class="bs' + (mine ? ' mine' : r ? ' oth' : '') + '" data-sa="' + esc(a.id) + '"' + (r ? ' disabled' : '') + '>' + lbl + '</button></div>';
+    return '<div class="brow"><div class="n"><b>' + esc(a.name) + '</b><small>' + esc(a.typ) + '</small></div><button type="button" class="bs' + (mine ? ' mine' : r ? ' oth' : '') + '" data-sa="' + esc(a.id) + '"' + (r && !mine ? ' disabled' : '') + '>' + lbl + '</button></div>';
   }).join('') || '<p class="mut">Kein Ansitz gefunden.</p>';
   openModal('<div style="position:sticky;top:-16px;z-index:1;background:var(--card);margin:-16px -16px 8px;padding:16px 16px 6px;display:flex;align-items:center;gap:8px"><h2 style="margin:0;flex:1">Ich sitze heute Abend auf …</h2><button type="button" class="btn sec sm fit" id="sClose" aria-label="Schließen" title="Schließen"><i class="ti ti-x" aria-hidden="true"></i></button></div>' +
-    (own ? '<p class="mut" style="margin:0 0 6px">Aktuell eingetragen: <b>' + esc((((S.ansitze || []).filter(t => t.id === own.ansitz)[0]) || {}).name || 'Ansitz') + '</b>. Ein anderer Sitz bucht dich um.</p>' : '') +
+    (own ? '<p class="mut" style="margin:0 0 6px">Aktuell eingetragen: <b>' + esc((((S.ansitze || []).filter(t => t.id === own.ansitz)[0]) || {}).name || 'Ansitz') + '</b>. Antippen gibt ihn wieder frei, ein anderer Sitz bucht dich um.</p>' : '') +
     '<div class="chp" id="sTyp"><button type="button" data-bt="kanzel" class="' + (S.sTyp.kanzel ? 'on' : '') + '"><i class="ti ti-home-2" aria-hidden="true"></i>Kanzel</button><button type="button" data-bt="leiter" class="' + (S.sTyp.leiter ? 'on' : '') + '"><i class="ti ti-ladder" aria-hidden="true"></i>Leiter</button><button type="button" data-bt="bock" class="' + (S.sTyp.bock ? 'on' : '') + '"><i class="ti ti-crosshair" aria-hidden="true"></i>DJ-Bock</button></div>' +
     '<div style="margin-top:8px">' + rows + '</div><p id="mErr" class="mut" style="color:var(--err)"></p><button class="btn sec big" id="mCancel">Schließen</button>');
   $('#mCancel').onclick = closeModal; $('#sClose').onclick = closeModal;
   document.querySelectorAll('#modalBody [data-sa]').forEach(b => { b.onclick = async () => {
     if (b.disabled) return; const aid = b.dataset.sa, a = (S.ansitze || []).filter(t => t.id === aid)[0];
     document.querySelectorAll('#modalBody [data-sa]').forEach(x => x.disabled = true);
+    if (own && own.ansitz === aid) {
+      try { await api('belegungDelete', { id: own.id }); S.bel = (S.bel || []).filter(x => x.id !== own.id); toast((a ? a.name : 'Sitz') + ' wieder frei'); sitzRender(); if (S.tab === 'strecke' && S.rv === 'bel') loadBel(); }
+      catch (e) { try { const r = await api('belegungen'); S.bel = r.belegungen; } catch (x) { } sitzRender(); $('#mErr').textContent = e.message; }
+      return;
+    }
     try {
       await api('belegungSave', { ansitz: aid, datum: de, schicht: 'Abend', gast: '' });
       if (own && own.ansitz !== aid) { try { await api('belegungDelete', { id: own.id }); } catch (e) { } }
