@@ -89,7 +89,7 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 .bs small{font-size:11px;font-weight:500;opacity:.85}.bs span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bs.mine{background:var(--g2);border-color:var(--g2);color:#fff}.bs.oth{background:var(--sumbg);border-color:var(--line);color:var(--txt)}
 #rvSeg i{display:none}#rvSeg button{padding-left:4px;padding-right:4px;font-size:13px}
-#bTyp,#sTyp{flex-wrap:nowrap;gap:6px}#bTyp button,#sTyp button{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 6px;min-height:40px;white-space:nowrap}#bTyp button i,#sTyp button i{font-size:19px;line-height:1}
+#bTyp,#sTyp,#auTyp{flex-wrap:nowrap;gap:6px}#bTyp button,#sTyp button,#auTyp button{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 6px;min-height:40px;white-space:nowrap}#bTyp button i,#sTyp button i,#auTyp button i{font-size:19px;line-height:1}
 .bdate{display:flex;gap:8px;align-items:center;margin-bottom:10px}.bdate input{flex:1;min-width:0}.bdate .btn{flex:none;padding:9px 14px}
 .toast .tact{margin-left:12px;background:none;border:1px solid #fff;color:#fff;border-radius:8px;padding:4px 12px;font:inherit;font-weight:600;cursor:pointer}
 .wl .h{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
@@ -226,6 +226,7 @@ select{-webkit-appearance:none;appearance:none;min-height:42px;border-radius:10p
       <div id="kundeRow" class="hide">
         <label>Kunde (Verkauf an)</label>
         <div class="row"><select id="selKunde"></select><button class="btn sec fit" data-act="kundeNew">+ Neu</button></div>
+        <select class="kvSel" aria-label="Kunden von" style="margin-top:6px"></select>
       </div>
       <label style="display:flex;align-items:center;margin-top:12px;color:var(--txt);font-size:15px">
         <input type="checkbox" id="chkDauer" checked> Dauerscan (Kamera bleibt an)
@@ -272,7 +273,7 @@ select{-webkit-appearance:none;appearance:none;min-height:42px;border-radius:10p
       <input id="fText" placeholder="z. B. Lende">
       <div class="row" style="margin-top:10px">
         <label style="display:flex;align-items:center;margin:0;color:var(--txt)"><input type="checkbox" id="fOut"> Ausgebuchte zeigen</label>
-        <button class="btn sec sm fit" id="btnReload">Aktualisieren</button>
+        <div style="display:flex;gap:6px"><button class="btn sec sm fit" data-act="bestPdf"><i class="ti ti-file-type-pdf" aria-hidden="true"></i>PDF</button><button class="btn sec sm fit" id="btnReload">Aktualisieren</button></div>
       </div>
     </div>
     <div class="card">
@@ -314,6 +315,7 @@ select{-webkit-appearance:none;appearance:none;min-height:42px;border-radius:10p
     </div>
     <div id="rvBel" class="hide">
       <div class="card">
+        <button type="button" class="btn sec sm" data-act="ausOpen" style="width:100%;margin-bottom:10px"><i class="ti ti-chart-bar" aria-hidden="true"></i>Auswertung</button>
         <div class="bdate"><button class="btn sec" id="bPrev" aria-label="Vortag">‹</button><input id="bDate" type="date" aria-label="Datum"><button class="btn sec" id="bNext" aria-label="Nächster Tag">›</button></div>
         <div class="sum" id="bSum"></div>
         <div class="chp" id="bTyp" style="margin-top:10px"><button type="button" data-bt="kanzel"><i class="ti ti-home-2" aria-hidden="true"></i>Kanzel</button><button type="button" data-bt="leiter"><i class="ti ti-ladder" aria-hidden="true"></i>Leiter</button><button type="button" data-bt="bock"><i class="ti ti-crosshair" aria-hidden="true"></i>DJ-Bock</button></div>
@@ -321,6 +323,15 @@ select{-webkit-appearance:none;appearance:none;min-height:42px;border-radius:10p
       </div>
       <div class="card hide" id="bMineCard"><h2>Meine Belegungen</h2><div class="lst" id="bMine"></div></div>
       <div class="card"><div id="bList"></div></div>
+    </div>
+    <div id="rvAus" class="hide">
+      <div class="card">
+        <div class="row" style="margin-bottom:10px"><button type="button" class="btn sec sm fit" data-act="ausBack"><i class="ti ti-arrow-left" aria-hidden="true"></i>Zurück</button><h2 style="margin:0;flex:1">Auswertung</h2></div>
+        <div class="seg" id="auMode"><button type="button" class="bic on" data-au="bel"><i class="ti ti-calendar-event bi" aria-hidden="true"></i>Belegung</button><button type="button" class="bic" data-au="str"><i class="ti ti-trophy bi" aria-hidden="true"></i>Strecke</button></div>
+        <select id="auZeit" aria-label="Zeitraum"></select>
+        <div class="chp" id="auTyp" style="margin-top:10px"><button type="button" data-bt="kanzel"><i class="ti ti-home-2" aria-hidden="true"></i>Kanzel</button><button type="button" data-bt="leiter"><i class="ti ti-ladder" aria-hidden="true"></i>Leiter</button><button type="button" data-bt="bock"><i class="ti ti-crosshair" aria-hidden="true"></i>DJ-Bock</button></div>
+      </div>
+      <div id="auOut"></div>
     </div>
     <div id="rvAufg" class="hide">
       <div class="card">
@@ -340,6 +351,7 @@ select{-webkit-appearance:none;appearance:none;min-height:42px;border-radius:10p
       <div class="lst" id="offenList"></div>
     </div>
     <div class="card">
+      <div style="margin-bottom:8px"><label>Kunden von</label><select class="kvSel"></select></div>
       <div class="row">
         <div><label>Kunde</label><select id="rKunde"></select></div>
         <div><label>Zeitraum</label><select id="rZeit">
@@ -356,6 +368,7 @@ select{-webkit-appearance:none;appearance:none;min-height:42px;border-radius:10p
   <section id="v-wunsch" class="hide">
     <div class="card">
       <div style="display:flex;gap:8px"><button class="btn" data-act="wNew" style="flex:1">+ Wunsch</button><button class="btn sec" data-act="wReload" aria-label="Neu laden"><i class="ti ti-refresh" aria-hidden="true"></i></button></div>
+      <select class="kvSel" aria-label="Kunden von" style="margin-top:10px"></select>
       <div class="seg" style="margin-top:10px">
         <button data-act="wView" data-v="art" class="on">Nach Artikel</button><button data-act="wView" data-v="kunde">Nach Kunde</button><button data-act="wView" data-v="done">Erledigt</button>
       </div>
@@ -375,6 +388,7 @@ select{-webkit-appearance:none;appearance:none;min-height:42px;border-radius:10p
     </details></div>
     <div class="card"><details class="fold" data-fold="kunden">
       <summary><h2>Kunden</h2><span class="mut" id="cnt_kunden"></span></summary>
+      <select class="kvSel" aria-label="Kunden von" style="margin-bottom:8px"></select>
       <div class="lst" id="kundenList"></div>
       <div style="margin-top:10px"><button class="btn sec" data-act="kundeNew">+ Kunde</button></div>
     </details></div>
@@ -446,7 +460,7 @@ function parseEan(raw) {
 /* ------------------------------------------------------------------- Server */
 /* ---- Zwischenspeicher: Daten sofort aus dem Speicher zeigen, im Hintergrund aktualisieren */
 const RC = { mem: {}, ttl: 30000, gen: 0, startPending: false };
-const RC_READ = { belegungen: 1, init: 1, nutzer: 1, start: 1, bestand: 1, rechnungen: 1, rechnung: 1, offene: 1, statistik: 1, strecke: 1, ansitze: 1, aufgaben: 1, abschuss: 1, wuensche: 1 };
+const RC_READ = { belegungen: 1, belegungenAlle: 1, init: 1, nutzer: 1, start: 1, bestand: 1, rechnungen: 1, rechnung: 1, offene: 1, statistik: 1, strecke: 1, ansitze: 1, aufgaben: 1, abschuss: 1, wuensche: 1 };
 const RC_INIT = { artikelSave: 1, lagerortSave: 1, kundeSave: 1 };
 const rcKey = (a, p) => 'waidr_c_' + S.user + '|' + a + '|' + JSON.stringify(p || {});
 function rcGet(k) {
@@ -1030,6 +1044,191 @@ function sitzRender() {
   }; });
 }
 $('#btnSitz').onclick = sitzAuf;
+/* ---- Auswertung Ansitze */
+S.au = S.au || { mode: 'bel', zeit: 'jj0', typ: {} };
+const AU_MON = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+const aKey = d => deKey(d);
+function auRange() {
+  const t = isoToday(), y = +t.slice(0, 4), m = +t.slice(5, 7), jy = m >= 4 ? y : y - 1, z = S.au.zeit;
+  if (z === 'jj0') return { von: jy + '0401', bis: (jy + 1) + '0331', lbl: 'Jagdjahr ' + jy + '/' + String(jy + 1).slice(2) };
+  if (z === 'jj1') return { von: (jy - 1) + '0401', bis: jy + '0331', lbl: 'Jagdjahr ' + (jy - 1) + '/' + String(jy).slice(2) };
+  if (z === 'ky0') return { von: y + '0101', bis: y + '1231', lbl: 'Kalenderjahr ' + y };
+  return { von: '00000000', bis: '99999999', lbl: 'Alle Jahre' };
+}
+async function loadAus() {
+  const sel = $('#auZeit'); if (!sel.options.length) {
+    const t = isoToday(), y = +t.slice(0, 4), m = +t.slice(5, 7), jy = m >= 4 ? y : y - 1;
+    sel.innerHTML = '<option value="jj0">Jagdjahr ' + jy + '/' + String(jy + 1).slice(2) + ' (aktuell)</option><option value="jj1">Jagdjahr ' + (jy - 1) + '/' + String(jy).slice(2) + '</option><option value="ky0">Kalenderjahr ' + y + '</option><option value="all">Alle Jahre</option>';
+  }
+  sel.value = S.au.zeit; renderAus();
+  try {
+    await Promise.all([
+      apiSWR('belegungenAlle', null, r => { S.belAll = r.belegungen; renderAus(); }),
+      loadStreckeQuiet(), (S.ansitze && S.ansitze.length) ? 0 : loadAnsitzeQuiet()
+    ]);
+  } catch (e) { toast(e.message); }
+  renderAus();
+}
+const auBar = (v, max, col) => '<div style="height:6px;border-radius:3px;background:' + (col || 'var(--acc)') + ';width:' + Math.max(2, max ? Math.round(v * 100 / max) : 0) + '%;margin-top:3px"></div>';
+const auCnt = (o, k) => { o[k] = (o[k] || 0) + 1; };
+const auTop = o => Object.keys(o).sort((a, b) => o[b] - o[a])[0] || '';
+const auChips = o => Object.keys(o).sort((a, b) => o[b] - o[a]).map(k => '<span class="chip">' + esc(k) + ' ' + o[k] + '</span>').join('');
+function auTypOk(a) { const on = Object.keys(S.au.typ).filter(k => S.au.typ[k]); return !on.length || (a && on.indexOf(belGrp(a)) >= 0); }
+function renderAus() {
+  if (S.rv !== 'aus') return;
+  const A = S.au, R = auRange(), ans = {}; (S.ansitze || []).forEach(a => { ans[a.id] = a; });
+  document.querySelectorAll('#auMode button').forEach(b => b.classList.toggle('on', b.dataset.au === A.mode));
+  document.querySelectorAll('#auTyp button').forEach(b => b.classList.toggle('on', !!A.typ[b.dataset.bt]));
+  const anyTyp = Object.keys(A.typ).some(k => A.typ[k]);
+  const nm = id => id ? (ans[id] ? ans[id].name : 'Gelöschter Ansitz') : 'ohne Ansitz';
+  const inR = d => { const k = aKey(d); return k >= R.von && k <= R.bis; };
+  const bel = (S.belAll || []).filter(x => inR(x.datum) && ans[x.ansitz] && auTypOk(ans[x.ansitz]));
+  const str = (S.strecke || []).filter(x => inR(x.datum) && (x.ansitz ? auTypOk(ans[x.ansitz]) : !anyTyp));
+  const nBel = {}; bel.forEach(x => auCnt(nBel, x.ansitz));
+  const sum = (a) => '<div class="sum">' + a.map(t => '<div><b>' + t[0] + '</b><span>' + t[1] + '</span></div>').join('') + '</div>';
+  let h = '';
+  if (A.mode === 'bel') {
+    const per = {}, sitz = {};
+    bel.forEach(x => {
+      const p = per[x.nutzer] = per[x.nutzer] || { n: 0, m: 0, a: 0, g: 0, gast: 0, s: {} };
+      p.n++; if (x.schicht === 'Morgen') p.m++; else if (x.schicht === 'Abend') p.a++; else p.g++; if (x.gast) p.gast++; auCnt(p.s, x.ansitz);
+      const q = sitz[x.ansitz] = sitz[x.ansitz] || { n: 0, w: {}, slots: 0 }; q.n++; auCnt(q.w, x.nutzer); q.slots += x.schicht === 'Ganztägig' ? 2 : 1;
+    });
+    const tNow = isoToday().replace(/-/g, ''), von = R.von === '00000000' ? (bel.map(x => aKey(x.datum)).sort()[0] || tNow) : R.von, bis = R.bis < tNow ? R.bis : tNow;
+    const d0 = new Date(von.slice(0, 4) + '-' + von.slice(4, 6) + '-' + von.slice(6, 8) + 'T12:00:00'), d1 = new Date(bis.slice(0, 4) + '-' + bis.slice(4, 6) + '-' + bis.slice(6, 8) + 'T12:00:00');
+    const days = Math.max(1, Math.round((d1 - d0) / 864e5) + 1);
+    const act = (S.ansitze || []).filter(a => a.aktiv && auTypOk(a));
+    const used = act.filter(a => nBel[a.id]).length;
+    h += '<div class="card">' + sum([[bel.length, 'Belegungen'], [Object.keys(per).length, 'Personen'], [used + '/' + act.length, 'Sitze genutzt']]) + '<div class="mut" style="margin-top:6px">' + esc(R.lbl) + '</div></div>';
+    const pk = Object.keys(per).sort((a, b) => per[b].n - per[a].n), pmax = pk.length ? per[pk[0]].n : 0;
+    h += '<div class="card"><h2>Wer sitzt wie oft</h2>' + (pk.map(k => { const p = per[k];
+      return '<div class="brow" style="display:block"><div style="display:flex;justify-content:space-between;gap:8px"><b>' + esc(k) + '</b><b>' + p.n + '</b></div>' + auBar(p.n, pmax) +
+        '<small>Morgen ' + p.m + ' · Abend ' + p.a + ' · ganztägig ' + p.g + (p.gast ? ' · Gäste ' + p.gast : '') + ' · meist: ' + esc(nm(auTop(p.s))) + '</small></div>'; }).join('') || '<p class="mut">Keine Belegungen im Zeitraum.</p>') + '</div>';
+    const sk = Object.keys(sitz).sort((a, b) => sitz[b].n - sitz[a].n), smax = sk.length ? sitz[sk[0]].n : 0;
+    h += '<div class="card"><h2>Wo wird gesessen</h2>' + (sk.map(k => { const q = sitz[k], pct = Math.min(100, Math.round(q.slots * 100 / (days * 2)));
+      return '<div class="brow" style="display:block"><div style="display:flex;justify-content:space-between;gap:8px"><b>' + esc(nm(k)) + '</b><b>' + q.n + '</b></div>' + auBar(q.n, smax) +
+        '<small>' + esc((ans[k] || {}).typ || '') + ' · ' + Object.keys(q.w).length + ' Pers. · Auslastung ' + pct + ' % · meist: ' + esc(auTop(q.w)) + '</small></div>'; }).join('') || '<p class="mut">Keine Belegungen im Zeitraum.</p>') +
+      (act.length - used ? '<p class="mut" style="margin-top:8px">Nie belegt: ' + esc(act.filter(a => !nBel[a.id]).map(a => a.name).join(', ')) + '</p>' : '') + '</div>';
+    const mon = {}; bel.forEach(x => { const k = x.datum.slice(6, 10) + '-' + x.datum.slice(3, 5); auCnt(mon, k); });
+    const mk = Object.keys(mon).sort(), mmax = Math.max.apply(null, mk.map(k => mon[k]).concat([1]));
+    if (mk.length) h += '<div class="card"><h2>Verlauf pro Monat</h2><div style="display:flex;align-items:flex-end;gap:4px;height:90px">' + mk.map(k => '<div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%"><small style="font-size:10px">' + mon[k] + '</small><div style="width:100%;border-radius:3px 3px 0 0;background:var(--acc);height:' + Math.max(3, Math.round(mon[k] * 70 / mmax)) + 'px"></div></div>').join('') + '</div><div style="display:flex;gap:4px">' + mk.map(k => '<small style="flex:1;min-width:0;text-align:center;font-size:10px;color:var(--mut)">' + AU_MON[+k.slice(5) - 1] + '</small>').join('') + '</div></div>';
+  } else {
+    const per = {}, sitz = {}; let kg = 0, kgN = 0;
+    str.forEach(x => {
+      if (x.gewichtKg != null) { kg += x.gewichtKg; kgN++; }
+      const p = per[x.erleger || 'unbekannt'] = per[x.erleger || 'unbekannt'] || { n: 0, kg: 0, s: {} }; p.n++; p.kg += x.gewichtKg || 0; auCnt(p.s, x.ansitz || '');
+      const q = sitz[x.ansitz || ''] = sitz[x.ansitz || ''] || { n: 0, kg: 0, kgN: 0, w: {}, g: {} }; q.n++; if (x.gewichtKg != null) { q.kg += x.gewichtKg; q.kgN++; } auCnt(q.w, x.wildart || 'Unbekannt'); auCnt(q.g, x.geschlecht || 'unbekannt');
+    });
+    h += '<div class="card">' + sum([[str.length, 'Stück'], [fmtK(kg), 'Gewicht gesamt'], [kgN ? fmtK(kg / kgN) : '–', 'Ø je Stück']]) + '<div class="mut" style="margin-top:6px">' + esc(R.lbl) + '</div></div>';
+    const sk = Object.keys(sitz).sort((a, b) => sitz[b].n - sitz[a].n), smax = sk.length ? sitz[sk[0]].n : 0;
+    h += '<div class="card"><h2>Wo wurde was erlegt</h2>' + (sk.map(k => { const q = sitz[k], b = nBel[k];
+      return '<div class="brow" style="display:block"><div style="display:flex;justify-content:space-between;gap:8px"><b>' + esc(nm(k)) + '</b><b>' + q.n + ' Stk · ' + (q.kgN ? fmtK(q.kg) : '– kg') + '</b></div>' + auBar(q.n, smax, 'var(--c-aus)') +
+        '<div>' + auChips(q.w) + '</div><small>' + (q.kgN ? 'Ø ' + fmtK(q.kg / q.kgN) + ' · ' : '') + Object.keys(q.g).map(g => g + ' ' + q.g[g]).join(' · ') + (k && b ? ' · 1 Stück je ' + fmt2(b / q.n) + ' Ansitze (Näherung)' : '') + '</small></div>'; }).join('') || '<p class="mut">Keine Strecke im Zeitraum.</p>') +
+      '<p class="mut" style="margin-top:8px">Näherung: Ansitze = Belegungen am Sitz im Zeitraum. Eine Reservierung belegt nur, dass der Sitz gebucht war, nicht dass jemand dort gesessen hat. Die Belegung gibt es erst seit der Einführung der Ansitzbelegung.</p></div>';
+    const pk = Object.keys(per).sort((a, b) => per[b].n - per[a].n), pmax = pk.length ? per[pk[0]].n : 0;
+    h += '<div class="card"><h2>Wer hat erlegt</h2>' + (pk.map(k => { const p = per[k];
+      return '<div class="brow" style="display:block"><div style="display:flex;justify-content:space-between;gap:8px"><b>' + esc(k) + '</b><b>' + p.n + ' Stk · ' + (p.kg ? fmtK(p.kg) : '– kg') + '</b></div>' + auBar(p.n, pmax, 'var(--c-aus)') + '<small>bester Ansitz: ' + esc(nm(auTop(p.s))) + '</small></div>'; }).join('') || '<p class="mut">Keine Strecke im Zeitraum.</p>') + '</div>';
+  }
+  $('#auOut').innerHTML = h;
+}
+document.querySelectorAll('#auMode button').forEach(b => { b.onclick = () => { S.au.mode = b.dataset.au; renderAus(); }; });
+$('#auZeit').onchange = e => { S.au.zeit = e.target.value; renderAus(); };
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('#auTyp button'); if (b) { S.au.typ[b.dataset.bt] = !S.au.typ[b.dataset.bt]; renderAus(); } });
+/* ---- PDF-Export Bestandsliste (eigener Mini-PDF-Writer, Helvetica) */
+const PDF_W = [278,278,355,556,556,889,667,191,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,278,278,584,584,584,556,1015,667,667,722,722,667,611,778,722,278,500,667,556,833,722,778,667,778,722,667,611,722,667,944,667,667,611,278,278,278,469,556,333,556,556,500,556,556,278,556,556,222,222,500,222,833,556,556,556,556,333,500,278,556,500,722,500,500,500,334,260,334,584];
+function pdfW(str, size) {
+  let w = 0;
+  for (const ch of String(str)) { const b = ch.normalize('NFD')[0], c = b.charCodeAt(0); w += (c >= 32 && c <= 126) ? PDF_W[c - 32] : ch === 'ß' ? 611 : ch === '€' ? 556 : 556; }
+  return w * size / 1000;
+}
+function pdfByte(ch) { const c = ch.charCodeAt(0); if (c < 256) return c; return { '€': 0x80, '–': 0x96, '—': 0x97, '„': 0x84, '“': 0x93, '”': 0x94, '‘': 0x91, '’': 0x92, '•': 0x95, '…': 0x85 }[ch] || 63; }
+function pdfEsc(str) { let o = ''; for (const ch of String(str)) { const b = pdfByte(ch); o += (b === 40 || b === 41 || b === 92) ? '\\' + String.fromCharCode(b) : String.fromCharCode(b); } return o; }
+function pdfBuild(pages) {
+  const H = 841.89, W = 595.28, parts = [], off = [];
+  let len = 0; const put = str => { const a = new Uint8Array(str.length); for (let i = 0; i < str.length; i++) a[i] = str.charCodeAt(i) & 255; parts.push(a); len += a.length; };
+  const obj = (n, body) => { off[n] = len; put(n + ' 0 obj\n' + body + '\nendobj\n'); };
+  put('%PDF-1.4\n');
+  const N = pages.length, kids = pages.map((_, i) => (5 + i * 2) + ' 0 R').join(' ');
+  obj(1, '<< /Type /Catalog /Pages 2 0 R >>');
+  obj(2, '<< /Type /Pages /Kids [' + kids + '] /Count ' + N + ' >>');
+  obj(3, '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>');
+  obj(4, '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>');
+  pages.forEach((ops, i) => {
+    let c = '';
+    ops.forEach(o => {
+      if (o.t === 'text') {
+        const x = o.align === 'r' ? o.x - pdfW(o.s, o.size) : o.align === 'c' ? o.x - pdfW(o.s, o.size) / 2 : o.x;
+        c += 'BT ' + (o.gray != null ? o.gray + ' g ' : '0 g ') + '/' + (o.bold ? 'F2' : 'F1') + ' ' + o.size + ' Tf ' + x.toFixed(2) + ' ' + (H - o.y).toFixed(2) + ' Td (' + pdfEsc(o.s) + ') Tj ET\n';
+      } else if (o.t === 'line') {
+        c += (o.gray != null ? o.gray : 0.7) + ' G ' + (o.w || 0.5) + ' w ' + o.x1.toFixed(2) + ' ' + (H - o.y).toFixed(2) + ' m ' + o.x2.toFixed(2) + ' ' + (H - o.y).toFixed(2) + ' l S\n';
+      }
+    });
+    obj(5 + i * 2, '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + W + ' ' + H + '] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ' + (6 + i * 2) + ' 0 R >>');
+    obj(6 + i * 2, '<< /Length ' + c.length + ' >>\nstream\n' + c + 'endstream');
+  });
+  const xr = len, total = 5 + N * 2;
+  let x = 'xref\n0 ' + total + '\n0000000000 65535 f \n';
+  for (let n = 1; n < total; n++) x += String(off[n]).padStart(10, '0') + ' 00000 n \n';
+  put(x + 'trailer\n<< /Size ' + total + ' /Root 1 0 R >>\nstartxref\n' + xr + '\n%%EOF');
+  const out = new Uint8Array(len); let p = 0; parts.forEach(a => { out.set(a, p); p += a.length; });
+  return out;
+}
+async function bestandPdf() {
+  const resBy = {}; (S.res || []).forEach(x => { resBy[x.artikelcode] = (resBy[x.artikelcode] || 0) + x.anzahl; });
+  const by = {};
+  (S.bestand || []).forEach(o => { const g = by[o.artikelcode] = by[o.artikelcode] || { n: 0, g: 0 }; g.n++; g.g += o.gewichtG; });
+  const wild = {}; let tn = 0, tg = 0, hadRes = false;
+  Object.keys(by).forEach(code => {
+    const g = by[code], a = S.artikel[code] || { bezeichnung: 'Artikel ' + code, wildart: '', preis: 0 };
+    const r = Math.min(resBy[code] || 0, g.n), n = g.n - r; if (r) hadRes = true; if (n <= 0) return;
+    const gg = g.g * n / g.n; tn += n; tg += gg;
+    (wild[a.wildart || 'Sonstige'] = wild[a.wildart || 'Sonstige'] || []).push({ name: a.bezeichnung, n, kg: gg / 1000, preis: a.preis });
+  });
+  const wk = Object.keys(wild).sort((a, b) => a.localeCompare(b, 'de'));
+  if (!wk.length) { toast('Kein Bestand vorhanden.'); return; }
+  const M = 42, XR = [380, 468, 553], pages = []; let ops = [], y = 0;
+  const heute = isoToDe(isoToday());
+  const head = () => {
+    ops = []; pages.push(ops); y = M + 14;
+    if (pages.length === 1) {
+      ops.push({ t: 'text', x: M, y, s: 'Wildbret – aktueller Bestand', size: 18, bold: true });
+      y += 18; ops.push({ t: 'text', x: M, y, s: 'Stand ' + heute + ' · Preise je kg', size: 10, gray: 0.4 }); y += 22;
+    } else { ops.push({ t: 'text', x: M, y, s: 'Wildbret – aktueller Bestand · Stand ' + heute, size: 9, gray: 0.4 }); y += 20; }
+  };
+  head();
+  wk.forEach(k => {
+    const L = wild[k].sort((a, b) => a.name.localeCompare(b.name, 'de'));
+    if (y > 841.89 - M - 80) head();
+    ops.push({ t: 'text', x: M, y, s: k, size: 12, bold: true });
+    ['Packungen', 'Gewicht', 'Preis/kg'].forEach((h, i) => ops.push({ t: 'text', x: XR[i], y, s: h, size: 8, gray: 0.45, align: 'r' }));
+    y += 5; ops.push({ t: 'line', x1: M, x2: 553, y, gray: 0.6 }); y += 13;
+    L.forEach(r => {
+      if (y > 841.89 - M - 20) { head(); ops.push({ t: 'text', x: M, y, s: k + ' (Fortsetzung)', size: 11, bold: true }); y += 5; ops.push({ t: 'line', x1: M, x2: 553, y, gray: 0.6 }); y += 13; }
+      let nm = r.name; while (nm.length > 3 && pdfW(nm, 10) > XR[0] - 70 - M) nm = nm.slice(0, -1);
+      if (nm !== r.name) nm = nm.trimEnd() + '…';
+      ops.push({ t: 'text', x: M, y, s: nm, size: 10 });
+      ops.push({ t: 'text', x: XR[0], y, s: String(r.n), size: 10, align: 'r' });
+      ops.push({ t: 'text', x: XR[1], y, s: fmt2(r.kg) + ' kg', size: 10, align: 'r' });
+      ops.push({ t: 'text', x: XR[2], y, s: r.preis ? fmt2(r.preis) + ' €' : '–', size: 10, align: 'r' });
+      y += 14;
+    });
+    y += 10;
+  });
+  if (y > 841.89 - M - 40) head();
+  ops.push({ t: 'line', x1: M, x2: 553, y: y - 4, gray: 0.6 });
+  ops.push({ t: 'text', x: M, y: y + 10, s: 'Gesamt', size: 10, bold: true });
+  ops.push({ t: 'text', x: XR[0], y: y + 10, s: String(tn), size: 10, bold: true, align: 'r' });
+  ops.push({ t: 'text', x: XR[1], y: y + 10, s: fmt2(tg / 1000) + ' kg', size: 10, bold: true, align: 'r' });
+  if (hadRes) ops.push({ t: 'text', x: M, y: y + 30, s: 'Reservierte Packungen sind nicht enthalten. Gewichte sind Summen der Packungsgewichte.', size: 8, gray: 0.45 });
+  pages.forEach((o, i) => o.push({ t: 'text', x: 595.28 / 2, y: 841.89 - 24, s: 'Seite ' + (i + 1) + ' von ' + pages.length, size: 8, gray: 0.5, align: 'c' }));
+  const bytes = pdfBuild(pages), name = 'Wildbret-Bestand_' + isoToday() + '.pdf';
+  const file = new File([bytes], name, { type: 'application/pdf' });
+  try {
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'Wildbret-Bestand' }); return; }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  const u = URL.createObjectURL(file), a = document.createElement('a'); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000);
+  toast('PDF erstellt');
+}
 $('#bDate').onchange = e => { S.bDate = e.target.value || isoToday(); renderBel(); };
 $('#bPrev').onclick = () => { S.bDate = isoAdd(S.bDate || isoToday(), -1); renderBel(); };
 $('#bNext').onclick = () => { S.bDate = isoAdd(S.bDate || isoToday(), 1); renderBel(); };
@@ -1039,9 +1238,10 @@ $('#bQ').oninput = renderBel;
 async function loadAufgaben() { try { await apiSWR('aufgaben', null, r => { S.aufg = r.aufgaben; renderAufgaben(); }); } catch (e) { toast(e.message); renderAufgaben(); } }
 function setRv(v) {
   S.rv = v;
-  document.querySelectorAll('#rvSeg button').forEach(b => b.classList.toggle('on', b.dataset.rv === v));
+  document.querySelectorAll('#rvSeg button').forEach(b => b.classList.toggle('on', b.dataset.rv === (v === 'aus' ? 'bel' : v)));
+  $('#rvAus').classList.toggle('hide', v !== 'aus');
   $('#rvStrecke').classList.toggle('hide', v !== 'strecke'); $('#rvAufg').classList.toggle('hide', v !== 'aufg'); $('#rvPlan').classList.toggle('hide', v !== 'plan'); $('#rvWind').classList.toggle('hide', v !== 'wind'); $('#rvBel').classList.toggle('hide', v !== 'bel');
-  if (v === 'aufg') loadAufgaben(); else if (v === 'plan') loadPlan(); else if (v === 'wind') showWind(); else if (v === 'bel') loadBel(); else renderStrecke();
+  if (v === 'aufg') loadAufgaben(); else if (v === 'plan') loadPlan(); else if (v === 'wind') showWind(); else if (v === 'bel') loadBel(); else if (v === 'aus') loadAus(); else renderStrecke();
 }
 document.querySelectorAll('#rvSeg button').forEach(b => { b.onclick = () => setRv(b.dataset.rv); });
 document.querySelectorAll('#aStSeg button').forEach(b => { b.onclick = () => { S.ast = b.dataset.ast; renderAufgaben(); }; });
@@ -1130,12 +1330,28 @@ function renderLager() {
   const wilds = Array.from(new Set(S.artikelList.map(a => a.wildart).filter(Boolean))).sort();
   const cw = $('#fWild').value; $('#fWild').innerHTML = '<option value="">Alle</option>' + wilds.map(w => '<option>' + esc(w) + '</option>').join(''); $('#fWild').value = cw;
 }
+/* ---- Filter „Kunde von" */
+try { S.kv = localStorage.getItem('waidr_kv') || ''; } catch (e) { S.kv = ''; }
+const kvNames = () => (S.nutzer || []).map(n => typeof n === 'string' ? n : n.name).filter(Boolean);
+const kvOf = n => ((S.kunden || []).filter(k => k.name === n)[0] || {}).von || '';
+const kvOk = n => !S.kv || (S.kv === '__none' ? !kvOf(n) : kvOf(n) === S.kv);
+const kvReal = () => S.kv && S.kv !== '__none' ? S.kv : '';
+function kvSync() {
+  const o = '<option value="">Alle Kunden</option>' + kvNames().map(n => '<option value="' + esc(n) + '">Kunden von ' + esc(n) + '</option>').join('') + '<option value="__none">Ohne Zuordnung</option>';
+  document.querySelectorAll('.kvSel').forEach(x => { x.innerHTML = o; x.value = S.kv; if (x.value !== S.kv) { S.kv = ''; x.value = ''; } });
+}
+document.addEventListener('change', e => {
+  if (!e.target.classList || !e.target.classList.contains('kvSel')) return;
+  S.kv = e.target.value; try { localStorage.setItem('waidr_kv', S.kv); } catch (x) { }
+  renderKunden(); renderStamm(); renderWunsch(); renderRech();
+});
 function renderKunden() {
-  const act = S.kunden.filter(k => k.aktiv);
+  kvSync();
+  const act = S.kunden.filter(k => k.aktiv && (kvOk(k.name) || k.name === S.kunde));
   if (S.kunde && !act.some(k => k.name === S.kunde)) S.kunde = '';
   $('#selKunde').innerHTML = '<option value="">– Kunde wählen –</option>' + act.map(k => '<option' + (k.name === S.kunde ? ' selected' : '') + '>' + esc(k.name) + '</option>').join('');
   const cur = $('#rKunde').value;
-  $('#rKunde').innerHTML = '<option value="">Alle</option>' + S.kunden.map(k => '<option>' + esc(k.name) + '</option>').join('');
+  $('#rKunde').innerHTML = '<option value="">Alle</option>' + S.kunden.filter(k => kvOk(k.name) || k.name === cur).map(k => '<option>' + esc(k.name) + '</option>').join('');
   $('#rKunde').value = cur;
 }
 function setMode(m) {
@@ -1428,7 +1644,7 @@ const r3 = x => Math.round(x * 1000) / 1000;
 const fmtK = v => fmt2(v) + ' kg';
 const fmtW = w => w.einheit === 'Stk' ? w.menge + ' Stk' : fmtK(w.menge);
 const aName = c => (S.artikel[c] || {}).bezeichnung || ('Artikel ' + c);
-const wOffen = () => (S.wuensche || []).filter(w => w.status === 'offen');
+const wOffen = () => (S.wuensche || []).filter(w => w.status === 'offen' && kvOk(w.kunde));
 function lagerKg(code) { return r3(S.bestand.filter(o => o.artikelcode === code).reduce((s, o) => s + o.gewichtG, 0) / 1000); }
 function lagerPk(code) { return S.bestand.filter(o => o.artikelcode === code).length; }
 // Durchschnittsgewicht einer Packung in kg: erst Lager, sonst zuletzt ausgebuchte, sonst unbekannt
@@ -1497,7 +1713,7 @@ function renderWunsch() {
         }).join('') + '</div></div>';
     }).join('') || '<p class="mut">Keine offenen Wünsche.</p>';
   } else {
-    const done = (S.wuensche || []).filter(w => w.status !== 'offen').slice().reverse().slice(0, 100);
+    const done = (S.wuensche || []).filter(w => w.status !== 'offen' && kvOk(w.kunde)).slice().reverse().slice(0, 100);
     h = '<div class="card"><div class="lst">' + (done.map(w => '<div class="it"><div class="n">' + esc(w.kunde) + ' · ' + esc(aName(w.artikelcode)) + ' · ' + fmtW(w) +
       '<small><span class="st ' + (w.status === 'erfüllt' ? 'e' : 'v') + '">' + esc(w.status) + '</span> ' + esc(w.erledigt) + '</small></div><button class="btn sec sm fit" data-act="wEdit" data-id="' + esc(w.id) + '">Bearbeiten</button></div>').join('') || '<p class="mut">Noch nichts erledigt.</p>') + '</div></div>';
   }
@@ -1507,7 +1723,7 @@ function askWunsch(id, pre) {
   const ex = id ? (S.wuensche || []).filter(w => w.id === id)[0] : null;
   const kSel = ex ? ex.kunde : (pre && pre.kunde) || '', aSel = ex ? ex.artikelcode : '';
   const eh0 = ex ? ex.einheit : (pre && pre.einheit) || 'kg';
-  const ks = S.kunden.filter(k => k.aktiv || k.name === kSel);
+  const ks = S.kunden.filter(k => (k.aktiv && kvOk(k.name)) || k.name === kSel);
   const as = S.artikelList.filter(a => a.aktiv || a.code === aSel);
   const wilds = Array.from(new Set(as.map(a => a.wildart || 'Sonstige'))).sort((a, b) => a.localeCompare(b, 'de'));
   const aOpts = wilds.map(w => '<optgroup label="' + esc(w) + '">' + as.filter(a => (a.wildart || 'Sonstige') === w).sort((a, b) => a.bezeichnung.localeCompare(b.bezeichnung, 'de'))
@@ -1531,7 +1747,7 @@ function askWunsch(id, pre) {
     const dup = S.kunden.filter(k => k.name.toLowerCase() === nm.toLowerCase())[0];
     try {
       let name = nm;
-      if (dup) name = dup.name; else { const r = await api('kundeSave', { name: nm, oldName: '', notiz: '', aktiv: true }); S.kunden = r.kunden; renderKunden(); renderStamm(); }
+      if (dup) name = dup.name; else { const r = await api('kundeSave', { name: nm, oldName: '', notiz: '', aktiv: true, von: kvReal() }); S.kunden = r.kunden; renderKunden(); renderStamm(); }
       const sel = $('#wKd'); if (!Array.from(sel.options).some(o => o.value === name)) sel.add(new Option(name, name));
       sel.value = name; $('#wKdName').value = ''; $('#wKdBox').classList.add('hide'); $('#mErr').textContent = '';
       toast(dup ? 'Kunde existiert schon – ausgewählt' : 'Kunde angelegt');
@@ -1614,7 +1830,7 @@ function offerWuensche(kunde, items) {
 
 /* -------------------------------------------------------------- Stammdaten */
 function renderStamm() {
-  $('#kundenList').innerHTML = S.kunden.map(k => '<div class="it ' + (k.aktiv ? '' : 'off') + '"><div class="n">' + esc(k.name) + '<small>' + (k.aktiv ? 'aktiv' : 'inaktiv') + (k.notiz ? ' · ' + esc(k.notiz) : '') + '</small></div><button class="btn sec sm fit" data-act="kundeEdit" data-name="' + esc(k.name) + '">Bearbeiten</button></div>').join('') || '<p class="mut">Noch keine Kunden.</p>';
+  $('#kundenList').innerHTML = S.kunden.filter(k => kvOk(k.name)).map(k => '<div class="it ' + (k.aktiv ? '' : 'off') + '"><div class="n">' + esc(k.name) + '<small>' + (k.aktiv ? 'aktiv' : 'inaktiv') + (k.von ? ' · von ' + esc(k.von) : '') + (k.notiz ? ' · ' + esc(k.notiz) : '') + '</small></div><button class="btn sec sm fit" data-act="kundeEdit" data-name="' + esc(k.name) + '">Bearbeiten</button></div>').join('') || '<p class="mut">Noch keine Kunden.</p>';
   $('#lagerList').innerHTML = S.lagerorte.map(l => '<div class="it ' + (l.aktiv ? '' : 'off') + '"><div class="n">' + esc(l.name) + '<small>' + (l.aktiv ? 'aktiv' : 'inaktiv') + '</small></div><button class="btn sec sm fit" data-act="lagerEdit" data-name="' + esc(l.name) + '">Bearbeiten</button></div>').join('') || '<p class="mut">Noch keine Lagerorte.</p>';
   $('#artList').innerHTML = S.artikelList.slice().sort((a, b) => a.code.localeCompare(b.code)).map(a => '<div class="it ' + (a.aktiv ? '' : 'off') + '"><div class="n">' + esc(a.bezeichnung) + '<small>' + a.code + ' · ' + fmtEur(a.preis) + '/kg' + (a.aktiv ? '' : ' · inaktiv') + '</small></div><button class="btn sec sm fit" data-act="artEdit" data-code="' + a.code + '">Bearbeiten</button></div>').join('') || '<p class="mut">Noch keine Artikel.</p>';
   $('#ansList').innerHTML = (S.ansitze || []).map(a => '<div class="it ' + (a.aktiv ? '' : 'off') + '"><div class="n">' + esc(a.name) + '<small>' + esc(a.typ + (a.blick.length ? ' · Blick ' + ansBlick(a) : ' · keine Blickrichtung') + (a.aktiv ? '' : ' · inaktiv')) + '</small></div><button class="btn sec sm fit" data-act="ansEdit" data-id="' + esc(a.id) + '">Bearbeiten</button></div>').join('') || '<p class="mut">Noch keine Ansitzeinrichtungen.</p>';
@@ -1658,6 +1874,7 @@ function askKunde(name) {
     const ex = S.kunden.filter(k => k.name === name)[0];
     openModal('<h2>' + (ex ? 'Kunde bearbeiten' : 'Neuer Kunde') + '</h2>' +
       '<label>Name</label><input id="kName" value="' + esc(ex ? ex.name : '') + '">' +
+      '<label>Kunde von</label><select id="kVon"><option value="">– niemand –</option>' + kvNames().map(n => '<option' + (n === (ex ? ex.von : kvReal()) ? ' selected' : '') + '>' + esc(n) + '</option>').join('') + '</select>' +
       '<label>Notiz (optional)</label><input id="kNotiz" value="' + esc(ex ? ex.notiz : '') + '">' +
       '<label style="display:flex;align-items:center;color:var(--txt);font-size:15px"><input type="checkbox" id="kAkt"' + (!ex || ex.aktiv ? ' checked' : '') + '> Aktiv</label>' +
       (ex ? '<p class="mut">Beim Umbenennen werden Bestand und Rechnungen mit umbenannt.</p>' : '') +
@@ -1667,7 +1884,7 @@ function askKunde(name) {
     $('#mSave').onclick = async () => {
       try {
         const nm = $('#kName').value.trim();
-        const r = await api('kundeSave', { name: nm, oldName: ex ? ex.name : '', notiz: $('#kNotiz').value, aktiv: $('#kAkt').checked });
+        const r = await api('kundeSave', { name: nm, oldName: ex ? ex.name : '', notiz: $('#kNotiz').value, aktiv: $('#kAkt').checked, von: $('#kVon').value });
         S.kunden = r.kunden; if (ex && S.kunde === ex.name) S.kunde = nm;
         renderKunden(); renderStamm(); closeModal(); resolve(nm);
       } catch (e) { $('#mErr').textContent = e.message; }
@@ -1700,7 +1917,7 @@ function askReservierung(ean, id) {
 }
 function askKundeWahl() {
   return new Promise(resolve => {
-    const act = S.kunden.filter(k => k.aktiv);
+    const act = S.kunden.filter(k => k.aktiv && kvOk(k.name));
     openModal('<h2>Ausbuchen an …</h2><label>Kunde</label><select id="wKunde"><option value="">– wählen –</option>' + act.map(k => '<option>' + esc(k.name) + '</option>').join('') + '</select>' +
       '<p id="mErr" class="mut" style="color:var(--err)"></p><div class="row"><button class="btn sec" id="mCancel">Abbrechen</button><button class="btn" id="mSave">Ausbuchen</button></div>');
     $('#mCancel').onclick = () => { closeModal(); resolve(''); };
@@ -1744,6 +1961,7 @@ function rechBase() {
   const kf = $('#rKunde').value, zf = $('#rZeit').value, now = new Date();
   return S.rechnungen.filter(r => {
     if (kf && r.kunde !== kf) return false;
+    if (!kvOk(r.kunde)) return false;
     const d = parseDe(r.datum);
     if (zf && d) {
       if (zf === 'jahr' && d.getFullYear() !== now.getFullYear()) return false;
@@ -1754,8 +1972,9 @@ function rechBase() {
 }
 function rechFiltered() { return rechBase().filter(r => S.rf[rechStat(r)]); }
 function renderRech() {
-  $('#offenCard').classList.toggle('hide', !S.offene.length);
-  $('#offenList').innerHTML = S.offene.map(g => '<div class="it"><div class="n">' + esc(g.kunde) + '<small>' + g.packungen + ' Packungen · ' + fmtKg(g.gewichtG) + ' · ' + fmtEur(g.summe) + '</small></div><button class="btn sec sm fit" data-act="offBack" data-kunde="' + esc(g.kunde) + '" aria-label="Alle zurück ins Lager" title="Alle zurück ins Lager"><i class="ti ti-arrow-back-up" aria-hidden="true"></i></button><button class="btn sm fit" data-act="rechCreate" data-kunde="' + esc(g.kunde) + '">Rechnung erstellen</button></div>').join('');
+  const offF = S.offene.filter(g => kvOk(g.kunde));
+  $('#offenCard').classList.toggle('hide', !offF.length);
+  $('#offenList').innerHTML = offF.map(g => '<div class="it"><div class="n">' + esc(g.kunde) + '<small>' + g.packungen + ' Packungen · ' + fmtKg(g.gewichtG) + ' · ' + fmtEur(g.summe) + '</small></div><button class="btn sec sm fit" data-act="offBack" data-kunde="' + esc(g.kunde) + '" aria-label="Alle zurück ins Lager" title="Alle zurück ins Lager"><i class="ti ti-arrow-back-up" aria-hidden="true"></i></button><button class="btn sm fit" data-act="rechCreate" data-kunde="' + esc(g.kunde) + '">Rechnung erstellen</button></div>').join('');
   const cnt = { offen: 0, bezahlt: 0, eingezahlt: 0 }; rechBase().forEach(r => { cnt[rechStat(r)]++; });
   const CH = [['offen', 'clock', 's0', 'Offen', 'nicht bezahlt'], ['bezahlt', 'cash', 's1', 'Bezahlt', 'bezahlt, noch nicht eingezahlt'], ['eingezahlt', 'pig-money', 's2', 'Eingezahlt', 'eingezahlt']];
   $('#rChips').innerHTML = CH.map(c => '<button class="' + c[2] + (S.rf[c[0]] ? ' on' : '') + '" data-act="rchip" data-rs="' + c[0] + '" aria-pressed="' + !!S.rf[c[0]] + '" title="' + c[4] + '"><span class="rc"><i class="ti ti-' + c[1] + '" aria-hidden="true"></i><b>' + cnt[c[0]] + '</b></span><span class="rl">' + c[3] + '</span></button>').join('');
@@ -1881,6 +2100,9 @@ document.addEventListener('click', e => {
     else if (a === 'strNew') askErlegung('');
     else if (a === 'strEdit') askErlegung(t.dataset.id);
     else if (a === 'planEdit') askPlan();
+    else if (a === 'ausOpen') setRv('aus');
+    else if (a === 'bestPdf') bestandPdf();
+    else if (a === 'ausBack') setRv('bel');
     else if (a === 'ansNew') askAnsitz('');
     else if (a === 'ansEdit') askAnsitz(t.dataset.id);
     else if (a === 'aufNew') askAufgabe('');
