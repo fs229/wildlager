@@ -1174,52 +1174,47 @@ function pdfBuild(pages) {
   return out;
 }
 async function bestandPdf() {
-  const resBy = {}; (S.res || []).forEach(x => { resBy[x.artikelcode] = (resBy[x.artikelcode] || 0) + x.anzahl; });
-  const by = {};
-  (S.bestand || []).forEach(o => { const g = by[o.artikelcode] = by[o.artikelcode] || { n: 0, g: 0 }; g.n++; g.g += o.gewichtG; });
-  const wild = {}; let tn = 0, tg = 0, hadRes = false;
-  Object.keys(by).forEach(code => {
-    const g = by[code], a = S.artikel[code] || { bezeichnung: 'Artikel ' + code, wildart: '', preis: 0 };
-    const r = Math.min(resBy[code] || 0, g.n), n = g.n - r; if (r) hadRes = true; if (n <= 0) return;
-    const gg = g.g * n / g.n; tn += n; tg += gg;
-    (wild[a.wildart || 'Sonstige'] = wild[a.wildart || 'Sonstige'] || []).push({ name: a.bezeichnung, n, kg: gg / 1000, preis: a.preis });
+  const resBy = {}; (S.res || []).forEach(x => { resBy[x.ean] = (resBy[x.ean] || 0) + x.anzahl; });
+  const wild = {}; let n = 0, hadRes = false;
+  (S.bestand || []).forEach(o => {
+    if (resBy[o.ean] > 0) { resBy[o.ean]--; hadRes = true; return; }
+    const a = S.artikel[o.artikelcode] || { bezeichnung: 'Artikel ' + o.artikelcode, wildart: '', preis: 0 };
+    n++; (wild[a.wildart || 'Sonstige'] = wild[a.wildart || 'Sonstige'] || []).push({ name: a.bezeichnung, g: o.gewichtG, preis: a.preis });
   });
   const wk = Object.keys(wild).sort((a, b) => a.localeCompare(b, 'de'));
-  if (!wk.length) { toast('Kein Bestand vorhanden.'); return; }
-  const M = 42, XR = [380, 468, 553], pages = []; let ops = [], y = 0;
+  if (!n) { toast('Kein Bestand vorhanden.'); return; }
+  const M = 42, XR = [410, 478, 553], pages = []; let ops = [], y = 0;
   const heute = isoToDe(isoToday());
   const head = () => {
     ops = []; pages.push(ops); y = M + 14;
     if (pages.length === 1) {
       ops.push({ t: 'text', x: M, y, s: 'Wildbret – aktueller Bestand', size: 18, bold: true });
-      y += 18; ops.push({ t: 'text', x: M, y, s: 'Stand ' + heute + ' · Preise je kg', size: 10, gray: 0.4 }); y += 22;
+      y += 18; ops.push({ t: 'text', x: M, y, s: 'Stand ' + heute, size: 10, gray: 0.4 }); y += 22;
     } else { ops.push({ t: 'text', x: M, y, s: 'Wildbret – aktueller Bestand · Stand ' + heute, size: 9, gray: 0.4 }); y += 20; }
+  };
+  const sect = (k, cont) => {
+    ops.push({ t: 'text', x: M, y, s: k + (cont ? ' (Fortsetzung)' : ''), size: 12, bold: true });
+    ['Gewicht', 'Preis/kg', 'Packung'].forEach((h, i) => ops.push({ t: 'text', x: XR[i], y, s: h, size: 8, gray: 0.45, align: 'r' }));
+    y += 5; ops.push({ t: 'line', x1: M, x2: 553, y, gray: 0.6 }); y += 13;
   };
   head();
   wk.forEach(k => {
-    const L = wild[k].sort((a, b) => a.name.localeCompare(b.name, 'de'));
+    const L = wild[k].sort((a, b) => a.name.localeCompare(b.name, 'de') || a.g - b.g);
     if (y > 841.89 - M - 80) head();
-    ops.push({ t: 'text', x: M, y, s: k, size: 12, bold: true });
-    ['Packungen', 'Gewicht', 'Preis/kg'].forEach((h, i) => ops.push({ t: 'text', x: XR[i], y, s: h, size: 8, gray: 0.45, align: 'r' }));
-    y += 5; ops.push({ t: 'line', x1: M, x2: 553, y, gray: 0.6 }); y += 13;
+    sect(k, false);
     L.forEach(r => {
-      if (y > 841.89 - M - 20) { head(); ops.push({ t: 'text', x: M, y, s: k + ' (Fortsetzung)', size: 11, bold: true }); y += 5; ops.push({ t: 'line', x1: M, x2: 553, y, gray: 0.6 }); y += 13; }
+      if (y > 841.89 - M - 20) { head(); sect(k, true); }
       let nm = r.name; while (nm.length > 3 && pdfW(nm, 10) > XR[0] - 70 - M) nm = nm.slice(0, -1);
       if (nm !== r.name) nm = nm.trimEnd() + '…';
       ops.push({ t: 'text', x: M, y, s: nm, size: 10 });
-      ops.push({ t: 'text', x: XR[0], y, s: String(r.n), size: 10, align: 'r' });
-      ops.push({ t: 'text', x: XR[1], y, s: fmt2(r.kg) + ' kg', size: 10, align: 'r' });
-      ops.push({ t: 'text', x: XR[2], y, s: r.preis ? fmt2(r.preis) + ' €' : '–', size: 10, align: 'r' });
+      ops.push({ t: 'text', x: XR[0], y, s: r.g + ' g', size: 10, align: 'r' });
+      ops.push({ t: 'text', x: XR[1], y, s: r.preis ? fmt2(r.preis) + ' €' : '–', size: 10, align: 'r' });
+      ops.push({ t: 'text', x: XR[2], y, s: r.preis ? fmt2(r.preis * r.g / 1000) + ' €' : '–', size: 10, align: 'r' });
       y += 14;
     });
     y += 10;
   });
-  if (y > 841.89 - M - 40) head();
-  ops.push({ t: 'line', x1: M, x2: 553, y: y - 4, gray: 0.6 });
-  ops.push({ t: 'text', x: M, y: y + 10, s: 'Gesamt', size: 10, bold: true });
-  ops.push({ t: 'text', x: XR[0], y: y + 10, s: String(tn), size: 10, bold: true, align: 'r' });
-  ops.push({ t: 'text', x: XR[1], y: y + 10, s: fmt2(tg / 1000) + ' kg', size: 10, bold: true, align: 'r' });
-  if (hadRes) ops.push({ t: 'text', x: M, y: y + 30, s: 'Reservierte Packungen sind nicht enthalten. Gewichte sind Summen der Packungsgewichte.', size: 8, gray: 0.45 });
+  if (hadRes) { if (y > 841.89 - M - 20) head(); ops.push({ t: 'text', x: M, y: y + 2, s: 'Reservierte Packungen sind nicht aufgeführt.', size: 8, gray: 0.45 }); }
   pages.forEach((o, i) => o.push({ t: 'text', x: 595.28 / 2, y: 841.89 - 24, s: 'Seite ' + (i + 1) + ' von ' + pages.length, size: 8, gray: 0.5, align: 'c' }));
   const bytes = pdfBuild(pages), name = 'Wildbret-Bestand_' + isoToday() + '.pdf';
   const file = new File([bytes], name, { type: 'application/pdf' });
