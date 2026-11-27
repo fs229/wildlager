@@ -89,7 +89,7 @@ input[type=checkbox]{width:auto;transform:scale(1.3);margin-right:8px}
 .bs small{font-size:11px;font-weight:500;opacity:.85}.bs span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bs.mine{background:var(--g2);border-color:var(--g2);color:#fff}.bs.oth{background:var(--sumbg);border-color:var(--line);color:var(--txt)}
 #rvSeg i{display:none}#rvSeg button{padding-left:4px;padding-right:4px;font-size:13px}
-#bTyp,#sTyp,#auTyp{flex-wrap:nowrap;gap:6px}#bTyp button,#sTyp button,#auTyp button{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 6px;min-height:40px;white-space:nowrap}#bTyp button i,#sTyp button i,#auTyp button i{font-size:19px;line-height:1}
+#bSearchB{flex:0 0 44px!important}#bTyp,#sTyp,#auTyp{flex-wrap:nowrap;gap:6px}#bTyp button,#sTyp button,#auTyp button{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 6px;min-height:40px;white-space:nowrap}#bTyp button i,#sTyp button i,#auTyp button i{font-size:19px;line-height:1}
 .bdate{display:flex;gap:8px;align-items:center;margin-bottom:10px}.bdate input{flex:1;min-width:0}.bdate .btn{flex:none;padding:9px 14px}
 .toast .tact{margin-left:12px;background:none;border:1px solid #fff;color:#fff;border-radius:8px;padding:4px 12px;font:inherit;font-weight:600;cursor:pointer}
 .wl .h{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
@@ -143,6 +143,10 @@ select{-webkit-appearance:none;appearance:none;min-height:42px;border-radius:10p
 .selw select{width:100%}
 .chp{display:flex;flex-wrap:wrap;gap:6px}
 .chp.w{flex-wrap:nowrap;gap:4px}
+.fRow{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+#fAct{margin-left:auto}
+#fAct{gap:3px}#fAct button{min-width:32px;min-height:34px;padding:0 4px}
+#fAct button i{font-size:19px;line-height:1}
 .chp button{border-radius:999px;padding:8px 14px;font-size:13px;border:1px solid var(--line);background:var(--inp);color:var(--mut);font-weight:600}
 .chp button.on{background:color-mix(in srgb,var(--acc) 16%,transparent);border-color:var(--acc);color:var(--acc)}
 .sseg{min-height:48px;background:var(--sumbg);border:1px solid var(--line);border-radius:14px;padding:3px;gap:3px;overflow:visible;margin-bottom:0}
@@ -268,13 +272,10 @@ select{-webkit-appearance:none;appearance:none;min-height:42px;border-radius:10p
       <div class="row">
         <div><label>Lagerort</label><select id="fLager"></select></div>
       </div>
-      <div style="margin-top:10px"><label>Wildart</label><select id="fWild"></select></div>
-      <label>Suche</label>
-      <input id="fText" placeholder="z. B. Lende">
-      <div class="row" style="margin-top:10px">
-        <label style="display:flex;align-items:center;margin:0;color:var(--txt)"><input type="checkbox" id="fOut"> Ausgebuchte zeigen</label>
-        <div style="display:flex;gap:6px"><button class="btn sec sm fit" data-act="bestPdf"><i class="ti ti-file-type-pdf" aria-hidden="true"></i>PDF</button><button class="btn sec sm fit" id="btnReload">Aktualisieren</button></div>
+      <div style="margin-top:10px"><label>Wildart</label>
+        <div class="fRow"><select id="fWild"></select><div class="chp w" id="fAct"><input type="checkbox" id="fOut" hidden><button type="button" class="wic" id="fSearchB" aria-pressed="false" aria-label="Suchen" title="Suchen"><i class="ti ti-search" aria-hidden="true"></i></button><button type="button" class="wic" id="fOutB" aria-pressed="false" aria-label="Ausgebuchte zeigen" title="Ausgebuchte zeigen"><i class="ti ti-archive" aria-hidden="true"></i></button><button type="button" class="wic" data-act="bestPdf" aria-label="Bestand als PDF" title="Bestand als PDF"><i class="ti ti-file-type-pdf" aria-hidden="true"></i></button><button type="button" class="wic" id="btnReload" aria-label="Aktualisieren" title="Aktualisieren"><i class="ti ti-refresh" aria-hidden="true"></i></button></div></div>
       </div>
+      <input id="fText" class="hide" placeholder="Suchen, z. B. Lende" aria-label="Suche" style="margin-top:10px">
     </div>
     <div class="card">
       <div class="sum" id="sum"></div>
@@ -318,8 +319,8 @@ select{-webkit-appearance:none;appearance:none;min-height:42px;border-radius:10p
         <button type="button" class="btn sec sm" data-act="ausOpen" style="width:100%;margin-bottom:10px"><i class="ti ti-chart-bar" aria-hidden="true"></i>Auswertung</button>
         <div class="bdate"><button class="btn sec" id="bPrev" aria-label="Vortag">‹</button><input id="bDate" type="date" aria-label="Datum"><button class="btn sec" id="bNext" aria-label="Nächster Tag">›</button></div>
         <div class="sum" id="bSum"></div>
-        <div class="chp" id="bTyp" style="margin-top:10px"><button type="button" data-bt="kanzel"><i class="ti ti-home-2" aria-hidden="true"></i>Kanzel</button><button type="button" data-bt="leiter"><i class="ti ti-ladder" aria-hidden="true"></i>Leiter</button><button type="button" data-bt="bock"><i class="ti ti-crosshair" aria-hidden="true"></i>DJ-Bock</button></div>
-        <input id="bQ" type="search" placeholder="Ansitz suchen" aria-label="Ansitz suchen" autocomplete="off" style="margin-top:10px">
+        <div class="chp" id="bTyp" style="margin-top:10px"><button type="button" data-bt="kanzel"><i class="ti ti-home-2" aria-hidden="true"></i>Kanzel</button><button type="button" data-bt="leiter"><i class="ti ti-ladder" aria-hidden="true"></i>Leiter</button><button type="button" data-bt="bock"><i class="ti ti-crosshair" aria-hidden="true"></i>DJ-Bock</button><button type="button" id="bSearchB" aria-pressed="false" aria-label="Suchen" title="Suchen"><i class="ti ti-search" aria-hidden="true"></i></button></div>
+        <input id="bQ" class="hide" type="search" placeholder="Ansitz suchen" aria-label="Ansitz suchen" autocomplete="off" style="margin-top:10px">
       </div>
       <div class="card hide" id="bMineCard"><h2>Meine Belegungen</h2><div class="lst" id="bMine"></div></div>
       <div class="card"><div id="bList"></div></div>
@@ -949,7 +950,7 @@ const deToIso = d => d ? d.slice(6, 10) + '-' + d.slice(3, 5) + '-' + d.slice(0,
 const isoToday = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
 const isoAdd = (iso, n) => { const d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() + n); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
 const dayLabel = iso => new Date(iso + 'T12:00:00').toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' });
-document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('#bTyp button'); if (b) { S.bTyp[b.dataset.bt] = !S.bTyp[b.dataset.bt]; renderBel(); return; } const c = e.target.closest && e.target.closest('#sTyp button'); if (c) { S.sTyp[c.dataset.bt] = !S.sTyp[c.dataset.bt]; sitzRender(); } });
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('#bTyp button[data-bt]'); if (b) { S.bTyp[b.dataset.bt] = !S.bTyp[b.dataset.bt]; renderBel(); return; } const c = e.target.closest && e.target.closest('#sTyp button'); if (c) { S.sTyp[c.dataset.bt] = !S.sTyp[c.dataset.bt]; sitzRender(); } });
 async function loadBel() { if (!S.bDate) S.bDate = isoToday(); try { await apiSWR('belegungen', null, r => { S.bel = r.belegungen; renderBel(); }); } catch (e) { toast(e.message); renderBel(); } }
 function belWho(r) { return r.gast ? r.gast : r.nutzer; }
 function belCover(aid, de, sch) { return (S.bel || []).filter(x => x.ansitz === aid && x.datum === de && (x.schicht === sch || x.schicht === 'Ganztägig'))[0]; }
@@ -960,7 +961,7 @@ function renderBel() {
   $('#bDate').value = S.bDate; $('#bDate').min = isoToday(); $('#bPrev').disabled = S.bDate <= isoToday();
   const de = isoToDe(S.bDate), q = $('#bQ').value.trim().toLowerCase(), me = S.user;
   const on = Object.keys(S.bTyp).filter(k => S.bTyp[k]);
-  document.querySelectorAll('#bTyp button').forEach(b => b.classList.toggle('on', !!S.bTyp[b.dataset.bt]));
+  document.querySelectorAll('#bTyp button[data-bt]').forEach(b => b.classList.toggle('on', !!S.bTyp[b.dataset.bt]));
   const act = (S.ansitze || []).filter(a => a.aktiv && (!on.length || on.indexOf(belGrp(a)) >= 0));
   const free = sch => act.filter(a => !belCover(a.id, de, sch)).length;
   const mine = (S.bel || []).filter(x => x.nutzer === me);
@@ -1227,7 +1228,12 @@ async function bestandPdf() {
 $('#bDate').onchange = e => { S.bDate = e.target.value || isoToday(); renderBel(); };
 $('#bPrev').onclick = () => { S.bDate = isoAdd(S.bDate || isoToday(), -1); renderBel(); };
 $('#bNext').onclick = () => { S.bDate = isoAdd(S.bDate || isoToday(), 1); renderBel(); };
-$('#bQ').oninput = renderBel;
+$('#bQ').oninput = () => { $('#bSearchB').classList.toggle('on', !!$('#bQ').value.trim()); renderBel(); };
+$('#bSearchB').onclick = () => {
+  const t = $('#bQ'), b = $('#bSearchB');
+  if (t.classList.contains('hide')) { t.classList.remove('hide'); b.classList.add('on'); b.setAttribute('aria-pressed', 'true'); t.focus(); }
+  else { const had = !!t.value; t.value = ''; t.classList.add('hide'); b.classList.remove('on'); b.setAttribute('aria-pressed', 'false'); if (had) renderBel(); }
+};
 
 /* ---- Aufgaben (Revierarbeit) */
 async function loadAufgaben() { try { await apiSWR('aufgaben', null, r => { S.aufg = r.aufgaben; renderAufgaben(); }); } catch (e) { toast(e.message); renderAufgaben(); } }
@@ -2146,8 +2152,14 @@ $('#btnManual').onclick = manual;
 $('#inManual').addEventListener('keydown', e => { if (e.key === 'Enter') manual(); });
 ['fLager', 'fWild'].forEach(id => $('#' + id).onchange = renderBestand);
 ['rKunde', 'rZeit'].forEach(id => $('#' + id).onchange = renderRech);
-$('#fText').oninput = renderBestand;
+$('#fText').oninput = () => { $('#fSearchB').classList.toggle('on', !!$('#fText').value.trim()); renderBestand(); };
+$('#fSearchB').onclick = () => {
+  const t = $('#fText'), open = t.classList.contains('hide');
+  if (open) { t.classList.remove('hide'); $('#fSearchB').classList.add('on'); $('#fSearchB').setAttribute('aria-pressed', 'true'); t.focus(); }
+  else { const had = !!t.value; t.value = ''; t.classList.add('hide'); $('#fSearchB').classList.remove('on'); $('#fSearchB').setAttribute('aria-pressed', 'false'); if (had) renderBestand(); }
+};
 $('#fOut').onchange = loadBestand;
+$('#fOutB').onclick = () => { const c = $('#fOut'); c.checked = !c.checked; $('#fOutB').classList.toggle('on', c.checked); $('#fOutB').setAttribute('aria-pressed', c.checked); loadBestand(); };
 $('#btnReload').onclick = loadBestand;
 // ---- Wind ----
 const WIND_N = ['N','NNO','NO','ONO','O','OSO','SO','SSO','S','SSW','SW','WSW','W','WNW','NW','NNW'];
