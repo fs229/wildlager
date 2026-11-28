@@ -1,9 +1,11 @@
 /* Waidr Service Worker: App startet auch ohne Netz, Icons und Scanner-Bibliothek werden lokal vorgehalten */
-const V = 'waidr-v3';
+const V = 'waidr-v4';
 const SHELL = ['./', 'manifest.webmanifest', 'apple-touch-icon.png'];
 const CDN = [
   'https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.52.0/dist/tabler-icons.min.css',
-  'https://cdn.jsdelivr.net/npm/barcode-detector@3.2.4/dist/iife/ponyfill.js'
+  'https://cdn.jsdelivr.net/npm/barcode-detector@3.2.4/dist/iife/ponyfill.js',
+  'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css',
+  'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js'
 ];
 const okish = r => r && (r.ok || r.type === 'opaque');
 

@@ -171,6 +171,17 @@ select{-webkit-appearance:none;appearance:none;min-height:42px;border-radius:10p
 .chp.w button{padding:0 11px;min-height:36px;min-width:0;font-size:13px}
 .chp.w button.wic{min-width:36px;padding:0 6px}
 .chp.w button.wic .wi{width:22px;height:22px}
+
+#kMap{height:calc(100dvh - 330px);min-height:340px;background:var(--sumbg);z-index:0}
+#kTyp{flex-wrap:nowrap;gap:6px}#kTyp button{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:5px;padding:0 8px;min-height:38px}
+.kmk{width:34px;height:34px;border-radius:50%;background:#fff;border:2.5px solid #2f5d41;display:flex;align-items:center;justify-content:center;color:#2f5d41;font-size:19px;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.kmk i{line-height:1}.kmk.oth{border-color:#c0392b;color:#c0392b;background:#fdecea}.kmk.mine{background:#2f5d41;color:#fff}.kLbl{background:rgba(255,255,255,.82);color:#1b231d;border:0;box-shadow:none;font-size:11px;font-weight:600;padding:1px 5px;border-radius:4px}.kLbl:before{display:none}
+.kRl{text-align:center;font-size:12px;font-weight:700;color:#1b231d;background:rgba(255,255,255,.85);border-radius:4px;line-height:16px}
+.kWind{background:#fff;color:#1b231d;border-radius:8px;padding:5px 9px;font-size:12px;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.35);display:flex;align-items:center;gap:6px}
+.kWind i{font-size:18px;line-height:1;display:inline-block}
+.kCtl a{display:flex!important;align-items:center;justify-content:center;font-size:19px;color:#1b231d!important;cursor:pointer}
+.kPop{color:#1b231d;font-size:13px;line-height:1.35;min-width:170px}.kPop b{font-size:15px}.kPop small{color:#667066;display:block}
+.kPop .kpb{display:flex;gap:6px;margin-top:8px}.kPop .kpb .btn{flex:1;min-height:36px;font-size:13px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:4px}
 </style>
 </head>
 <body>
@@ -288,7 +299,7 @@ select{-webkit-appearance:none;appearance:none;min-height:42px;border-radius:10p
 
   <!-- Strecke -->
   <section id="v-strecke" class="hide">
-    <div class="seg" id="rvSeg"><button data-rv="wind" class="on">Wind</button><button data-rv="strecke">Strecke</button><button data-rv="plan">Abschussplan</button><button data-rv="aufg">Aufgaben</button><button data-rv="bel">Ansitz</button></div>
+    <div class="seg" id="rvSeg"><button data-rv="wind" class="on">Wind</button><button data-rv="strecke">Strecke</button><button data-rv="plan">Abschussplan</button><button data-rv="aufg">Aufgaben</button><button data-rv="bel">Ansitz</button><button data-rv="karte" aria-label="Karte"><i class="ti ti-map-2" aria-hidden="true"></i>Karte</button></div>
     <div id="rvStrecke" class="hide">
     <div class="card">
       <button class="btn big" data-act="strNew">+ Erlegung erfassen</button>
@@ -327,6 +338,15 @@ select{-webkit-appearance:none;appearance:none;min-height:42px;border-radius:10p
       </div>
       <div class="card hide" id="bMineCard"><h2>Meine Belegungen</h2><div class="lst" id="bMine"></div></div>
       <div class="card"><div id="bList"></div></div>
+    </div>
+    <div id="rvKarte" class="hide">
+      <div class="card" style="padding:10px">
+        <div class="chp" id="kTyp"><button type="button" data-kt="kanzel"><i class="ti ti-home-2" aria-hidden="true"></i>Kanzel</button><button type="button" data-kt="leiter"><i class="ti ti-ladder" aria-hidden="true"></i>Leiter</button><button type="button" data-kt="bock"><i class="ti ti-crosshair" aria-hidden="true"></i>DJ-Bock</button></div>
+        <div class="seg" id="kSch" style="margin-top:8px"><button type="button" data-ks="Morgen">Morgen</button><button type="button" data-ks="Abend">Abend</button></div>
+        <div class="sum" id="kSum" style="margin-top:8px"></div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden"><div id="kMap" role="application" aria-label="Revierkarte"></div></div>
+      <p id="kMsg" class="mut" style="margin:6px 2px"></p>
     </div>
     <div id="rvAus" class="hide">
       <div class="card">
@@ -771,7 +791,7 @@ function askErlegung(id) {
     const iso = ex ? ex.datum.slice(6, 10) + '-' + ex.datum.slice(3, 5) + '-' + ex.datum.slice(0, 2) : now.getFullYear() + '-' + p2(now.getMonth() + 1) + '-' + p2(now.getDate());
     const tm = ex ? ex.uhrzeit : p2(now.getHours()) + ':' + p2(now.getMinutes());
     const opt = S.strOpt || { g: ['männlich', 'weiblich', 'unbekannt'], a: ['Jungtier', 'Mittel', 'Alt', 'unbekannt'] };
-    const wl = Array.from(new Set(S.artikelList.map(a => a.wildart).concat((S.strecke || []).map(x => x.wildart), Object.keys(S.plankat || {}), ['Fuchs', 'Dachs']).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'de'));
+    const wl = Array.from(new Set(S.artikelList.map(a => a.wildart).concat((S.strecke || []).map(x => x.wildart), Object.keys(S.plankat || {}), ['Fuchs', 'Dachs']).filter(w => w && w !== 'Gemischt'))).sort((a, b) => a.localeCompare(b, 'de'));
     const names = (S.nutzer || []).map(n => typeof n === 'string' ? n : n.name).filter(Boolean);
     const sel = (idn, arr, v) => '<select id="' + idn + '">' + arr.map(o => '<option' + (o === v ? ' selected' : '') + '>' + esc(o) + '</option>').join('') + '</select>';
     openModal('<h2>' + (ex ? 'Erlegung bearbeiten' : 'Erlegung erfassen') + '</h2>' +
@@ -1258,14 +1278,136 @@ $('#bSearchB').onclick = () => {
   else { const had = !!t.value; t.value = ''; t.classList.add('hide'); b.classList.remove('on'); b.setAttribute('aria-pressed', 'false'); if (had) renderBel(); }
 };
 
+/* ---- Revierkarte (Prototyp) */
+S.kTyp = S.kTyp || { kanzel: true, leiter: true, bock: true };
+S.kSch = S.kSch || (new Date().getHours() < 14 ? 'Morgen' : 'Abend');
+let kRingG = null, kRingOn = false, kMeLL = null, kMap = null, kBase = 'osm', kTiles = {}, kPins = null, kSecs = null, kWindEl = null, kMe = null, kLoadP = null, kFit = true;
+function kLeaflet() {
+  if (window.L) return Promise.resolve();
+  if (kLoadP) return kLoadP;
+  return (kLoadP = new Promise((res, rej) => {
+    const c = document.createElement('link'); c.rel = 'stylesheet'; c.href = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css'; document.head.appendChild(c);
+    const j = document.createElement('script'); j.src = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js';
+    j.onload = res; j.onerror = () => { kLoadP = null; rej(new Error('Kartenbibliothek nicht erreichbar')); }; document.head.appendChild(j);
+  }));
+}
+function kSector(lat, lng, deg, r, half) {
+  const pts = [[lat, lng]], k = 111320, cl = Math.cos(lat * Math.PI / 180);
+  for (let a = deg - half; a <= deg + half; a += 10) { const b = a * Math.PI / 180; pts.push([lat + r * Math.cos(b) / k, lng + r * Math.sin(b) / (k * cl)]); }
+  return pts;
+}
+function kStatus(a) {
+  const r = belCover(a.id, isoToDe(isoToday()), S.kSch);
+  return !r ? { c: 'frei', r: r } : (r.nutzer === S.user && !r.gast) ? { c: 'mine', r: r } : { c: 'oth', r: r };
+}
+async function loadKarte() {
+  $('#kMsg').textContent = '';
+  try { await kLeaflet(); } catch (e) { $('#kMsg').textContent = e.message + '. Die Karte braucht beim ersten Öffnen Netz.'; return; }
+  if (!kMap) kInit();
+  setTimeout(() => { if (kMap) kMap.invalidateSize(); }, 60);
+  renderKarte();
+  if (!S.ansitze) loadAnsitzeQuiet().then(() => { if (S.rv === 'karte') renderKarte(); });
+  apiSWR('belegungen', null, r => { S.bel = r.belegungen; if (S.rv === 'karte') renderKarte(); }).catch(() => { });
+  getWindNow().then(w => { if (w && S.rv === 'karte') renderKarte(); });
+}
+function kInit() {
+  kMap = L.map('kMap', { zoomControl: true }).setView([CONFIG.WIND.lat, CONFIG.WIND.lon], 14);
+  kTiles.osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' });
+  kTiles.sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Esri, Maxar, Earthstar Geographics' });
+  kTiles.osm.addTo(kMap);
+  kSecs = L.layerGroup().addTo(kMap); kPins = L.layerGroup().addTo(kMap);
+  const Ctl = L.Control.extend({
+    options: { position: 'topleft' },
+    onAdd() {
+      const d = L.DomUtil.create('div', 'leaflet-bar kCtl');
+      const mk = (ic, lbl, fn) => { const a = L.DomUtil.create('a', '', d); a.setAttribute('role', 'button'); a.setAttribute('aria-label', lbl); a.title = lbl; a.href = '#'; a.innerHTML = '<i class="ti ' + ic + '" aria-hidden="true"></i>'; L.DomEvent.on(a, 'click', e => { L.DomEvent.stop(e); fn(a); }); return a; };
+      mk('ti-satellite', 'Satellit umschalten', a => {
+        kMap.removeLayer(kTiles[kBase]); kBase = kBase === 'osm' ? 'sat' : 'osm'; kTiles[kBase].addTo(kMap);
+        a.innerHTML = '<i class="ti ' + (kBase === 'osm' ? 'ti-satellite' : 'ti-map-2') + '" aria-hidden="true"></i>';
+      });
+      mk('ti-current-location', 'Mein Standort', () => {
+        if (!navigator.geolocation) return toast('Standort nicht verfügbar');
+        navigator.geolocation.getCurrentPosition(p => {
+          const ll = [p.coords.latitude, p.coords.longitude];
+          kMeLL = ll; if (kRingOn) kRings();
+          if (kMe) kMap.removeLayer(kMe);
+          kMe = L.layerGroup([L.circle(ll, { radius: p.coords.accuracy, color: '#2b6cb0', weight: 1, fillOpacity: .12 }), L.circleMarker(ll, { radius: 7, color: '#fff', weight: 2, fillColor: '#2b6cb0', fillOpacity: 1 })]).addTo(kMap);
+          kMap.setView(ll, Math.max(kMap.getZoom(), 16));
+        }, () => toast('Standort nicht ermittelbar'), { enableHighAccuracy: true, timeout: 10000 });
+      });
+      mk('ti-radar-2', 'Entfernungsringe', a => {
+        kRingOn = !kRingOn; a.style.background = kRingOn ? 'var(--btn2, #e4e9e1)' : ''; kRings();
+      });
+      L.DomEvent.disableClickPropagation(d); return d;
+    }
+  });
+  kMap.on('zoomend', () => { if (S.rv === 'karte') renderKarte(); });
+  new Ctl().addTo(kMap);
+  const W = L.Control.extend({ options: { position: 'topright' }, onAdd() { kWindEl = L.DomUtil.create('div', 'kWind'); kWindEl.hidden = true; return kWindEl; } });
+  new W().addTo(kMap);
+}
+function kRings() {
+  if (kRingG) { kMap.removeLayer(kRingG); kRingG = null; }
+  if (!kRingOn) return;
+  const c = kMeLL || [kMap.getCenter().lat, kMap.getCenter().lng], k = 111320;
+  kRingG = L.layerGroup().addTo(kMap);
+  [250, 500, 750, 1000].forEach(r => {
+    L.circle(c, { radius: r, color: '#1b231d', weight: 1, fill: false, opacity: .55, interactive: false }).addTo(kRingG);
+    L.marker([c[0] + r / k, c[1]], { icon: L.divIcon({ className: '', html: '<div class="kRl">' + r + ' m</div>', iconSize: [50, 16], iconAnchor: [25, 8] }), interactive: false, keyboard: false }).addTo(kRingG);
+  });
+  L.circleMarker(c, { radius: 4, color: '#1b231d', weight: 1, fillColor: '#fff', fillOpacity: 1, interactive: false }).addTo(kRingG);
+}
+function renderKarte() {
+  if (!kMap) return;
+  document.querySelectorAll('#kTyp button').forEach(b => b.classList.toggle('on', !!S.kTyp[b.dataset.kt]));
+  document.querySelectorAll('#kSch button').forEach(b => b.classList.toggle('on', b.dataset.ks === S.kSch));
+  const w = S.windNow;
+  if (kWindEl) {
+    kWindEl.hidden = !w;
+    if (w) kWindEl.innerHTML = '<i class="ti ti-arrow-up" style="transform:rotate(' + Math.round(w.dir + 180) + 'deg)" aria-hidden="true"></i>' + windName(w.dir) + ' · ' + Math.round(w.v) + ' km/h';
+  }
+  kPins.clearLayers(); kSecs.clearLayers();
+  const all = (S.ansitze || []).filter(a => a.aktiv), on = all.filter(a => S.kTyp[belGrp(a)] || belGrp(a) === 'sonst' && Object.keys(S.kTyp).some(k => S.kTyp[k]));
+  const pos = on.filter(a => a.lat != null && a.lng != null), noPos = on.length - pos.length;
+  const ICON = { kanzel: 'ti-home-2', leiter: 'ti-ladder', bock: 'ti-crosshair', sonst: 'ti-map-pin' };
+  let nf = 0, nb = 0;
+  pos.forEach(a => {
+    const st = kStatus(a); if (st.c === 'frei') nf++; else nb++;
+    if (a.blick && a.blick.length) {
+      const d = w ? ansDiff(a, w.dir) : null, col = d === null ? '#2f5d41' : d <= 45 ? '#1e8a46' : d <= 90 ? '#d9a21b' : '#8a8f8a';
+      a.blick.forEach(b => L.polygon(kSector(a.lat, a.lng, ANS_DEG[b], 70, 28), { color: col, weight: 1, fillColor: col, fillOpacity: .28, interactive: false }).addTo(kSecs));
+    }
+    const m = L.marker([a.lat, a.lng], { icon: L.divIcon({ className: '', html: '<div class="kmk ' + st.c + '"><i class="ti ' + ICON[belGrp(a)] + '" aria-hidden="true"></i></div>', iconSize: [34, 34], iconAnchor: [17, 17] }), title: a.name, alt: a.name, keyboard: true });
+    m.bindPopup(() => kPopup(a), { closeButton: true, autoPanPadding: [20, 20] });
+    m.on('popupopen', e => {
+      const el = e.popup.getElement(); if (!el) return;
+      const b = el.querySelector('[data-k=bel]'); if (b) b.onclick = () => { kMap.closePopup(); belTap(a.id, S.kSch, isoToDe(isoToday())); };
+    });
+    if (kMap.getZoom() >= 15) m.bindTooltip(esc(a.name), { permanent: true, direction: 'right', offset: [14, 0], className: 'kLbl' });
+    m.addTo(kPins);
+  });
+  $('#kSum').innerHTML = '<div class="tot"><b>' + nf + '</b><span>' + S.kSch + ' frei</span></div><div><b>' + nb + '</b><span>belegt</span></div><div><b>' + noPos + '</b><span>ohne Koordinaten</span></div>';
+  if (kFit && pos.length) { kFit = false; kMap.fitBounds(L.latLngBounds(pos.map(a => [a.lat, a.lng])), { padding: [30, 30], maxZoom: 16 }); }
+}
+function kPopup(a) {
+  const st = kStatus(a), me = st.c === 'mine';
+  const stTxt = st.r ? (st.c === 'mine' ? 'von dir belegt' : 'belegt: ' + esc(belWho(st.r))) : 'frei';
+  return '<div class="kPop"><b>' + esc(a.name) + '</b><small>' + esc(a.typ + (a.blick && a.blick.length ? ' · Blick ' + ansBlick(a) : '') + (a.zustand ? ' · ' + a.zustand : '')) + '</small><small>' + S.kSch + ' heute: ' + stTxt + '</small>' +
+    '<div class="kpb"><button type="button" class="btn sm" data-k="bel"><i class="ti ti-calendar-event" aria-hidden="true"></i>' + (me ? 'Ändern' : 'Belegen') + '</button><a class="btn sec sm" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=' + a.lat + ',' + a.lng + '"><i class="ti ti-route" aria-hidden="true"></i>Navi</a></div></div>';
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest && e.target.closest('#kTyp button'); if (t) { S.kTyp[t.dataset.kt] = !S.kTyp[t.dataset.kt]; renderKarte(); return; }
+  const s2 = e.target.closest && e.target.closest('#kSch button'); if (s2) { S.kSch = s2.dataset.ks; renderKarte(); }
+});
+
 /* ---- Aufgaben (Revierarbeit) */
 async function loadAufgaben() { try { await apiSWR('aufgaben', null, r => { S.aufg = r.aufgaben; renderAufgaben(); }); } catch (e) { toast(e.message); renderAufgaben(); } }
 function setRv(v) {
   S.rv = v;
   document.querySelectorAll('#rvSeg button').forEach(b => b.classList.toggle('on', b.dataset.rv === (v === 'aus' ? 'bel' : v)));
   $('#rvAus').classList.toggle('hide', v !== 'aus');
-  $('#rvStrecke').classList.toggle('hide', v !== 'strecke'); $('#rvAufg').classList.toggle('hide', v !== 'aufg'); $('#rvPlan').classList.toggle('hide', v !== 'plan'); $('#rvWind').classList.toggle('hide', v !== 'wind'); $('#rvBel').classList.toggle('hide', v !== 'bel');
-  if (v === 'aufg') loadAufgaben(); else if (v === 'plan') loadPlan(); else if (v === 'wind') showWind(); else if (v === 'bel') loadBel(); else if (v === 'aus') loadAus(); else renderStrecke();
+  $('#rvKarte').classList.toggle('hide', v !== 'karte'); $('#rvStrecke').classList.toggle('hide', v !== 'strecke'); $('#rvAufg').classList.toggle('hide', v !== 'aufg'); $('#rvPlan').classList.toggle('hide', v !== 'plan'); $('#rvWind').classList.toggle('hide', v !== 'wind'); $('#rvBel').classList.toggle('hide', v !== 'bel');
+  if (v === 'aufg') loadAufgaben(); else if (v === 'plan') loadPlan(); else if (v === 'wind') showWind(); else if (v === 'bel') loadBel(); else if (v === 'aus') loadAus(); else if (v === 'karte') loadKarte(); else renderStrecke();
 }
 document.querySelectorAll('#rvSeg button').forEach(b => { b.onclick = () => setRv(b.dataset.rv); });
 document.querySelectorAll('#aStSeg button').forEach(b => { b.onclick = () => { S.ast = b.dataset.ast; renderAufgaben(); }; });
