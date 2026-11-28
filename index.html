@@ -172,7 +172,7 @@ select{-webkit-appearance:none;appearance:none;min-height:42px;border-radius:10p
 .chp.w button.wic{min-width:36px;padding:0 6px}
 .chp.w button.wic .wi{width:22px;height:22px}
 
-#kMap{height:calc(100dvh - 330px);min-height:340px;background:var(--sumbg);z-index:0}
+#kMap{height:calc(100dvh - 290px);min-height:340px;background:var(--sumbg);z-index:0}
 #kTyp{flex-wrap:nowrap;gap:6px}#kTyp button{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:5px;padding:0 8px;min-height:38px}
 .kmk{width:34px;height:34px;border-radius:50%;background:#fff;border:2.5px solid #2f5d41;display:flex;align-items:center;justify-content:center;color:#2f5d41;font-size:19px;box-shadow:0 1px 4px rgba(0,0,0,.4)}
 .kmk i{line-height:1}.kmk.oth{border-color:#c0392b;color:#c0392b;background:#fdecea}.kmk.mine{background:#2f5d41;color:#fff}.kLbl{background:rgba(255,255,255,.82);color:#1b231d;border:0;box-shadow:none;font-size:11px;font-weight:600;padding:1px 5px;border-radius:4px}.kLbl:before{display:none}
@@ -342,8 +342,6 @@ select{-webkit-appearance:none;appearance:none;min-height:42px;border-radius:10p
     <div id="rvKarte" class="hide">
       <div class="card" style="padding:10px">
         <div class="chp" id="kTyp"><button type="button" data-kt="kanzel"><i class="ti ti-home-2" aria-hidden="true"></i>Kanzel</button><button type="button" data-kt="leiter"><i class="ti ti-ladder" aria-hidden="true"></i>Leiter</button><button type="button" data-kt="bock"><i class="ti ti-crosshair" aria-hidden="true"></i>DJ-Bock</button></div>
-        <div class="seg" id="kSch" style="margin-top:8px"><button type="button" data-ks="Morgen">Morgen</button><button type="button" data-ks="Abend">Abend</button></div>
-        <div class="sum" id="kSum" style="margin-top:8px"></div>
       </div>
       <div class="card" style="padding:0;overflow:hidden"><div id="kMap" role="application" aria-label="Revierkarte"></div></div>
       <p id="kMsg" class="mut" style="margin:6px 2px"></p>
@@ -1280,7 +1278,6 @@ $('#bSearchB').onclick = () => {
 
 /* ---- Revierkarte (Prototyp) */
 S.kTyp = S.kTyp || { kanzel: true, leiter: true, bock: true };
-S.kSch = S.kSch || (new Date().getHours() < 14 ? 'Morgen' : 'Abend');
 let kRingG = null, kRingOn = false, kMeLL = null, kMap = null, kBase = 'osm', kTiles = {}, kPins = null, kSecs = null, kWindEl = null, kMe = null, kLoadP = null, kFit = true;
 function kLeaflet() {
   if (window.L) return Promise.resolve();
@@ -1297,8 +1294,9 @@ function kSector(lat, lng, deg, r, half) {
   return pts;
 }
 function kStatus(a) {
-  const r = belCover(a.id, isoToDe(isoToday()), S.kSch);
-  return !r ? { c: 'frei', r: r } : (r.nutzer === S.user && !r.gast) ? { c: 'mine', r: r } : { c: 'oth', r: r };
+  const de = isoToDe(isoToday()), rs = (S.bel || []).filter(x => x.ansitz === a.id && x.datum === de);
+  const r = rs.filter(x => x.nutzer === S.user && !x.gast)[0] || rs[0];
+  return !r ? { c: 'frei', r: null, rs: rs } : (r.nutzer === S.user && !r.gast) ? { c: 'mine', r: r, rs: rs } : { c: 'oth', r: r, rs: rs };
 }
 async function loadKarte() {
   $('#kMsg').textContent = '';
@@ -1360,7 +1358,6 @@ function kRings() {
 function renderKarte() {
   if (!kMap) return;
   document.querySelectorAll('#kTyp button').forEach(b => b.classList.toggle('on', !!S.kTyp[b.dataset.kt]));
-  document.querySelectorAll('#kSch button').forEach(b => b.classList.toggle('on', b.dataset.ks === S.kSch));
   const w = S.windNow;
   if (kWindEl) {
     kWindEl.hidden = !w;
@@ -1370,9 +1367,8 @@ function renderKarte() {
   const all = (S.ansitze || []).filter(a => a.aktiv), on = all.filter(a => S.kTyp[belGrp(a)] || belGrp(a) === 'sonst' && Object.keys(S.kTyp).some(k => S.kTyp[k]));
   const pos = on.filter(a => a.lat != null && a.lng != null), noPos = on.length - pos.length;
   const ICON = { kanzel: 'ti-home-2', leiter: 'ti-ladder', bock: 'ti-crosshair', sonst: 'ti-map-pin' };
-  let nf = 0, nb = 0;
   pos.forEach(a => {
-    const st = kStatus(a); if (st.c === 'frei') nf++; else nb++;
+    const st = kStatus(a);
     if (a.blick && a.blick.length) {
       const d = w ? ansDiff(a, w.dir) : null, col = d === null ? '#2f5d41' : d <= 45 ? '#1e8a46' : d <= 90 ? '#d9a21b' : '#8a8f8a';
       a.blick.forEach(b => L.polygon(kSector(a.lat, a.lng, ANS_DEG[b], 70, 28), { color: col, weight: 1, fillColor: col, fillOpacity: .28, interactive: false }).addTo(kSecs));
@@ -1381,23 +1377,21 @@ function renderKarte() {
     m.bindPopup(() => kPopup(a), { closeButton: true, autoPanPadding: [20, 20] });
     m.on('popupopen', e => {
       const el = e.popup.getElement(); if (!el) return;
-      const b = el.querySelector('[data-k=bel]'); if (b) b.onclick = () => { kMap.closePopup(); belTap(a.id, S.kSch, isoToDe(isoToday())); };
+      const b = el.querySelector('[data-k=bel]'); if (b) b.onclick = () => { kMap.closePopup(); const r0 = kStatus(a).r; belTap(a.id, r0 ? r0.schicht : (new Date().getHours() < 14 ? 'Morgen' : 'Abend'), isoToDe(isoToday())); };
     });
     if (kMap.getZoom() >= 15) m.bindTooltip(esc(a.name), { permanent: true, direction: 'right', offset: [14, 0], className: 'kLbl' });
     m.addTo(kPins);
   });
-  $('#kSum').innerHTML = '<div class="tot"><b>' + nf + '</b><span>' + S.kSch + ' frei</span></div><div><b>' + nb + '</b><span>belegt</span></div><div><b>' + noPos + '</b><span>ohne Koordinaten</span></div>';
   if (kFit && pos.length) { kFit = false; kMap.fitBounds(L.latLngBounds(pos.map(a => [a.lat, a.lng])), { padding: [30, 30], maxZoom: 16 }); }
 }
 function kPopup(a) {
   const st = kStatus(a), me = st.c === 'mine';
-  const stTxt = st.r ? (st.c === 'mine' ? 'von dir belegt' : 'belegt: ' + esc(belWho(st.r))) : 'frei';
-  return '<div class="kPop"><b>' + esc(a.name) + '</b><small>' + esc(a.typ + (a.blick && a.blick.length ? ' · Blick ' + ansBlick(a) : '') + (a.zustand ? ' · ' + a.zustand : '')) + '</small><small>' + S.kSch + ' heute: ' + stTxt + '</small>' +
+  const stTxt = st.rs.length ? st.rs.map(x => x.schicht + ': ' + esc(x.nutzer === S.user && !x.gast ? 'du' : belWho(x))).join(', ') : 'frei';
+  return '<div class="kPop"><b>' + esc(a.name) + '</b><small>' + esc(a.typ + (a.blick && a.blick.length ? ' · Blick ' + ansBlick(a) : '') + (a.zustand ? ' · ' + a.zustand : '')) + '</small><small>Heute: ' + stTxt + '</small>' +
     '<div class="kpb"><button type="button" class="btn sm" data-k="bel"><i class="ti ti-calendar-event" aria-hidden="true"></i>' + (me ? 'Ändern' : 'Belegen') + '</button><a class="btn sec sm" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=' + a.lat + ',' + a.lng + '"><i class="ti ti-route" aria-hidden="true"></i>Navi</a></div></div>';
 }
 document.addEventListener('click', e => {
-  const t = e.target.closest && e.target.closest('#kTyp button'); if (t) { S.kTyp[t.dataset.kt] = !S.kTyp[t.dataset.kt]; renderKarte(); return; }
-  const s2 = e.target.closest && e.target.closest('#kSch button'); if (s2) { S.kSch = s2.dataset.ks; renderKarte(); }
+  const t = e.target.closest && e.target.closest('#kTyp button'); if (t) { S.kTyp[t.dataset.kt] = !S.kTyp[t.dataset.kt]; renderKarte(); }
 });
 
 /* ---- Aufgaben (Revierarbeit) */
