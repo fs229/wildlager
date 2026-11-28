@@ -173,7 +173,8 @@ select{-webkit-appearance:none;appearance:none;min-height:42px;border-radius:10p
 .chp.w button.wic .wi{width:22px;height:22px}
 
 #kMap{height:calc(100dvh - 290px);min-height:340px;background:var(--sumbg);z-index:0}
-#kTyp{flex-wrap:nowrap;gap:6px}#kTyp button{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:5px;padding:0 8px;min-height:38px}
+#rvSeg button{font-size:13px;white-space:nowrap;padding:8px 1px}
+#kTyp{flex-wrap:nowrap;gap:5px}#kTyp button{white-space:nowrap;font-size:13px;gap:4px!important;padding:0 6px!important}#kTyp button{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:5px;padding:0 8px;min-height:38px}
 .kmk{width:34px;height:34px;border-radius:50%;background:#fff;border:2.5px solid #2f5d41;display:flex;align-items:center;justify-content:center;color:#2f5d41;font-size:19px;box-shadow:0 1px 4px rgba(0,0,0,.4)}
 .kmk i{line-height:1}.kmk.oth{border-color:#c0392b;color:#c0392b;background:#fdecea}.kmk.mine{background:#2f5d41;color:#fff}.kLbl{background:rgba(255,255,255,.82);color:#1b231d;border:0;box-shadow:none;font-size:11px;font-weight:600;padding:1px 5px;border-radius:4px}.kLbl:before{display:none}
 .kRl{text-align:center;font-size:12px;font-weight:700;color:#1b231d;background:rgba(255,255,255,.85);border-radius:4px;line-height:16px}
@@ -299,7 +300,7 @@ select{-webkit-appearance:none;appearance:none;min-height:42px;border-radius:10p
 
   <!-- Strecke -->
   <section id="v-strecke" class="hide">
-    <div class="seg" id="rvSeg"><button data-rv="wind" class="on">Wind</button><button data-rv="strecke">Strecke</button><button data-rv="plan">Abschussplan</button><button data-rv="aufg">Aufgaben</button><button data-rv="bel">Ansitz</button><button data-rv="karte" aria-label="Karte"><i class="ti ti-map-2" aria-hidden="true"></i>Karte</button></div>
+    <div class="seg" id="rvSeg"><button data-rv="karte" class="on" aria-label="Karte">Karte</button><button data-rv="wind">Wind</button><button data-rv="strecke">Strecke</button><button data-rv="plan">Abschussplan</button><button data-rv="aufg">Aufgaben</button><button data-rv="bel">Ansitz</button></div>
     <div id="rvStrecke" class="hide">
     <div class="card">
       <button class="btn big" data-act="strNew">+ Erlegung erfassen</button>
@@ -320,7 +321,7 @@ select{-webkit-appearance:none;appearance:none;min-height:42px;border-radius:10p
       </div>
       <div id="pList"></div>
     </div>
-    <div id="rvWind">
+    <div id="rvWind" class="hide">
       <div class="card">
         <h2 id="windTitle">Wind</h2>
         <div id="windBox"></div>
@@ -339,9 +340,9 @@ select{-webkit-appearance:none;appearance:none;min-height:42px;border-radius:10p
       <div class="card hide" id="bMineCard"><h2>Meine Belegungen</h2><div class="lst" id="bMine"></div></div>
       <div class="card"><div id="bList"></div></div>
     </div>
-    <div id="rvKarte" class="hide">
+    <div id="rvKarte">
       <div class="card" style="padding:10px">
-        <div class="chp" id="kTyp"><button type="button" data-kt="kanzel"><i class="ti ti-home-2" aria-hidden="true"></i>Kanzel</button><button type="button" data-kt="leiter"><i class="ti ti-ladder" aria-hidden="true"></i>Leiter</button><button type="button" data-kt="bock"><i class="ti ti-crosshair" aria-hidden="true"></i>DJ-Bock</button></div>
+        <div class="chp" id="kTyp"><button type="button" data-kt="kanzel"><i class="ti ti-home-2" aria-hidden="true"></i>Kanzel</button><button type="button" data-kt="leiter"><i class="ti ti-ladder" aria-hidden="true"></i>Leiter</button><button type="button" data-kt="bock"><i class="ti ti-crosshair" aria-hidden="true"></i>DJ-Bock</button><button type="button" id="kWindB" aria-pressed="false" title="Nur Sitze, die zum Wind passen"><i class="ti ti-wind" aria-hidden="true"></i>Wind</button></div>
       </div>
       <div class="card" style="padding:0;overflow:hidden"><div id="kMap" role="application" aria-label="Revierkarte"></div></div>
       <p id="kMsg" class="mut" style="margin:6px 2px"></p>
@@ -648,7 +649,7 @@ function applyInit(r) {
   const def = ls.get('wl_lager_' + S.user);
   const act = S.lagerorte.filter(l => l.aktiv);
   S.lagerort = act.some(l => l.name === def) ? def : (act[0] ? act[0].name : '');
-  renderLager(); renderKunden(); S.wuensche = null; S.res = []; S.strecke = null; S.aufg = null; S.plan = null; S.ansitze = []; S.windNow = null; loadAnsitzeQuiet(); S.rv = 'wind'; S.ast = 'offen'; S.erl = ''; loadStreckeQuiet(); loadWuenscheQuiet(); S.sub = {}; setTab('bestand'); qRestore();
+  renderLager(); renderKunden(); S.wuensche = null; S.res = []; S.strecke = null; S.aufg = null; S.plan = null; S.ansitze = []; S.windNow = null; loadAnsitzeQuiet(); S.rv = 'karte'; S.ast = 'offen'; S.erl = ''; loadStreckeQuiet(); loadWuenscheQuiet(); S.sub = {}; setTab('bestand'); qRestore();
 }
 
 /* -------------------------------------------------------------------- Tabs */
@@ -1277,7 +1278,7 @@ $('#bSearchB').onclick = () => {
 };
 
 /* ---- Revierkarte (Prototyp) */
-S.kTyp = S.kTyp || { kanzel: true, leiter: true, bock: true };
+S.kTyp = S.kTyp || { kanzel: true, leiter: true, bock: false };
 let kRingG = null, kRingOn = false, kMeLL = null, kMap = null, kBase = 'osm', kTiles = {}, kPins = null, kSecs = null, kWindEl = null, kMe = null, kLoadP = null, kFit = true;
 function kLeaflet() {
   if (window.L) return Promise.resolve();
@@ -1309,7 +1310,7 @@ async function loadKarte() {
   getWindNow().then(w => { if (w && S.rv === 'karte') renderKarte(); });
 }
 function kInit() {
-  kMap = L.map('kMap', { zoomControl: true }).setView([CONFIG.WIND.lat, CONFIG.WIND.lon], 14);
+  kMap = L.map('kMap', { zoomControl: true, zoomSnap: 0.1, zoomDelta: 0.5 }).setView([CONFIG.WIND.lat, CONFIG.WIND.lon], 14);
   kTiles.osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' });
   kTiles.sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Esri, Maxar, Earthstar Geographics' });
   kTiles.osm.addTo(kMap);
@@ -1365,7 +1366,8 @@ function renderKarte() {
   }
   kPins.clearLayers(); kSecs.clearLayers();
   const all = (S.ansitze || []).filter(a => a.aktiv), on = all.filter(a => S.kTyp[belGrp(a)] || belGrp(a) === 'sonst' && Object.keys(S.kTyp).some(k => S.kTyp[k]));
-  const pos = on.filter(a => a.lat != null && a.lng != null), noPos = on.length - pos.length;
+  $('#kWindB').classList.toggle('on', !!S.kWind); $('#kWindB').setAttribute('aria-pressed', S.kWind ? 'true' : 'false');
+  const pos = on.filter(a => a.lat != null && a.lng != null && (!S.kWind || !w || (ansDiff(a, w.dir) !== null && ansDiff(a, w.dir) <= 45))), noPos = on.length - pos.length;
   const ICON = { kanzel: 'ti-home-2', leiter: 'ti-ladder', bock: 'ti-crosshair', sonst: 'ti-map-pin' };
   pos.forEach(a => {
     const st = kStatus(a);
@@ -1382,7 +1384,7 @@ function renderKarte() {
     if (kMap.getZoom() >= 15) m.bindTooltip(esc(a.name), { permanent: true, direction: 'right', offset: [14, 0], className: 'kLbl' });
     m.addTo(kPins);
   });
-  if (kFit && pos.length) { kFit = false; kMap.fitBounds(L.latLngBounds(pos.map(a => [a.lat, a.lng])), { padding: [30, 30], maxZoom: 16 }); }
+  if (kFit && pos.length) { kFit = false; kMap.fitBounds(L.latLngBounds(pos.map(a => [a.lat, a.lng])), { paddingTopLeft: [50, 40], paddingBottomRight: [70, 30], maxZoom: 17 }); }
 }
 function kPopup(a) {
   const st = kStatus(a), me = st.c === 'mine';
@@ -1391,7 +1393,11 @@ function kPopup(a) {
     '<div class="kpb"><button type="button" class="btn sm" data-k="bel"><i class="ti ti-calendar-event" aria-hidden="true"></i>' + (me ? 'Ändern' : 'Belegen') + '</button><a class="btn sec sm" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=' + a.lat + ',' + a.lng + '"><i class="ti ti-route" aria-hidden="true"></i>Navi</a></div></div>';
 }
 document.addEventListener('click', e => {
-  const t = e.target.closest && e.target.closest('#kTyp button'); if (t) { S.kTyp[t.dataset.kt] = !S.kTyp[t.dataset.kt]; renderKarte(); }
+  const t = e.target.closest && e.target.closest('#kTyp button[data-kt]'); if (t) { S.kTyp[t.dataset.kt] = !S.kTyp[t.dataset.kt]; renderKarte(); return; }
+  if (e.target.closest && e.target.closest('#kWindB')) {
+    if (S.kWind) { S.kWind = false; renderKarte(); return; }
+    getWindNow().then(w => { if (!w) return toast('Keine Winddaten verfügbar'); S.kWind = true; renderKarte(); });
+  }
 });
 
 /* ---- Aufgaben (Revierarbeit) */
@@ -1477,7 +1483,7 @@ function setTab(t) {
   if (grp) $('#grpSeg').innerHTML = GRP_TABS[grp].map(x => '<button data-tab="' + x[0] + '"' + (x[0] === t ? ' class="on"' : '') + '>' + x[1] + '</button>').join('');
   show(t);
   if (t === 'bestand') loadBestand();
-  if (t === 'strecke') { if (S.rv === 'aufg') loadAufgaben(); else if (S.rv === 'plan') loadPlan(); else if (S.rv === 'wind') showWind(); else if (S.rv === 'bel') loadBel(); else loadStrecke(); }
+  if (t === 'strecke') { if (S.rv === 'karte') setRv('karte'); else if (S.rv === 'aufg') loadAufgaben(); else if (S.rv === 'plan') loadPlan(); else if (S.rv === 'wind') showWind(); else if (S.rv === 'bel') loadBel(); else loadStrecke(); }
   if (t === 'rech') loadRech();
   if (t === 'wunsch') loadWunsch();
   if (t === 'stamm') { setSv(S.sv || 'daten'); renderStamm(); }
